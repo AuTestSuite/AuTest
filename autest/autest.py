@@ -63,10 +63,12 @@ if __name__ == '__main__':
     
    
     # this is a commandline tool so make the cli host
-    myhost=hosts.ConsoleHost(parser)
+    hosts.setDefaultArgs(parser)
+    #myhost=hosts.ConsoleHost(parser)
 
     #parser should have all option defined by program and or host type defined
     args=parser.parse_args()
+    print (args.debug)
 
     print(args)
     
