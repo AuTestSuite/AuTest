@@ -1,5 +1,7 @@
 import sys
+import os
 import linecache
+import colorama
 
 from . import interfaces
 
@@ -7,26 +9,32 @@ from . import interfaces
 class ConsoleHost(interfaces.UIHost):
     """description of class"""
     def __init__(self,parser):
-        
-        
-
         args=parser.parse_args()
         
         self.__verbose=[] if args.verbose is None else args.verbose
-        self.__debug=args.debug
+        self.__debug=[] if args.debug is None else args.debug
+
+        if os.name=='nt': 
+            colorama.init(wrap=False)
+            self.__stdout__= colorama.AnsiToWin32(sys.__stdout__).stream
+            self.__stderr__= colorama.AnsiToWin32(sys.__stderr__).stream
+        else:
+            colorama.init()
+            self.__stdout__= sys.__stdout__
+            self.__stderr__= sys.__stderr__
 
 #class C io streams
     
     def writeStdOut(self,msg):
-        sys.__stdout__.write(msg)
+        self.__stdout__.write(msg)
             
     def writeStdErr(self,msg):
-        sys.__stderr__.write(msg)
+        self.__stderr__.write(msg)
 
 # our virtual streams
     
     def writeMessage(self,msg):
-        sys.__stdout__.write(msg)
+        self.__stdout__.write(colorama.Style.BRIGHT+msg+colorama.Fore.RESET)
 
     
     def get_contents(self, filename, lineno):
@@ -42,42 +50,16 @@ class ConsoleHost(interfaces.UIHost):
         return content
 
     def writeWarning(self,msg,stack=None,show_stack=True):
-        if show_stack:
-            if stack is not None:
-                filename, lineno, routine, content=stack
-            else:
-                frame=sys._getframe(2)
-                filename=frame.f_code.co_filename
-                lineno= frame.f_lineno
-                routine=frame.f_code.co_name
-                content=self.get_contents(filename, lineno)
-                
-            msg+=' File: "%s", line: %s, in "%s"\n %s\n' % (filename, lineno, routine,content)
-        sys.__stdout__.write("Warning: "+msg)
+
+        self.__stdout__.write(colorama.Fore.LIGHTYELLOW_EX+msg+colorama.Fore.RESET)
 
     
-    def writeError(self,msg,stack=None,show_stack=True,exit=1):
-        if show_stack:
-            if stack is not None:
-                filename, lineno, routine, content=stack
-            else:
-                frame=sys._getframe(2)
-                filename=frame.f_code.co_filename
-                lineno= frame.f_lineno
-                routine=frame.f_code.co_name
-                content=self.get_contents(filename, lineno)
-                
-            msg+=' File: "%s", line: %s, in "%s"\n %s\n' % (filename, lineno, routine,content)
+    def writeError(self,msg,stack=None,show_stack=True):
 
-        sys.__stderr__.write("Error: "+msg)
-
-        if exit:
-            sys.exit(exit)
-
-
+        self.__stderr__.write(colorama.Fore.LIGHTRED_EX+msg+colorama.Fore.RESET)
 
     
-    def writeDebug(self,catagory,stream):
+    def writeDebug(self,catagory,msg):
         '''
         prints a debug message
         catagorty - is the type of verbose message
@@ -87,7 +69,7 @@ class ConsoleHost(interfaces.UIHost):
         The host can use this value help orginize messages, it is suggested
         that a given message is clearly formatted with the catagory type.
         '''
-        sys.__stdout__.write("Debug: [{0}] {1}".format(catagory,msg))
+        self.__stdout__.write(colorama.Fore.GREEN+msg+colorama.Fore.RESET)
 
     
     def writeVerbose(self,catagory,msg):
@@ -100,7 +82,7 @@ class ConsoleHost(interfaces.UIHost):
         The host can use this value help orginize messages, it is suggested
         that a given message is clearly formatted with the catagory type. 
         '''
-        sys.__stdout__.write("Verbose: [{0}] {1}".format(catagory,msg))
+        self.__stdout__.write(colorama.Fore.CYAN+msg+colorama.Fore.RESET)
 
     
     def writeProgress(self,task,msg=None,progress=None,completed=False):

@@ -4,11 +4,11 @@ from __future__ import print_function
 import sys
 import os
 import argparse
-
+from autest.core.engine import Engine
 import hosts
-#import gtest.engine
-#import gtest.hosts
-#import gtest.setuptasks
+import hosts.output
+from hosts.console import ConsoleHost
+
 
 def MakePath(arg):
     path=os.path.abspath(arg)
@@ -28,8 +28,6 @@ def JobValues(arg):
         msg='Must be a postive value'.format(j)
         raise argparse.ArgumentTypeError(msg)
     return j
-
-
 
 
 if __name__ == '__main__':
@@ -64,24 +62,28 @@ if __name__ == '__main__':
    
     # this is a commandline tool so make the cli host
     hosts.setDefaultArgs(parser)
-    #myhost=hosts.ConsoleHost(parser)
+    # make default host
+    myhost=hosts.ConsoleHost(parser)
+    # setup the extended streams to run
+    hosts.Setup(myhost)
 
     #parser should have all option defined by program and or host type defined
     args=parser.parse_args()
-    print (args.debug)
+    hosts.output.WriteDebug("init","args=",args)
 
-    print(args)
-    
+    #print(args)
+
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options, or maybe not
-    #myEngine=gtest.Engine(MyHost,
-                   #jobs=args.jobs,
-                   #test_dir=args.directory,
-                   #run_dir=args.sandbox,
-                   #gtest_site=args.gtest_site)
-    
-    #ret=myEngine.Start()
-    #exit(ret)
+    myEngine=Engine(
+                   jobs=args.jobs,
+                   test_dir=args.directory,
+                   run_dir=args.sandbox,
+                   gtest_site=args.gtest_site)
+
+
+    ret=myEngine.Start()
+    exit(ret)
 
     
 

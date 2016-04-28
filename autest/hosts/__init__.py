@@ -1,5 +1,8 @@
 from .console import ConsoleHost
+from .formattter import Formatter
+import glb
 import argparse
+import copy
 
 class extendAction(argparse.Action):
     def __init__(self,
@@ -13,12 +16,13 @@ class extendAction(argparse.Action):
                  required=False,
                  help=None,
                  metavar=None):
-        if nargs == 0:
-            raise ValueError('nargs for append actions must be > 0; if arg '
-                             'strings are not supplying the value to append, '
-                             'the append const action may be more appropriate')
-        if const is not None and nargs != OPTIONAL:
-            raise ValueError('nargs must be %r to supply const' % OPTIONAL)
+        
+        #if nargs == 0:
+        #    raise ValueError('nargs for append actions must be > 0; if arg '
+        #                     'strings are not supplying the value to append, '
+        #                     'the append const action may be more appropriate')
+        #if const is not None and nargs != OPTIONAL:
+        #    raise ValueError('nargs must be %r to supply const' % OPTIONAL)
         super(extendAction, self).__init__(option_strings=option_strings,
             dest=dest,
             nargs=nargs,
@@ -31,10 +35,11 @@ class extendAction(argparse.Action):
             metavar=metavar)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        import copy
         items = copy.copy(getattr(namespace, self.dest, []))
         if items is None:
             items = []
+        if values == []:
+            values = ['all']
         for i in values:
             i = i.split(",")
             items.extend(i)
@@ -62,3 +67,9 @@ def setDefaultArgs(argparser):
                     nargs='*',
                     metavar="CATAGORY",
                     help="Display all debug messages or only messages of provided catagories")
+
+
+
+
+def Setup(defaultHost=None, hosts=[]):
+    glb.formatter = Formatter(defaultHost)

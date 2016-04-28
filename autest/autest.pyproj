@@ -15,6 +15,9 @@
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>--verbose --debug</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,8 +28,109 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="autest\api\setup.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\api\test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\api\testrun.py" />
+    <Compile Include="autest\api\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest.py" />
+    <Compile Include="autest\common\disk.py" />
+    <Compile Include="autest\common\execfile.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\is_a.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\namespace.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\ospath.py" />
+    <Compile Include="autest\common\process.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\reg.py" />
+    <Compile Include="autest\core\report.py" />
+    <Compile Include="autest\core\streamwriter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\task.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\win32.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\__init__.py" />
+    <Compile Include="autest\core\conditions.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\engine.py" />
+    <Compile Include="autest\core\order.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\eventinfo.py" />
+    <Compile Include="autest\common\event.py" />
+    <Compile Include="autest\exceptions\setuperror.py" />
+    <Compile Include="autest\exceptions\__init__.py" />
+    <Compile Include="autest\testrunitems\process.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\testrunitem.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\glb.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\runtesttask.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\setup.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\setupitem.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\testrun.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\testrunitems\directory.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\testrunitems\disk.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\testrunitems\file.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\testrunitems\processes.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\testrunitems\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="hosts\common\is_a.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="hosts\common\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="hosts\console.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="hosts\formattter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="hosts\glb.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="hosts\interfaces\uihost.py">
@@ -35,13 +139,45 @@
     <Compile Include="hosts\interfaces\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="hosts\output.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="hosts\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\setupitems\copy_items.py" />
+    <Compile Include="autest\setupitems\svn.py" />
+    <Compile Include="autest\setupitems\__init__.py" />
+    <Compile Include="autest\testers\directory_exists.py" />
+    <Compile Include="autest\testers\equal.py" />
+    <Compile Include="autest\testers\file_callback.py" />
+    <Compile Include="autest\testers\file_exists.py" />
+    <Compile Include="autest\testers\gold_file.py" />
+    <Compile Include="autest\testers\greater_equal.py" />
+    <Compile Include="autest\testers\greater_than.py" />
+    <Compile Include="autest\testers\less_equal.py" />
+    <Compile Include="autest\testers\less_than.py" />
+    <Compile Include="autest\testers\not_equal.py" />
+    <Compile Include="autest\testers\regexp_content.py" />
+    <Compile Include="autest\testers\tester.py" />
+    <Compile Include="autest\testers\zip_content.py" />
+    <Compile Include="autest\testers\__init__.py" />
+    <Compile Include="autest\__init__.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="autest\core\" />
+    <Folder Include="autest\common\" />
+    <Folder Include="autest\exceptions\" />
+    <Folder Include="autest\testrunitems\" />
     <Folder Include="hosts\" />
     <Folder Include="hosts\interfaces\" />
+    <Folder Include="autest\api\" />
+    <Folder Include="autest\" />
+    <Folder Include="autest\setupitems\" />
+    <Folder Include="autest\testers\" />
+    <Folder Include="hosts\common\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\2.7" />

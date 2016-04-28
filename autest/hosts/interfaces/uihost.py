@@ -18,15 +18,15 @@ class UIHost(object):
         pass
 
     @abc.abstractmethod
-    def writeWarning(self,msg,stack=None):
+    def writeWarning(self,msg,stack=None,show_stack=False):
         pass
 
     @abc.abstractmethod
-    def writeError(self,msg,stack=None):
+    def writeError(self,msg,stack=None,show_stack=True):
         pass
 
     @abc.abstractmethod
-    def writeDebug(self,catagory,stream):
+    def writeDebug(self,catagory,msg):
         '''
         prints a debug message
         catagorty - is the type of verbose message
@@ -74,3 +74,30 @@ class UIHost(object):
     @abc.abstractproperty
     def verboseCatagories(self):
         return []
+
+    # Format our virtual streams
+    # these are not required but allow custom formating 
+    # from the default formatting which can be useful
+    # for output hosts that write to certain file formats
+
+    
+    def formatMessage(self,msg_list,sep=' ',end='\n',**kw):
+        return None
+
+    def formatWarning(self,msg_list,sep=' ',end='\n',stack=None,show_stack=False,**kw):
+        return None
+
+    def formatError(self,msg_list,sep=' ',end='\n',stack=None,show_stack=True,**kw):
+        return None
+
+    def formatDebug(self,catagory,msg_list,sep=' ',end='\n',**kw):
+        return None
+
+    def formatVerbose(self,catagory,msg_list,sep=' ',end='\n',**kw):
+        return None
+
+    def formatProgress(self,task,msg=None,progress=None,completed=False):
+        return None
+
+    def formatStack(self,stack):
+        return None
