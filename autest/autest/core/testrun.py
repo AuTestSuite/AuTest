@@ -162,8 +162,8 @@ class BaseTestRun (DelayedEventMapper):
         return self.__exceptionMessage
 
     @_ExceptionMessage.setter
-    def _ExceptionMessage(self):
-        return self.__exceptionMessage;
+    def _ExceptionMessage(self,val):
+        self.__exceptionMessage=val;
 
 
     def _getTesters(self):
