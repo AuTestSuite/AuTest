@@ -13,14 +13,13 @@ class Processes ( testrunitem.TestRunItem ):
             # order logic
             self.__default = None
 
-    def Process( self, cmdstr, id = None, returncode = None ):
+    def Process( self, id, cmdstr=None, returncode = None ):
+        #todo ... add check to make sure id a varaible safe
+
         tmp = Process(self._TestRun, id, cmdstr)
-        if self.__processes.has_key(cmdstr):
-            host.WriteWarning("Overriding process object {0}".format(cmdstr))
-        self.__processes[cmdstr] = tmp
-            
-        if not id:
-            host.WriteError("Must provide unique ID value for Process")
+        if self.__processes.has_key(id):
+            host.WriteWarning("Overriding process object {0}".format(id))
+        self.__processes[id] = tmp
         self.__dict__[id] = tmp
         return tmp
 

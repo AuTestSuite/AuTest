@@ -31,7 +31,7 @@ class Setup(object):
         try:
             for i in items:
                 i.setup()
-        except setuperror.SetupError, e:
+        except setuperror.SetupError as e:
             self.__reason=str(e)
             raise 
 
@@ -40,7 +40,7 @@ class Setup(object):
         try:
             for t in items:
                 t.cleanup() 
-        except setuperror.SetupError, e:
+        except setuperror.SetupError as e:
             self.__reason=str(e)
             raise e
     @property

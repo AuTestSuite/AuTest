@@ -22,7 +22,7 @@ class GoldFile(tester.Tester):
             pass
         try:
             val_content=file(tmp).read()
-        except (OSError, IOError), e:
+        except (OSError, IOError) as e:
             self.Result=tester.ResultType.Failed
             self.Reason=str(e)
             return

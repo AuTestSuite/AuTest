@@ -1,5 +1,6 @@
 
 import collections
+import is_a
 
 def flatten(iterable):
     if isinstance(iterable, collections.Iterable) and not isinstance(iterable,str):

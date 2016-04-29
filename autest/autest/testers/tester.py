@@ -139,7 +139,7 @@ class Tester ( object ):
                 self.Reason = msg
                 return None
             return ret
-        except AttributeError, e:
+        except AttributeError as e:
             pass
         # if that did not work because GetContent() does not exist
         # try to call object as a function (ie callable) that takes

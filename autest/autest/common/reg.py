@@ -23,16 +23,16 @@ if sys.platform == 'win32':
                         #get key value
                         QueryValueEx(rpath,key)
                     return True
-                except WindowsError,e:
+                except WindowsError as e:
                     try:
                         # maybe this was just checking for a path
                         with OpenKey(root,fullkey) as rpath:
                             pass
                         return True
-                    except WindowsError,e:
+                    except WindowsError as e:
                         pass
 
-        except WindowsError,e:
+        except WindowsError as e:
             pass
 
         return False

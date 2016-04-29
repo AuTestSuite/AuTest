@@ -57,7 +57,7 @@ class Engine(object):
             while True:
                 try:
                     shutil.rmtree(self.__run_dir, onerror=remove_read_only)
-                except BaseException, e:
+                except BaseException as e:
                     if e.args != oldExceptionArgs:
                         # maybe this is Windows issue where antivirus won't let us remove
                         # some random directory, so we're waiting & retrying
