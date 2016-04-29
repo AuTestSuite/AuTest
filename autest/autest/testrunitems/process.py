@@ -185,7 +185,7 @@ class Process ( testrunitem.TestRunItem,order.Order ):
     def _wait( self,timeout ):
         # wait a little while for the process to finish
         # should make this wait time a variable
-        self.__proc.wait(30)
+        self.__proc.waitTimeOut(30)
         # if it is not done yet, kill it.
         #if self._isRunning():
             #self.kill()

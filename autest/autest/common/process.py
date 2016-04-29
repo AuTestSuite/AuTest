@@ -17,6 +17,11 @@ if os.name == 'nt':
         '''
         win32.TerminateJobObject(self._job, -1) #pylint: disable=protected-access
 
+    def waitTimeOut(process, timeout):
+        # WaitForSingleObject expects timeout in milliseconds, so we convert it
+        win32.WaitForSingleObject(int_to_handle(process._handle), int(timeout * 1000))
+        return (process.poll() is None)
+
     def int_to_handle( value ):
         '''
         Casts Python integer to ctypes.wintypes.HANDLE
@@ -71,6 +76,15 @@ else:
         #pylint: disable=no-member
         os.killpg(os.getpgid(self.pid), signal.SIGKILL)
 
+    
+    def waitTimeOut(process, timeout):
+        startTime = time.time()
+        endTime = startTime + timeout
+        while (time.time() < endTime) and (process.poll() is None):
+            #This sleep the thread it is called in
+            time.sleep(0.1)
+        return (process.poll() is None)
+
     #pylint: disable=invalid-name
     def Popen( *args, **kw ):
         '''
@@ -94,4 +108,5 @@ else:
 
 # add killtree function
 subprocess.Popen.killtree = killtree
+subprocess.Popen.waitTimeOut = waitTimeOut
 

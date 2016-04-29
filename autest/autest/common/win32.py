@@ -317,6 +317,9 @@ if os.name == 'nt':
     TerminateProcess = tryKernal32("TerminateProcess",BOOL,(HANDLE, ctypes.c_uint))
     GetProcessTimes = tryKernal32("GetProcessTimes",BOOL,(HANDLE, LPFILETIME, LPFILETIME, LPFILETIME, LPFILETIME))
 
+    # the wait function
+    WaitForSingleObject = tryKernal32("WaitForSingleObject",DWORD,(HANDLE, DWORD))
+
     # Job object
     CreateJobObject = tryKernal32("CreateJobObjectW",HANDLE,(ctypes.POINTER(SECURITY_ATTRIBUTES),LPWSTR))
     AssignProcessToJobObject = tryKernal32("AssignProcessToJobObject",BOOL,(HANDLE,HANDLE))
