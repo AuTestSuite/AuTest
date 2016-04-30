@@ -11,7 +11,7 @@ class LessThan(tester.Tester):
         #Get value to test against
         val=self._GetContent(eventinfo)
         # do test
-        if val < self._value:
+        if val >= self._value:
             self.Result=tester.ResultType.Failed
             reason="Returned value: {0} >= {1}".format(val,self._value)
             if self.KillOnFailure:

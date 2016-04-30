@@ -195,11 +195,16 @@ class Process(testrunitem.TestRunItem,order.Order):
         #if self._isRunning():
             #self.kill()
 
-
     def _kill(self):
         if self._isRunning():
             self.__proc.killtree()
         self.__cleanup()
+
+    # these are to help with discription
+    def _isRunningBefore(self):
+            return self._isRunning()
+    def _isRunningAfter(self):
+            return self._isRunning()
 
     # streams setup (as this is a lot of copy and paste code otherwise
     def __defineProperties__(properties):

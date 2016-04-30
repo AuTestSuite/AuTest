@@ -1,5 +1,16 @@
 from autest.common.event import EventInfo
 
+#core test run
+class StartInfo(EventInfo):
+    def __init__(self,testrun):
+        self.__test_run=testrun
+   
+    @property
+    def TestRun(self):
+        return self.__test_run
+
+
+# process events
 class StartingInfo(EventInfo):
     def __init__(self):
         pass

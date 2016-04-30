@@ -5,7 +5,7 @@ import autest.testers as testers
 import hosts.output as host
 from autest.common.execfile import execFile
 import conditions
-from .eventinfo import EventInfo
+from .eventinfo import EventInfo, StartInfo
 import autest.common.disk as disk
 
 from exceptions import KeyboardInterrupt
@@ -130,8 +130,14 @@ class RunTestTask(Task):
             else:
                 #run the test step
                 try:
-                    tr.StartEvent(EventInfo())
-                    self.runTestStep(tr)
+                    # dump out events that have been registered for debugging
+                    host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",tr.Name, pprint.pformat(tr._GetRegisteredEvents()))
+                    # bind the events now
+                    tr._RegisterEvent("runtest", tr.StartEvent, self.runTestStep)
+                    tr._BindEvents()
+                    # run events
+                    tr.SetupEvent(EventInfo())
+                    tr.StartEvent(StartInfo(tr))
                     tr.EndEvent(EventInfo())
                 except KeyboardInterrupt:
                     raise
@@ -193,13 +199,9 @@ class RunTestTask(Task):
         return ret
 
 
-    def runTestStep(self,tr):
-
-        # dump out events that have been registered for debugging
-        host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",tr.Name, pprint.pformat(tr._GetRegisteredEvents()))
-        # bind the events now
-        tr._BindEvents()
+    def runTestStep(self,ev):
         # get the processes we need to run in order
+        tr=ev.TestRun
         ps=self._gen_process_list(tr)
         # run each process
         for p in ps:

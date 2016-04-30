@@ -167,7 +167,7 @@ class BaseTestRun (DelayedEventMapper):
 
 
     def _getTesters(self):
-        return self._GetCallBacks()
+        return filter(lambda x: isinstance(x, testers.tester.Tester), self._GetCallBacks())
 
     @property
     def _Test(self):

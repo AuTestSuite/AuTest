@@ -43,38 +43,38 @@ class Processes ( testrunitem.TestRunItem ):
 def StillRunningBefore(self,process):
     def getChecker():
         if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunning
+            process.TestValue = process._isRunningBefore
             return process
         else:
-            return testers.Equal(True, test_value=process._isRunning)
+            return testers.Equal(True, test_value=process._isRunningBefore)
     self._Register("Process.{0}.RunningStart".format(process.Name), getChecker, event=self.SetupEvent)
 
 def StillRunningAfter(self,process):
     def getChecker():
         if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunning
+            process.TestValue = process._isRunningAfter
             return process
         else:
-            return testers.Equal(True, test_value=process._isRunning)
-    self._Register("Process.{0}.RunningStart".format(process.Name), getChecker, event=self.EndEvent)
+            return testers.Equal(True, test_value=process._isRunningAfter)
+    self._Register("Process.{0}.RunningAfter".format(process.Name), getChecker, event=self.EndEvent)
 
 def NotRunningBefore(self,process):
     def getChecker():
         if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunning
+            process.TestValue = process._isRunningBefore
             return process
         else:
-            return testers.NotEqual(True, test_value=process._isRunning)
-    self._Register("Process.{0}.RunningStart".format(process.Name), getChecker, event=self.SetupEvent)
+            return testers.NotEqual(True, test_value=process._isRunningBefore)
+    self._Register("Process.{0}.NotRunningStart".format(process.Name), getChecker, event=self.SetupEvent)
 
 def NotRunningAfter(self,process):
     def getChecker():
         if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunning
+            process.TestValue = process._isRunningAfter
             return process
         else:
-            return testers.NotEqual(True, test_value=process._isRunning)
-    self._Register("Process.{0}.RunningStart".format(process.Name), getChecker, event=self.EndEvent)
+            return testers.NotEqual(True, test_value=process._isRunningAfter)
+    self._Register("Process.{0}.NotRunningAfter".format(process.Name), getChecker, event=self.EndEvent)
 
 import autest.api
 autest.api.AddTestRunMember(Processes)
