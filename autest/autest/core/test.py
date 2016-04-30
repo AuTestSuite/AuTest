@@ -6,6 +6,35 @@ import autest.testers.tester as testers
 
 import os
 
+class Processes ( object ):
+
+    def __init__( self,test):
+            super(Processes, self).__init__()
+            # special testrun object to allow for global processes
+            # probally should split the process object better
+            self._TestRun=testrun.TestRun(test, "_Global", "_interal_run")
+            self.__Test=test
+            self.__processes = {}
+            # this the process we will be viewed as the primary process for the
+            # test run
+            # if not set we will use try to start the correct based on the
+            # order logic
+            self.__default = None
+
+    def _GetProcesses(self):
+        return self.__processes.viewvalues()
+
+    def Process( self, id, cmdstr=None, returncode = None ):
+        from autest.testrunitems.process import Process
+        #todo ... add check to make sure id a varaible safe
+
+        tmp = Process(self._TestRun, id, cmdstr)
+        if self.__processes.has_key(id):
+            host.WriteWarning("Overriding process object {0}".format(id))
+        self.__processes[id] = tmp
+        self.__dict__[id] = tmp
+        return tmp
+
 class Test(object):
     """Defines a test.
     A test contains a list of test runs objects,
@@ -49,9 +78,11 @@ class Test(object):
         self.__run_dir = os.path.normpath(os.path.join(run_root, name))
         #this is the result of the test ( did it pass, fail, etc...)
         self.__result=None
+
+        ## this is a bit of a hack as this hard coded in.. try to address later
         # this is the set of extra processes that we might need running 
         #for the test to work
-        self.__processes=[]
+        self.__processes=Processes(self)
 
         # property objects
         self.__setup = setup.Setup(self)
@@ -120,17 +151,16 @@ class Test(object):
         return self.__env
 
 
+    @property
+    def Processes(self):
+        return self.__processes
+
 # public methods 
     def AddTestRun(self, name='general', displaystr=None):
         tmp = testrun.TestRun(self, "%s-%s" % (len(self._TestRuns), name), displaystr)
         self._TestRuns.append(tmp)
         return tmp
-
-    #def AddProcess(self,cmd,start=False):
-    #    p=process.Process(cmd)
-    #    self.__processes.append(p)
-    #    return p
-    
+   
     #internal stuff
     @property
     def _Result(self):

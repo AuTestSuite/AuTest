@@ -12,8 +12,8 @@ import string
 import subprocess
 import time
 
-class Process ( testrunitem.TestRunItem,order.Order ):
-    def __init__( self, testrun, name, cmdstr = None,*lst,**kw ):
+class Process(testrunitem.TestRunItem,order.Order):
+    def __init__(self, testrun, name, cmdstr=None,*lst,**kw):
         super(Process, self).__init__(testrun,*lst,**kw)
         self.__name = name
         self.__cmdstr = cmdstr
@@ -33,32 +33,36 @@ class Process ( testrunitem.TestRunItem,order.Order ):
 
 
     @property
-    def Command( self ):
+    def Name(self):
+        return self.__name
+
+    @property
+    def Command(self):
         return self.__cmdstr
 
     @Command.setter
-    def Command( self,value ):
+    def Command(self,value):
         value = value.replace('/',os.sep)
         self.__cmdstr = value
 
     # need to remeber if this case is needed
     # ///////////////////////
     @property
-    def RawCommand( self ):
+    def RawCommand(self):
         return self.__cmdstr
 
     @RawCommand.setter
-    def RawCommand( self,value ):
+    def RawCommand(self,value):
         self.__cmdstr = value
     # ////////////////////////
 
     # testable items
     @property
-    def ReturnCode( self ):
+    def ReturnCode(self):
         return self._GetRegisterEvent("Process.{0}.ReturnCode".format(self.__name))
 
     @ReturnCode.setter
-    def ReturnCode( self, val ):
+    def ReturnCode(self, val):
         def getChecker():
             if isinstance(val, testers.Tester):
                 val.TestValue = 'ReturnCode'
@@ -68,11 +72,11 @@ class Process ( testrunitem.TestRunItem,order.Order ):
         self._Register("Process.{0}.ReturnCode".format(self.__name), getChecker, event=self.RunFinished)
 
     @property
-    def Time( self ):
+    def Time(self):
         return self._GetRegisterEvent("Process.{0}.Time".format(self.__name))
 
     @Time.setter
-    def Time( self, val ):
+    def Time(self, val):
         def getChecker():
             if isinstance(val, testers.Tester):
                 val.TestValue = 'TotalTime'
@@ -82,11 +86,11 @@ class Process ( testrunitem.TestRunItem,order.Order ):
         self._Register("Process.{0}.Time".format(self.__name), getChecker, event=self.RunFinished)
 
     @property
-    def TimeOut( self ):
+    def TimeOut(self):
         return self._GetRegisterEvent("Process.{0}.TimeOut".format(self.__name))
 
     @TimeOut.setter
-    def TimeOut( self, val ):
+    def TimeOut(self, val):
         def getChecker():
             if isinstance(val, testers.Tester):
                 val.TestValue = 'TotalTime'
@@ -99,7 +103,7 @@ class Process ( testrunitem.TestRunItem,order.Order ):
     # internal functions to control the process
 
     
-    def _Start( self ):
+    def _Start(self):
         
         #create a StreamWriter which will write out the stream data of the run
         #to sorted files
@@ -138,7 +142,7 @@ class Process ( testrunitem.TestRunItem,order.Order ):
         self.RunStarted()
 
 
-    def _Poll( self ):
+    def _Poll(self):
         if self._isRunning():
             curr_time = time.time()
             if curr_time - self.__last_event_time > 500:
@@ -155,7 +159,7 @@ class Process ( testrunitem.TestRunItem,order.Order ):
 
         return False
 
-    def __cleanup( self ):
+    def __cleanup(self):
         if self.__output:
             self.__stdout.close()
             self.__stderr.close()
@@ -173,36 +177,37 @@ class Process ( testrunitem.TestRunItem,order.Order ):
             self.__proc = None
 
     # pull out to base process logic
-    def _start( self,*lst,**kw ):
+    def _start(self,*lst,**kw):
         if self.__proc and self.__proc.poll() is None:
             # we have something running so nothing to start
             return
         self.__proc = autest.common.process.Popen(self.__cmdstr,*lst,**kw)
 
-    def _isRunning( self ):
+
+    def _isRunning(self):
         return self.__proc and self.__proc.poll() is None
 
-    def _wait( self,timeout ):
+    def _wait(self,timeout):
         # wait a little while for the process to finish
         # should make this wait time a variable
-        self.__proc.waitTimeOut(30)
+        self.__proc.waitTimeOut(timeout)
         # if it is not done yet, kill it.
         #if self._isRunning():
             #self.kill()
 
 
-    def _kill( self ):
+    def _kill(self):
         if self._isRunning():
             self.__proc.killtree()
         self.__cleanup()
 
     # streams setup (as this is a lot of copy and paste code otherwise
-    def __defineProperties__( properties ):
-        def createStreamProperty( name, event, testValue ):
-            def getter( self ):
+    def __defineProperties__(properties):
+        def createStreamProperty(name, event, testValue):
+            def getter(self):
                 return self._GetRegisterEvent(event)
 
-            def setter( self, value ):
+            def setter(self, value):
                 def getChecker():
                     if isinstance(value, testers.Tester):
                         value.TestValue = testValue
@@ -238,63 +243,63 @@ class Process ( testrunitem.TestRunItem,order.Order ):
 
 # some forwarding functions...
 # for backward compatiblity
-def Command( self,cmdstr ):
+def Command(self,cmdstr):
     self.Processes.Default.Command = cmdstr
-def RawCommand( self,cmdstr ):
+def RawCommand(self,cmdstr):
     self.Processes.Default.RawCommand = cmdstr
-def ReturnCode( self,val ):
+def ReturnCode(self,val):
     self.Processes.Default.ReturnCode = val
-def Time( self,val ):
+def Time(self,val):
     self.Processes.Default.Time = val
-def TimeOut( self,val ):
+def TimeOut(self,val):
     self.Processes.Default.TimeOut = val
 
 # for backward compatiblity
-class Streams ( testrunitem.TestRunItem ):
-    def __init__( self,testrun ):
+class Streams(testrunitem.TestRunItem):
+    def __init__(self,testrun):
         super(Streams, self).__init__(testrun)
 
     @property
-    def stdout( self ):
+    def stdout(self):
         return self._TestRun.Processes.Default.stdout
     @stdout.setter
-    def stdout( self,val ):
+    def stdout(self,val):
         self._TestRun.Processes.Default.stdout = val
     @property
-    def stderr( self ):
+    def stderr(self):
         return self._TestRun.Processes.Default.stderr
     @stderr.setter
-    def stderr( self,val ):
+    def stderr(self,val):
         self._TestRun.Processes.Default.stderr = val
     @property
-    def All( self ):
+    def All(self):
         return self._TestRun.Processes.Default.All
     @All.setter
-    def All( self,val ):
+    def All(self,val):
         self._TestRun.Processes.Default.All = val
     @property
-    def Warning( self ):
+    def Warning(self):
         return self._TestRun.Processes.Default.Warning
     @Warning.setter
-    def Warning( self,val ):
+    def Warning(self,val):
         self._TestRun.Processes.Default.Warning = val
     @property
-    def Error( self ):
+    def Error(self):
         return self._TestRun.Processes.Default.Error
     @Error.setter
-    def Error( self,val ):
+    def Error(self,val):
         self._TestRun.Processes.Default.Error = val
     @property
-    def Debug( self ):
+    def Debug(self):
         return self._TestRun.Processes.Default.Debug
     @Debug.setter
-    def Debug( self,val ):
+    def Debug(self,val):
         self._TestRun.Processes.Default.Debug = val
     @property
-    def Verbose( self ):
+    def Verbose(self):
         return self._TestRun.Processes.Default.Verbose
     @Verbose.setter
-    def Verbose( self,val ):
+    def Verbose(self,val):
         self._TestRun.Processes.Default.Verbose = val
 
 

@@ -237,6 +237,8 @@ class Formatter(uihost.UIHost):
                     # does this host care
                     if h.verboseCatagories and match in h.verboseCatagories:
                         #it does so we make the message
+                        if not is_a.List(msg_list):
+                            msg_list=[str(msg_list)]
                         msg = h.formatVerbose(cat,msg_list,**kw)
                         if not msg and not fmsg:
                             fmsg = self._formatVerbose(cat,msg_list,**kw)

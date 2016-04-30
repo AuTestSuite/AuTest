@@ -81,11 +81,16 @@ class RunTestTask(Task):
         return True
 
     def setupTest(self):
+        host.WriteVerbosef("run_test","Setting Test {0}",self.__test)
         self.__test.Setup._do_setup()
 
     def cleanupTest(self):
+        host.WriteVerbosef("run_test","Cleanup Test {0}",self.__test)
         #need to add a cleanup phase
         
+        # clean up an processes that might stil be running
+
+        self.stopGlobalProcess()
         #if test passed as we don't want to keep the tests
         # we can remove it
         if self.__test._Result == testers.ResultType.Passed:
@@ -199,7 +204,6 @@ class RunTestTask(Task):
         # run each process
         for p in ps:
             p._Start()
-        
         # wait for default process stop
         while tr.Processes.Default._isRunning():
             for p in ps:
@@ -210,6 +214,36 @@ class RunTestTask(Task):
         while 1:
             running=None
             for p in ps:
+                # Check to see that it is in the global process list
+                # if it is not in the lists we will try to shut it down
+                # this allows for process to be from different test runs
+                # to be used in this test run.. hwoever that is OK I think..
+                if p not in tr._Test.Processes._GetProcesses() and p._Poll():
+                    running=p
+            
+            if running:
+                running._wait(1)
+            else:
+                # everything finished
+                break
+            #if the time we will wait up?
+            if time.time() - st > 15.0: 
+                # we kill them
+                for p in ps:
+                    if p._isRunning():
+                        p._kill()
+                break
+    
+    def stopGlobalProcess(self):  
+        st=time.time()
+        ps = self.__test.Processes._GetProcesses()
+        while len(ps):
+            running=None
+            for p in ps:
+                # Check to see that it is in the global process list
+                # if it is not in the lists we will try to shut it down
+                # this allows for process to be from different test runs
+                # to be used in this test run.. hwoever that is OK I think..
                 if p._Poll():
                     running=p
             if running:
@@ -218,12 +252,11 @@ class RunTestTask(Task):
                 # everything finished
                 break
             #if the time we will wait up?
-            if time.time() - st > 30.0: 
+            if time.time() - st > 5.0: 
                 # we kill them
                 for p in ps:
                     if p._isRunning():
                         p._kill()
                 break
-          
 
     

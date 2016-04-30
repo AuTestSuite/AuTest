@@ -12,14 +12,14 @@ class LessEqual(tester.Tester):
         val=self._GetContent(eventinfo)
         # do test
         if val < self._value:
-            self.Result=ResultType.Failed
+            self.Result=tester.ResultType.Failed
             reason="Returned value: {0} > {1}".format(val,self_.value)
             if self.KillOnFailure:
                 self.Reason=reason+"\n Kill on failure is set".format(val,self._value)
                 raise KillOnFailureError
             self.Reason=reason
         else:
-            self.Result=ResultType.Passed
+            self.Result=tester.ResultType.Passed
             self.Reason="Returned value: {0} <= {1}".format(val,self._value)
         host.WriteVerbose(["testers.LessEqual","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
 
