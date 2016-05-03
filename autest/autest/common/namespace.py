@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import, division, print_function
 
 # this is a utility class that allows us to add objects
 # to another as if it was in a namespace

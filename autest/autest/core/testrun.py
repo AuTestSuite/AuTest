@@ -1,9 +1,9 @@
-
+from __future__ import absolute_import, division, print_function
 import autest.glb as glb
 import hosts.output as host
 import autest.common.event as event
 import autest.testers as testers
-from autest.common import with_metaclass
+from future.utils import with_metaclass
 
 # this is base class to add common logic for when I need to
 # delay adding the event mapping. The reasonf or this woudl be cases
@@ -139,6 +139,7 @@ class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
     @property
     def _Result(self):
         if self.__result is None:
+            self.__result=0
             for i in self._getTesters():
                 if self.__result < i.Result:
                     self.__result = i.Result

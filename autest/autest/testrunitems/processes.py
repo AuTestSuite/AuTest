@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import autest.core.testrunitem as testrunitem
 import hosts.output as host
 import autest.testers as testers

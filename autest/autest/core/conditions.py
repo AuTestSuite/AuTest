@@ -1,14 +1,15 @@
+from __future__ import absolute_import, division, print_function
+import autest.glb as glb
+import autest.common.ospath as ospath
+import autest.common.reg as reg
+
 import subprocess
 import os
 import sys
 import platform
 import stat
 
-import autest.glb as glb
-import autest.common.ospath as ospath
-
-import autest.common.reg as reg
-
+from builtins import object
 
 class Condition(object):
     def __init__(self, testfunc, reason, pass_value,neg_reason=None):
@@ -17,7 +18,12 @@ class Condition(object):
         self.__pass_value = pass_value
         self.__neg_msg = neg_reason
 
+    #python 2
     def __nonzero__(self):
+        return self.Pass()
+
+    #python 3
+    def __bool__(self):
         return self.Pass()
 
     def Pass(self):

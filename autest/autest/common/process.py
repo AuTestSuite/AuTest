@@ -2,6 +2,8 @@
 Module overrides Popen and introduces killtree function
 '''
 
+from __future__ import absolute_import, division, print_function
+
 import subprocess
 import os
 import signal
@@ -10,7 +12,7 @@ import ctypes
 import time
 
 if os.name == 'nt':
-    import win32
+    from . import win32
     def killtree( self ):
         '''
         Kills a process with all its children

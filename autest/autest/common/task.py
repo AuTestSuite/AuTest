@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 
 class Task(object):
     def __init__(self, callback):

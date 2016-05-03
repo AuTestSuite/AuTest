@@ -1,6 +1,6 @@
+from __future__ import absolute_import, division, print_function
 import os
 import stat
-
 
 def has_program(program,path=None):
     return where_is(program,path)!=None

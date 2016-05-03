@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import autest.core.testrunitem as testrunitem
 from .directory import Directory
 from .file import File

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 
 def safeCompile(string, filename, mode='exec', flags=0, dont_inherit=0):
     '''

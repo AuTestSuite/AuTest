@@ -1,5 +1,6 @@
-import sys
+from __future__ import absolute_import, division, print_function
 
+import sys
 import autest.glb as glb
 
 if sys.platform == 'win32':

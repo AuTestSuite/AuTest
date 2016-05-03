@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import, division, print_function
 # simple event class
 # need to look at extending this or 
 # finding a usable existing solution

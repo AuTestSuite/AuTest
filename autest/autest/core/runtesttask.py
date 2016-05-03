@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import autest.glb as glb
 from autest.common.task import Task
 from autest.common.execfile import execFile

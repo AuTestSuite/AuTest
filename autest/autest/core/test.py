@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import, division, print_function
 from . import setup
 from . import conditions
 from . import testrun
@@ -165,6 +165,7 @@ class Test(object):
     @property
     def _Result(self):
         if self.__result is None:
+            self.__result=0
             for tr in self.__test_runs:
                 if self.__result < tr._Result:
                     self.__result = tr._Result

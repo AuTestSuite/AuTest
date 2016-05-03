@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import, division, print_function
 
 # This class is for all the objects we add to a testrun object
 # It contains a interface that allows us to forward call to the main 

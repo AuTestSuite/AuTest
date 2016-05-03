@@ -6,7 +6,7 @@ from .file_callback import FileContentCallback
 
 class RegexpContent(FileContentCallback):
     def __init__(self, regexp, description, killOnFailure=False):
-        if isinstance(regexp, basestring):
+        if isinstance(regexp, str):
             regexp = re.compile(regexp)
         self.__regexp = regexp
         FileContentCallback.__init__(self, self.__check, description, killOnFailure)

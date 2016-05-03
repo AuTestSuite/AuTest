@@ -1,7 +1,7 @@
-
+from __future__ import absolute_import, division, print_function
 import autest.glb as glb
 import autest.exceptions.setuperror as setuperror
-from autest.common import with_metaclass
+from future.utils import with_metaclass
 
 class _setup__metaclass__(type):
         def __call__(cls,*lst,**kw):

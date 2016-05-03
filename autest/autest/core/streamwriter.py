@@ -1,9 +1,11 @@
+from __future__ import absolute_import, division, print_function
+
 import hosts.output as host
 
 import threading
 import re
 import os
-
+import sys
    
 class PipeRedirector(object):
     '''
@@ -12,12 +14,10 @@ class PipeRedirector(object):
     for this primarly lets us sort the data into different stream files for testing purposes
     '''
     def _readerthread(self):
-        l = ' '
-        while l != '':
-            l = self.pipein.readline()
-            #sys.__stdout__.write(l)
-            if l != "":
-                self.writer(l)
+        for i in iter(self.pipein):
+            i=i.decode("utf-8") 
+            self.writer(i)
+    
                 
 
     def __init__(self,pipein,writer):
@@ -119,7 +119,7 @@ class StreamWriter(object):
         self.DebugFile=os.path.join(path,debug_stream_file)
         
         cmdfile=open(os.path.join(path,"command.txt"),'wb')
-        cmdfile.write("Command= {0}\n".format(cmd))
+        cmdfile.write("Command= {0}\n".format(cmd).encode("utf-8"))
         cmdfile.close()
         
         self.both=open(self.FullFile,'wb')
@@ -135,16 +135,16 @@ class StreamWriter(object):
 
     def _smart_match(self,str):
         if is_error(str):
-            self.errorfile.write(str)
+            self.errorfile.write(str.encode("utf-8"))
             return True
         elif is_warning(str):
-            self.warningfile.write(str)
+            self.warningfile.write(str.encode("utf-8"))
             return True
         elif is_verbose(str):
-            self.verbosefile.write(str)
+            self.verbosefile.write(str.encode("utf-8"))
             return True
         elif is_debug(str):
-            self.debugfile.write(str)
+            self.debugfile.write(str.encode("utf-8"))
             return True
         return False
 
@@ -208,16 +208,16 @@ class StreamWriter(object):
                     elif s[0]==' ' or s[0]=='\t': # group indented text
                         grpstr+=s+'\n'
                     else:
-                        self.both.write(grpstr)
+                        self.both.write(grpstr.encode("utf-8"))
                         if not self._smart_match(grpstr):
                             pass
-                        self.outfile.write(grpstr)
+                        self.outfile.write(grpstr.encode("utf-8"))
                         grpstr=s+'\n'
                 else:
-                    self.both.write(grpstr)
+                    self.both.write(grpstr.encode("utf-8"))
                     if not self._smart_match(grpstr):
                         pass
-                    self.outfile.write(grpstr)
+                    self.outfile.write(grpstr.encode("utf8"))
             elif text[0] == StreamWriter.stderr:
                 brkup=text[1].split('\n')
                 grpstr=''
@@ -232,16 +232,16 @@ class StreamWriter(object):
                     elif s[0]==' ' or s[0]=='\t': # group indented text
                         grpstr+=s+'\n'
                     else:
-                        self.both.write(grpstr)
+                        self.both.write(grpstr.encode("utf8"))
                         if not self._smart_match(grpstr):
                             pass
-                        self.errfile.write(grpstr)
+                        self.errfile.write(grpstr.encode("utf8"))
                         grpstr=s+'\n'
                 else:
-                    self.both.write(grpstr)
+                    self.both.write(grpstr.encode("utf8"))
                     if not self._smart_match(grpstr):
                         pass
-                    self.errfile.write(grpstr)
+                    self.errfile.write(grpstr.encode("utf8"))
             else:
                 # we have some error or unknown code
                 pass

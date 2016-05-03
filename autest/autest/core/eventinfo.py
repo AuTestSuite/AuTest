@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 from autest.common.event import EventInfo
 
 #core test run

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import hosts.output as host
 import autest.core.testrunitem as testrunitem
 import autest.testers as testers
@@ -217,7 +218,7 @@ class Process(testrunitem.TestRunItem,order.Order):
                     if isinstance(value, testers.Tester):
                         value.TestValue = testValue
                         return value
-                    elif isinstance(value, basestring):
+                    elif isinstance(value, str):
                         return testers.GoldFile(File(self._TestRun, value, runtime=False),
                                                 test_value=testValue)
                     elif isinstance(value, (tuple, list)):

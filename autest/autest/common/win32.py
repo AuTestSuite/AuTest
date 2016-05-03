@@ -5,8 +5,9 @@
 # copy and paste of code in different files.
 # this is a continous growing file... 
 # Will probally break up into a module
-
+from __future__ import absolute_import, division, print_function
 import os
+
 if os.name == 'nt':
 
     import ctypes

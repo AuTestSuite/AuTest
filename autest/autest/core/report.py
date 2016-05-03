@@ -1,6 +1,7 @@
 '''
 Report object that knows how to print itself and can be exported to a file
 '''
+from __future__ import absolute_import, division, print_function
 from autest.testers.tester import ResultType
 import collections
 import json

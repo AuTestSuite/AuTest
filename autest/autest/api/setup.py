@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import, division, print_function
 import autest.glb as glb
 import autest.common.namespace as namespace
 import types
