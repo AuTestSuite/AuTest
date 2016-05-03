@@ -1,4 +1,4 @@
-import tester
+from . import tester
 import hosts.output as host
 
 import os

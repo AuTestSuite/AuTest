@@ -3,7 +3,10 @@ import sys
 import autest.glb as glb
 
 if sys.platform == 'win32':
-    from  _winreg import *
+    if sys.version_info >= (3,):
+        from winreg import *
+    else:
+        from _winreg import *
 
     glb.Locals['HKEY_CLASSES_ROOT']=HKEY_CLASSES_ROOT
     glb.Locals['HKEY_CURRENT_USER']=HKEY_CURRENT_USER

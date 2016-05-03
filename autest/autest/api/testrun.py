@@ -8,7 +8,7 @@ def ExtendTestRun(func,name=None,setproperty=False):
     if name is None:
         name=func.__name__
     
-    method=types.MethodType(func,None,TestRun)
+    method=func#types.MethodType(func,None,TestRun)
     if setproperty:
         method=property(fset=method)
 
@@ -33,7 +33,7 @@ def AddTestRunMember(obj, name=None, cls=None ):
 
     # get any info that might exist, else return empty dictionary
     cls_info=glb._runtest_items.get(cls,{})
-    if cls_info.has_key(name):
+    if name in cls_info:
         host.WriteError("Cannot add user object member {1}.{0}\n {0} already exists on {1} object".format(name,cls.__name__), show_stack=False)
     cls_info[name]=obj
     # set the information ( as this might have been the empty dictionary )

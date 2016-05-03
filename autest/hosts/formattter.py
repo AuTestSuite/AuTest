@@ -80,7 +80,6 @@ class Formatter(uihost.UIHost):
         # If this is None, we will do the formating
         if not msg:
             if stack is not None:
-                print stack
                 filename, lineno, routine, content = stack
             else:
                 frame = sys._getframe(4)

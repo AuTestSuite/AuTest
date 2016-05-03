@@ -21,14 +21,14 @@ class Processes ( testrunitem.TestRunItem ):
         #todo ... add check to make sure id a varaible safe
 
         tmp = Process(self._TestRun, id, cmdstr)
-        if self.__processes.has_key(id):
+        if id in self.__processes:
             host.WriteWarning("Overriding process object {0}".format(id))
         self.__processes[id] = tmp
         self.__dict__[id] = tmp
         return tmp
 
     def Add(self,process):
-        if self.__processes.has_key(self.process.Name):
+        if self.process.Name in self.__processes:
             host.WriteWarning("Overriding process object {0}".format(self.process.Name))
         self.__processes[self.process.Name] = self.process
         self.__dict__[self.process.Name] = self.process

@@ -4,11 +4,10 @@ from autest.common.execfile import execFile
 import autest.testers as testers
 import hosts.output as host
 from autest.common.execfile import execFile
-import conditions
+from . import conditions
 from .eventinfo import EventInfo, StartInfo
 import autest.common.disk as disk
 
-from exceptions import KeyboardInterrupt
 import os
 import traceback
 import copy

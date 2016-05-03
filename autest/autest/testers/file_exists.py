@@ -1,5 +1,5 @@
 import hosts.output as host
-import tester
+from . import tester
 
 import os
 

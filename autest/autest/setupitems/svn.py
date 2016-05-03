@@ -2,7 +2,6 @@
 from autest.core.setupitem import SetupItem
 import autest.api as api
 import os
-from exceptions import KeyboardInterrupt
 
 class CreateRepository(SetupItem):
     def __init__(self,name):#,dir_to_add):

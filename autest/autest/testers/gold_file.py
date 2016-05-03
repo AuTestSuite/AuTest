@@ -1,7 +1,6 @@
-import tester
+from . import tester
 import hosts.output as host
 
-from exceptions import KeyboardInterrupt
 import difflib
 import json
 
@@ -21,7 +20,7 @@ class GoldFile(tester.Tester):
         if tmp is None:
             pass
         try:
-            val_content=file(tmp).read()
+            val_content=open(tmp).read()
         except (OSError, IOError) as e:
             self.Result=tester.ResultType.Failed
             self.Reason=str(e)
@@ -32,7 +31,7 @@ class GoldFile(tester.Tester):
         if tmp is None:
             pass
         try:
-            gf_content=file(tmp).read()
+            gf_content=open(tmp).read()
         except KeyboardInterrupt:
             raise
         except:

@@ -118,18 +118,18 @@ class StreamWriter(object):
         self.VerboseFile=os.path.join(path,verbose_stream_file)
         self.DebugFile=os.path.join(path,debug_stream_file)
         
-        cmdfile=file(os.path.join(path,"command.txt"),'wb')
+        cmdfile=open(os.path.join(path,"command.txt"),'wb')
         cmdfile.write("Command= {0}\n".format(cmd))
         cmdfile.close()
         
-        self.both=file(self.FullFile,'wb')
-        self.outfile=file(self.StdOutFile,'wb')
-        self.errfile=file(self.StdErrFile,'wb')
+        self.both=open(self.FullFile,'wb')
+        self.outfile=open(self.StdOutFile,'wb')
+        self.errfile=open(self.StdErrFile,'wb')
 
-        self.warningfile=file(self.WarningFile,'wb')
-        self.errorfile=file(self.ErrorFile,'wb')
-        self.verbosefile=file(self.VerboseFile,'wb')
-        self.debugfile=file(self.DebugFile,'wb')
+        self.warningfile=open(self.WarningFile,'wb')
+        self.errorfile=open(self.ErrorFile,'wb')
+        self.verbosefile=open(self.VerboseFile,'wb')
+        self.debugfile=open(self.DebugFile,'wb')
 
         self.cache= []
 

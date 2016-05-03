@@ -1,7 +1,7 @@
 
-import setup
-import conditions
-import testrun
+from . import setup
+from . import conditions
+from . import testrun
 import autest.testers.tester as testers
 
 import os
@@ -22,14 +22,14 @@ class Processes ( object ):
             self.__default = None
 
     def _GetProcesses(self):
-        return self.__processes.viewvalues()
+        return self.__processes.values()
 
     def Process( self, id, cmdstr=None, returncode = None ):
         from autest.testrunitems.process import Process
         #todo ... add check to make sure id a varaible safe
 
         tmp = Process(self._TestRun, id, cmdstr)
-        if self.__processes.has_key(id):
+        if id in self.__processes:
             host.WriteWarning("Overriding process object {0}".format(id))
         self.__processes[id] = tmp
         self.__dict__[id] = tmp

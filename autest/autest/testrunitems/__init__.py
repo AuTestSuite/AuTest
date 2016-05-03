@@ -1,5 +1,5 @@
-import disk
-import file
-import processes
-import process
-import directory
+from . import disk
+from . import file
+from . import processes
+from . import process
+from . import directory

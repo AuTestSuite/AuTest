@@ -1,4 +1,3 @@
-from exceptions import KeyboardInterrupt
 
 # simple event class
 # need to look at extending this or 

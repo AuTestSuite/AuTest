@@ -3,6 +3,7 @@ import autest.glb as glb
 import hosts.output as host
 import autest.common.event as event
 import autest.testers as testers
+from autest.common import with_metaclass
 
 # this is base class to add common logic for when I need to
 # delay adding the event mapping. The reasonf or this woudl be cases
@@ -27,12 +28,12 @@ class DelayedEventMapper ( object ):
         '''
         Bind the event to the callbacks
         '''
-        for event, callback in self.__addevent.itervalues():
+        for event, callback in self.__addevent.values():
             event += callback
 
     def _GetCallBacks(self):
         ret=[]
-        for v in self.__addevent.viewvalues():
+        for v in self.__addevent.values():
             ret.append(v[1])
         return ret
 
@@ -40,7 +41,7 @@ class DelayedEventMapper ( object ):
         '''
         Default set or override "named" event
         '''
-        if self.__addevent.has_key(key):
+        if key in self.__addevent:
             host.WriteDebug(['testrun'],"Replacing existing key: {0} value: {1} with\n new value: {2}".format(key,self.__addevent[key],(event, callback)))
         self.__addevent[key] = (event, callback)
 
@@ -70,7 +71,7 @@ class DelayedEventMapper ( object ):
                 self._RegisterEvent(key, event, checker)
             else:
                 host.WriteError('Invalid type')
-        except BaseException, err:
+        except BaseException as err:
             import traceback
             host.WriteError('Exception occurred: {0}'.format(traceback.format_exc()))
 
@@ -83,13 +84,11 @@ class _testrun__metaclass__(type):
             # in a dictionary which items we want to add
             cls_info=glb._runtest_items.get(cls,{})
             # add any items we want to add to the runtest item.
-            for k,v in cls_info.iteritems():
+            for k,v in cls_info.items():
                 setattr(inst,k,v(inst))
             return inst
 
-class BaseTestRun (DelayedEventMapper):
-
-    __metaclass__=_testrun__metaclass__
+class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
 
     def __init__( self, testobj, name, displaystr ):
         self.__displaystr = displaystr # what we display to the user

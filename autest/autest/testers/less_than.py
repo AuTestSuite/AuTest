@@ -1,5 +1,5 @@
 import hosts.output as host
-import tester
+from . import tester
 
 class LessThan(tester.Tester):
     def __init__(self,value,test_value=None,kill_on_failure=False):

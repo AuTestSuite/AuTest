@@ -1,6 +1,6 @@
 import autest.core.testrunitem as testrunitem
-from directory import Directory
-from file import File
+from .directory import Directory
+from .file import File
 import hosts.output as host
 
 class Disk(testrunitem.TestRunItem):
@@ -15,7 +15,7 @@ class Disk(testrunitem.TestRunItem):
     def File(self, name, exists=None, size=None, content=None, execute=None, id=None,
              runtime=True):
         tmp = File(self._TestRun, name, exists, size, content, execute, runtime)
-        if self.__files.has_key(name):
+        if name in self.__files:
             host.WriteWarning("Overriding file object {0}".format(name))
         self.__files[name] = tmp
         if id:
@@ -24,7 +24,7 @@ class Disk(testrunitem.TestRunItem):
 
     def Directory(self, name, exists=None, id=None, runtime=True):
         tmp = Directory(self._TestRun, name, exists, runtime)
-        if self.__dirs.has_key(name):
+        if name in self.__dirs:
             host.WriteWarning("Overriding directory object {0}".format(name))
         self.__dirs[name] = tmp
         if id:

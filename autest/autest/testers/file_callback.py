@@ -1,5 +1,5 @@
 import hosts.output as host
-import tester
+from . import tester
 
 class FileContentCallback(tester.Tester):
     '''
@@ -26,7 +26,7 @@ class FileContentCallback(tester.Tester):
         try:
             with open(absPath, 'r') as inp:
                 data = inp.read()
-        except IOError, err:
+        except IOError as err:
             result = tester.ResultType.Failed
             self.Reason = 'Cannot read {0}: {1}'.format(absPath, err)
         else:

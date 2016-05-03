@@ -1,12 +1,15 @@
 
 from . import common
 import hosts.glb as glb
+
+from builtins import map
+
 # these function are the "main" function the user will ideally use in a normal application
 # They map the logic to the formatter which will format the message as requested
 # and do any remapping required.  The formatter is given a "list" of string data do it can
 # correctly combine the finial message via as requested
 def WriteMessage(*lst,**kw):
-    msg = map(str,lst) # map everything to a string
+    msg = list(map(str,lst)) # map everything to a string
     glb.formatter.writeMessage(msg,**kw)
 
 def WriteMessagef(sfmt, *lst,**kw):
@@ -14,7 +17,7 @@ def WriteMessagef(sfmt, *lst,**kw):
     glb.formatter.writeMessage(msg,**kw)
 
 def WriteWarning(*lst,**kw):
-    msg = map(str,lst) # map everything to a string
+    msg = list(map(str,lst)) # map everything to a string
     glb.formatter.writeWarning(msg,**kw)
     
 def WriteWarningf(sfmt, *lst,**kw):
@@ -22,7 +25,7 @@ def WriteWarningf(sfmt, *lst,**kw):
     glb.formatter.writeWarning(msg,**kw)
 
 def WriteError(*lst,**kw):
-    msg = map(str,lst) # map everything to a string
+    msg = list(map(str,lst)) # map everything to a string
     glb.formatter.writeError(msg,**kw)
 
 def WriteErrorf(sfmt, *lst,**kw):
@@ -32,7 +35,7 @@ def WriteErrorf(sfmt, *lst,**kw):
 def WriteDebug(catagory, *lst,**kw):
     catagory = common.make_list(catagory)
     catagory.append("all")
-    msg = map(str,lst) # map everything to a string
+    msg = list(map(str,lst)) # map everything to a string
     glb.formatter.writeDebug(catagory,msg,**kw)
 
 def WriteDebugf(catagory, sfmt, *lst,**kw):
@@ -44,7 +47,7 @@ def WriteDebugf(catagory, sfmt, *lst,**kw):
 def WriteVerbose(catagory, *lst, **kw):
     catagory = common.make_list(catagory)
     catagory.append("all")
-    msg = map(str,lst) # map everything to a string
+    msg = list(map(str,lst)) # map everything to a string
     glb.formatter.writeVerbose(catagory,msg,**kw)
     
 def WriteVerbosef(catagory, sfmt, *lst, **kw):

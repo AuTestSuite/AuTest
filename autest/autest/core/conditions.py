@@ -92,7 +92,7 @@ class ConditionFactory(object):
                                                                                               platform.system().lower(),
                                                                                               os.name),)
 
-    def True(self,msg):
+    def true(self,msg):
         return self.Condition(lambda : True,
                        msg,
                        True)

@@ -1,17 +1,17 @@
 
 import autest.glb as glb
 import autest.exceptions.setuperror as setuperror
+from autest.common import with_metaclass
 
 class _setup__metaclass__(type):
         def __call__(cls,*lst,**kw):
             inst=type.__call__(cls,*lst,**kw)
-            for k,v in glb._setup_items.iteritems():
+            for k,v in glb._setup_items.items():
                 setattr(inst,k,v(inst))
             return inst
 
-class Setup(object):
-    __metaclass__=_setup__metaclass__
-
+class Setup(with_metaclass(_setup__metaclass__,object)):
+    
     def __init__(self,test):
         self.__setup_items=[]
         self.__test=test

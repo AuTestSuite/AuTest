@@ -1,6 +1,7 @@
 from .console import ConsoleHost
 from .formattter import Formatter
-import glb
+from . import glb
+
 import argparse
 import copy
 

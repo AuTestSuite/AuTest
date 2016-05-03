@@ -25,7 +25,7 @@ def AddSetupItem(item,name=None,ns=None):
 
     if ns is None:
         host.WriteVerbose("setupext","Adding setup extension named: {0}".format(name))
-        method=types.MethodType(wrapper,None,Setup)
+        method=wrapper#types.MethodType(wrapper,None,Setup)
         setattr(Setup,name,method)
     else:
         # see if we have this namespace defined already
@@ -36,6 +36,6 @@ def AddSetupItem(item,name=None,ns=None):
             #copy on class type as defined for given name
             glb._setup_items[ns]=nsobj
         #add new method to namespace object
-        x=types.MethodType(wrapper,None,nsobj)
+        x=wrapper #types.MethodType(wrapper,None,nsobj)
         setattr(nsobj,name,x)
         host.WriteVerbose("setupext","Adding setup extension named: {0} to namespace: {1}".format(name,ns))

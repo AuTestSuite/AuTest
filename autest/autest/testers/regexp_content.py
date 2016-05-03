@@ -1,8 +1,8 @@
 import hosts.output as host
 import re
 
-import tester
-from file_callback import FileContentCallback
+from . import tester
+from .file_callback import FileContentCallback
 
 class RegexpContent(FileContentCallback):
     def __init__(self, regexp, description, killOnFailure=False):

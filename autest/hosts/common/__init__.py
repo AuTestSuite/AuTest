@@ -1,6 +1,6 @@
 
 import collections
-import is_a
+from . import is_a
 
 
 def flatten(iterable):

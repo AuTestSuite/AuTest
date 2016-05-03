@@ -1,4 +1,3 @@
-from exceptions import KeyboardInterrupt
 
 class Task(object):
     def __init__(self, callback):

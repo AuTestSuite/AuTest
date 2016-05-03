@@ -2,12 +2,12 @@ import autest.glb as glb
 import autest.common.execfile as execfile
 import hosts.output as host
 import autest.api as api
-import setupitem
-import runtesttask
+from . import setupitem
+from . import runtesttask
 import autest.testers.tester as testers
 from autest.common.disk import remove_read_only
-import report 
-import test
+from . import report 
+from . import test
 
 
 import os
@@ -144,18 +144,18 @@ class Engine(object):
                     if not fnmatch(name, self.__filter_in):
                         continue
 
-                    if self.__tests.has_key(name):
+                    if name in self.__tests:
                         host.WriteWarning("overiding test",name, "with test in", root)
                     host.WriteVerbose("test_scan","   Found test",name)
                     self.__tests[name]=test.Test(name,root,f,self.__run_dir,self.__test_dir)
 
     def _run_tests(self):
         if self.__jobs > 1:
-            for t in self.__tests.itervalues():
+            for t in self.__tests.values():
                 self.__pool.addTask(self.__run_test_task, t)
             self.__pool.waitCompletion()
         else:
-            for t in self.__tests.itervalues():
+            for t in self.__tests.values():
                 self.__run_test_task(t)
 
     def __run_test_task(self, task):
@@ -166,7 +166,7 @@ class Engine(object):
     def _make_report(self):
         # need to clean this up more...
         reportdata = report.TestsReport()
-        for test in self.__tests.itervalues():
+        for test in self.__tests.values():
             reportdata.addTestRun(test)
         host.WriteMessage("\nReport: --------------")
         for msg in reportdata.exportForConsole():

@@ -1,7 +1,7 @@
 import hosts.output as host
 import abc
 import traceback
-from exceptions import KeyboardInterrupt
+
 
 def get_name( obj ):
     if hasattr(obj, '__call__'):
@@ -18,7 +18,7 @@ class ResultType ( object ):
 
     @classmethod
     def to_string( cls, v ):
-        for name, value in vars(cls).iteritems():
+        for name, value in vars(cls).items():
             if value == v:
                 return name
         return "Unknown"

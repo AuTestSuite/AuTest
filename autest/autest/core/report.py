@@ -72,13 +72,13 @@ class TestsReport(object):
                                 yield '      Reason: %s' % reason
 
     def exportForConsole(self):
-        for testDir, testFile in self.testRuns.iterkeys():
+        for testDir, testFile in self.testRuns.keys():
             for msg in self._asStrList(testDir, testFile):
                 yield msg
 
     def exportForJson(self):
         result = []
-        for (testDir, testFile), (status, msg) in self.testRuns.iteritems():
+        for (testDir, testFile), (status, msg) in self.testRuns.items():
             messages = [msg for msg in self._asStrList(testDir, testFile, addStreamBoth=True)]
             result.append((testDir, testFile, status, '\n'.join(messages)))
         return json.dumps(result)

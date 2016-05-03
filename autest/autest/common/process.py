@@ -7,7 +7,7 @@ import os
 import signal
 
 import ctypes
-
+import time
 
 if os.name == 'nt':
     import win32
@@ -93,7 +93,7 @@ else:
         # this is to deal with anything new
         args = list(args)
         kw = dict(kw)
-        if kw.has_key('preexec_fn'):
+        if 'preexec_fn' in kw:
             preexec_fn = kw['preexec_fn']
             def wrapper( *lst, **kw ):
                 '''

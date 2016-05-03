@@ -1,3 +1,3 @@
 
-import svn
-import copy_items
+from . import svn
+from . import copy_items
