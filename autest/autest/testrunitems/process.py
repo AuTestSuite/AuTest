@@ -121,7 +121,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         command_line = template.substitute(self._Test.Env)
 
         #call event that we are starting to run the process
-        host.WriteDebugf(["process"],"Calling StartingRun event with {0} callback mapped to it",len(self.StartingRun))
+        host.WriteDebugf(["process"],"Calling StartingRun event with {0} callbacks mapped to it",len(self.StartingRun))
         self.StartingRun()  
         host.WriteVerbose(["process"],"Running cmd='{0}'".format(command_line))
         self.__proc = autest.common.process.Popen(command_line,
@@ -139,7 +139,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__last_event_time = self.__start_time
 
         #set event that process was started
-        host.WriteDebugf(["process"],"Calling RunStarted event with {0} callback mapped to it",len(self.RunStarted))
+        host.WriteDebugf(["process"],"Calling RunStarted event with {0} callbacks mapped to it",len(self.RunStarted))
         self.RunStarted()
 
 
@@ -150,7 +150,7 @@ class Process(testrunitem.TestRunItem,order.Order):
                 #make event info object
                 event_info = eventinfo.RunningInfo(self.__start_time,curr_time)
                 #call event
-                host.WriteDebugf(["process"],"Calling Running event with {0} callback mapped to it",len(self.Running))
+                host.WriteDebugf(["process"],"Calling Running event with {0} callbacks mapped to it",len(self.Running))
                 test_run.Running(event_info)
                 self.__last_event_time = curr_time
             return True
@@ -169,7 +169,7 @@ class Process(testrunitem.TestRunItem,order.Order):
             #make event info object
             event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
             #call event
-            host.WriteDebug(["process"],"Calling RunFinished event with {0} callback mapped to it".format(len(self.RunFinished)))
+            host.WriteDebug(["process"],"Calling RunFinished event with {0} callbacks mapped to it".format(len(self.RunFinished)))
             self.RunFinished(event_info)
 
             self.__stdout = None
