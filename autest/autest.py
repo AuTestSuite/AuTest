@@ -7,7 +7,48 @@ from autest.core.engine import Engine
 import hosts
 import hosts.output
 from hosts.console import ConsoleHost
+import copy
 
+class extendAction(argparse.Action):
+    def __init__(self,
+                 option_strings,
+                 dest,
+                 nargs=None,
+                 const=None,
+                 default=None,
+                 type=None,
+                 choices=None,
+                 required=False,
+                 help=None,
+                 metavar=None):
+        
+        #if nargs == 0:
+        #    raise ValueError('nargs for append actions must be > 0; if arg '
+        #                     'strings are not supplying the value to append, '
+        #                     'the append const action may be more appropriate')
+        #if const is not None and nargs != OPTIONAL:
+        #    raise ValueError('nargs must be %r to supply const' % OPTIONAL)
+        super(extendAction, self).__init__(option_strings=option_strings,
+            dest=dest,
+            nargs=nargs,
+            const=const,
+            default=default,
+            type=type,
+            choices=choices,
+            required=required,
+            help=help,
+            metavar=metavar)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = copy.copy(getattr(namespace, self.dest, []))
+        if items is None:
+            items = []
+        if values == []:
+            values = ['*']
+        for i in values:
+            i = i.split(",")
+            items.extend(i)
+        setattr(namespace, self.dest, items)
 
 def MakePath(arg):
     path=os.path.abspath(arg)
@@ -55,6 +96,12 @@ if __name__ == '__main__':
                         default=1,
                         type=JobValues,
                         help="The number of test to try to run at the same time")
+    
+    parser.add_argument("-f", "--filters", 
+                        dest='filters',
+                        nargs='*',
+                        action=extendAction,
+                        help="Filter the tests run by their names")
 
     parser.add_argument('-V','--version', action='version', version='%(prog)s 1.0.Beta')
     
@@ -78,7 +125,8 @@ if __name__ == '__main__':
                    jobs=args.jobs,
                    test_dir=args.directory,
                    run_dir=args.sandbox,
-                   gtest_site=args.gtest_site)
+                   gtest_site=args.gtest_site,
+                   filters=args.filters)
 
 
     ret=myEngine.Start()

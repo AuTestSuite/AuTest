@@ -22,14 +22,14 @@ class Engine(object):
     """description of class"""
 
     def __init__(self, jobs=1, test_dir='./', run_dir="./_sandbox", gtest_site=None,
-                 filter_in='*', dump_report=False):
+                 filters='*', dump_report=False):
 
         self.__tests = {}  # the dict of the different tests we have {name:testobj}
         self.__jobs = jobs  # how many jobs to try to run at a given time
         self.__test_dir = test_dir  # this the root directory to look for the tests
         self.__run_dir = os.path.abspath(run_dir) # this is the directory to run the tests in
         self.__gtest_site = gtest_site # any special gtest directory to look up. None uses standard one
-        self.__filter_in = filter_in  # which set of tests to run
+        self.__filters = filters  # which set of tests to run
         #self.__dump_report = dump_report
         x=""
 
@@ -141,10 +141,17 @@ class Engine(object):
                         name=f[:-len('.test.py')]
                     else:
                         name=f[:-len('.test')]
-
-                    if not fnmatch(name, self.__filter_in):
+                    match=False
+                    for filter in self.__filters:
+                        if not filter.startswith("*"):
+                            filter="*"+filter
+                        if fnmatch(os.path.join(root,name), filter):
+                            # we have a match, use this test 
+                            break
+                    else:
+                        # did not get a match
+                        host.WriteVerbose("test_scan","   Skipping test",name)
                         continue
-
                     if name in self.__tests:
                         host.WriteWarning("overiding test",name, "with test in", root)
                     host.WriteVerbose("test_scan","   Found test",name)
