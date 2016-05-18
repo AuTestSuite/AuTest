@@ -70,8 +70,7 @@ def JobValues(arg):
     return j
 
 
-if __name__ == '__main__':
-    
+def main():    
     # create primary commandline parser
     parser=argparse.ArgumentParser()
     
@@ -133,7 +132,8 @@ if __name__ == '__main__':
     exit(ret)
 
     
-
+if __name__ == '__main__':
+    main()
 
 
 

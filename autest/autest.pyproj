@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>cdfc1861-76ef-4998-8917-9ea1bcbcac14</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>autest.py</StartupFile>
+    <StartupFile>autest\autest.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -39,7 +39,7 @@
     <Compile Include="autest\api\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest.py" />
+    <Compile Include="autest\autest.py" />
     <Compile Include="autest\common\disk.py" />
     <Compile Include="autest\common\execfile.py">
       <SubType>Code</SubType>
