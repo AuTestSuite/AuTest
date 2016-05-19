@@ -99,6 +99,7 @@ def main():
     parser.add_argument("-f", "--filters", 
                         dest='filters',
                         nargs='*',
+                        default=['*'],
                         action=extendAction,
                         help="Filter the tests run by their names")
 

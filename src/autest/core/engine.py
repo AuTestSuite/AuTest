@@ -80,6 +80,10 @@ class Engine(object):
         #self.__timer.startEvent('scanning for tests')
         host.WriteVerbose("engine", "Scanning for tests")
         self._scan_for_tests()
+        if not self.__tests:
+            host.WriteMessage("No tests found to run")
+            host.WriteMessage("If your tests are in a different directory try using --directory=<path with tests>")
+            return ""
         #self.__timer.stopEvent('scanning for tests')
         host.WriteVerbose("engine", "Running tests")
         self._run_tests()
@@ -128,7 +132,6 @@ class Engine(object):
 
     def _scan_for_tests(self):
         # scan for tests in and under the provided test directory
-        ret=[]
         for root, dirs, files in os.walk(self.__test_dir):
             host.WriteVerbose("test_scan","Looking for tests in",root)
             # Note because we are using os.walk we get the file name with our directory

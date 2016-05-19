@@ -10,7 +10,7 @@ setup(name="autest",
         version="1.0.0",
         packages=find_packages(exclude=('test')),
 		entry_points={
-          'console_scripts': ['autest = autest.autest:main']
+          'console_scripts': ['autest = autest.__main__:main']
           },
         install_requires =[
                 "colorama",
