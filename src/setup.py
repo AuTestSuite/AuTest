@@ -1,8 +1,6 @@
 from setuptools import setup, find_packages
 import os
 
-print find_packages(exclude=('test'))
-
 setup(name="autest",
         description="Resuable gold file testing system",
         author="Jason Kenny",

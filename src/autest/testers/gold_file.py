@@ -5,10 +5,11 @@ import difflib
 import json
 
 class GoldFile(tester.Tester):
-    def __init__(self,goldfile,test_value=None,kill_on_failure=False):
+    def __init__(self,goldfile,test_value=None,kill_on_failure=False,normalize_eol=True):
         super(GoldFile,self).__init__(test_value=test_value,kill_on_failure=kill_on_failure)
-        self.Description="Checking that {0} matches {1}".format(test_value,goldfile)
-        self._goldfile=goldfile
+        self.Description = "Checking that {0} matches {1}".format(test_value,goldfile)
+        self._goldfile = goldfile
+        self._normalize_eol = normalize_eol
 
     def test(self,eventinfo,**kw):
         #if not self._test_attibute(eventinfo,self.test_value):
@@ -16,93 +17,95 @@ class GoldFile(tester.Tester):
         #val=getattr(eventinfo,self.test_value)
 
         # get the attribute file context
-        tmp=self._GetContent(eventinfo)
+        tmp = self._GetContent(eventinfo)
         if tmp is None:
             pass
         try:
-            val_content=open(tmp).read()
+            val_content = open(tmp).read()
         except (OSError, IOError) as e:
-            self.Result=tester.ResultType.Failed
-            self.Reason=str(e)
+            self.Result = tester.ResultType.Failed
+            self.Reason = str(e)
             return
 
         # get the gold file context
-        tmp=self._GetContent(eventinfo,self._goldfile)
+        tmp = self._GetContent(eventinfo,self._goldfile)
         if tmp is None:
             pass
         try:
-            gf_content=open(tmp).read()
+            gf_content = open(tmp).read()
         except KeyboardInterrupt:
             raise
         except:
             host.WriteError("Can't open file {0}".format(tmp))
         
-        
+        if self._normalize_eol:
+            val_content = val_content.replace("\r\n","\n")
+            gf_content = gf_content.replace("\r\n","\n")
 
         # make seqerncer differ
-        seq=difflib.SequenceMatcher(None,val_content,gf_content)
+        seq = difflib.SequenceMatcher(None,val_content,gf_content)
         #do we have a match
         if seq.ratio() == 1.0:
             #The says ratio everything matched
-            self.Result=tester.ResultType.Passed
-            self.Reason="Values match"
+            self.Result = tester.ResultType.Passed
+            self.Reason = "Values match"
             host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
             return
-        # if we are here we don't have a match at the moment. At this point we process difference to see if they 
-        # match and special code we have and do replacements of values and diff again to see if we have a match
+        # if we are here we don't have a match at the moment.  At this point we
+        # process difference to see if they
+        # match and special code we have and do replacements of values and diff
+        # again to see if we have a match
         #get diffs
-        results=seq.get_opcodes()
-        newtext=''
+        results = seq.get_opcodes()
+        newtext = ''
         for tag, i1, i2, j1, j2 in results:
             # technically we can see that we might have a real diff
-            # but we continue as this allow certain values to be replaced helping to make the 
+            # but we continue as this allow certain values to be replaced
+            # helping to make the
             # finial diff string more readable
-            if tag =="replace" :
-                data=gf_content[j1:j2]
-                tmp=self._do_action_replace(data,val_content[i1:i2])
+            if tag == "replace" :
+                data = gf_content[j1:j2]
+                tmp = self._do_action_replace(data,val_content[i1:i2])
                 if tmp:
                     newtext+=tmp
                     continue
 
-            if tag =="insert" :
-                data=gf_content[j1:j2]
-                tmp=self._do_action_add(data,val_content[i1:i2])
+            if tag == "insert" :
+                data = gf_content[j1:j2]
+                tmp = self._do_action_add(data,val_content[i1:i2])
                 if tmp is not None:
                     newtext+=tmp
                     continue
             
             newtext+=gf_content[j1:j2]
 
-        #reset the sequence test 
+        #reset the sequence test
         seq.set_seq2(newtext)
         if seq.ratio() == 1.0:
             #The says ratio everything matched
-            self.Result=tester.ResultType.Passed
-            self.Reason="Values match"
+            self.Result = tester.ResultType.Passed
+            self.Reason = "Values match"
             host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
             return
-        # this makes a nice string value.. 
-        diff=difflib.Differ()
-        self.Result=tester.ResultType.Failed
-        tmp_result="\n".join(diff.compare(val_content.splitlines(),
-                                              newtext.splitlines()
-                                              )
-                                 )
+        # this makes a nice string value..
+        diff = difflib.Differ()
+        self.Result = tester.ResultType.Failed
+        tmp_result = "\n".join(diff.compare(val_content.splitlines(),
+                                              newtext.splitlines()))
         
-        self.Reason="File differences\nData File : {0}\nGold File : {1}\n{2}".format(
-                            self._GetContent(eventinfo),
+        self.Reason = "File differences\nData File : {0}\nGold File : {1}\n{2}".format(self._GetContent(eventinfo),
                             self._GetContent(eventinfo,self._goldfile),
-                            tmp_result
-                            )
+                            tmp_result)
         host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
         if self.KillOnFailure:
             raise KillOnFailureError
 
-        # todo Change this logic to 
+        # todo Change this logic to
         # replace gold file text token with special values
         # special value is key, while orginial text is the "action"
         # on first diff we see if replace text matches key, if so we do action
-        # note unique key need to be a safe, ideally control character that would not be typed 
+        # note unique key need to be a safe, ideally control character that
+        # would not be typed
         # or added to a text file normally
     def _do_action_replace(self,data,text):
         try:
@@ -125,15 +128,16 @@ class GoldFile(tester.Tester):
         return None
 
 class GoldFileList(tester.Tester):
-    def __init__(self, goldfilesList, test_value=None, kill_on_failure=False):
+    def __init__(self, goldfilesList, test_value=None, kill_on_failure=False,normalize_eol=True):
         super(GoldFileList, self).__init__(test_value=test_value,
-                                          kill_on_failure=kill_on_failure)
+                                            kill_on_failure=kill_on_failure)
         self.Description = "Checking that {0} matches one of {1}".format(test_value,
                 ', '.join([str(gold) for gold in goldfilesList]))
         golds = []
         for goldfile in goldfilesList:
             golds.append(GoldFile(goldfile, test_value=test_value,
-                                  kill_on_failure=kill_on_failure))
+                                    kill_on_failure=kill_on_failure,
+                                    normalize_eol=normalize_eol))
         self._golds = golds
         
     def test(self, eventinfo, **kw):
@@ -148,7 +152,7 @@ class GoldFileList(tester.Tester):
 
         # there were no matching gold files found
         self.Result = tester.ResultType.Failed
-        self.Reason = 'No matching gold files found, differences:\n%s' % '\n\n'.join(results)
+        self.Reason = 'No matching gold files found, differences:\n{0}'.format('\n\n'.join(results))
 
     @property
     def TestValue(self):
