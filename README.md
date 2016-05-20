@@ -26,14 +26,17 @@ How do I get set up?
 Make sure you have python installed
 
 To install run the command:
+~~~~
  pip install autest
+~~~~
 
 Basic usage
 ----------------------------------
 
 In the directory containing the tests run:
-
+~~~~
 autest
+~~~~
 
 Read documentation to learn how to use write and use autest in more detail
 <fill in once we have documenation written>
