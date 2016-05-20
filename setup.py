@@ -1,17 +1,35 @@
 from setuptools import setup, find_packages
-import os
 
 setup(name="autest",
         version="1.0.0b0",
         description="Resuable gold file testing system",
-        long_description="fill in",
+        long_description='''Resuable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
+
+Goals
+----------------------------------
+
+* Easy to write and add tests
+* Extensible system to allow: 
+ * Adding new functionality for testing your application
+ * Batch commands as a new function to make it easier to write tests
+ * Define custom report outputs
+* Percise as possible error messages to make it easy to see what is wrong fast
+* Sandbox to make it easy to see what failed and reproduce out of test system
+* Flexibale gold file synatx to make it easier to ignore text that is not important
+* Run on python 2 or 3
+
+Non-Goals
+----------------------------------
+
+The Resuable Gold testing system is not about making another unit testing framework.
+        ''',
         author="Jason Kenny",
         author_email="dragon512@live.com",
         url="https://bitbucket.org/dragon512/reusable-gold-testing-system",
         license="MIT",
         package_dir = {'': 'src'},
         packages=find_packages('src',exclude=('test')),
-		entry_points={
+        entry_points={
           'console_scripts': ['autest = autest.__main__:main']
           },
         install_requires =["colorama",
