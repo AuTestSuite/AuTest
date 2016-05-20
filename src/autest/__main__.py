@@ -103,7 +103,7 @@ def main():
                         action=extendAction,
                         help="Filter the tests run by their names")
 
-    parser.add_argument('-V','--version', action='version', version='%(prog)s 1.0.Beta')
+    parser.add_argument('-V','--version', action='version', version='%(prog)s 1.0.0b0')
     
    
     # this is a commandline tool so make the cli host
