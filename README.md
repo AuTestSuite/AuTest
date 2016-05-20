@@ -1,29 +1,46 @@
-# README #
+Reusable Gold Testing System
+===================================
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Resuable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
 
-### What is this repository for? ###
+Goals
+----------------------------------
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* Easy to write and add tests
+* Extensible system to allow: 
+ * Adding new functionality for testing your application
+ * Batch commands as a new function to make it easier to write tests
+ * Define custom report outputs
+* Percise as possible error messages to make it easy to see what is wrong fast
+* Sandbox to make it easy to see what failed and reproduce out of test system
+* Flexibale gold file synatx to make it easier to ignore text that is not important
+* Run on python 2 or 3
 
-### How do I get set up? ###
+Non-Goals
+----------------------------------
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+The Resuable Gold testing system is not about making another unit testing framework.
 
-### Contribution guidelines ###
+How do I get set up?
+----------------------------------
+Make sure you have python installed
 
-* Writing tests
-* Code review
-* Other guidelines
+To install run the command:
+ pip install autest
 
-### Who do I talk to? ###
+Basic usage
+----------------------------------
 
-* Repo owner or admin
-* Other community or team contact
+In the directory containing the tests run:
+
+autest
+
+Read documentation to learn how to use write and use autest in more detail
+<fill in once we have documenation written>
+
+Contribution guidelines
+----------------------------------
+
+* Feel free to suggest fixes or ask question
+* Have a fix submit a pull request!
+
