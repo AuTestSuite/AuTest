@@ -1,7 +1,13 @@
 from setuptools import setup, find_packages
+import sys
+
+sys.path.append("./src")
+
+import autest
+
 
 setup(name="autest",
-        version="1.0.0b0",
+        version=autest.__version__,
         description="Resuable gold file testing system",
         long_description='''Resuable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
 
