@@ -28,16 +28,16 @@ class Engine(object):
         self.__jobs = jobs  # how many jobs to try to run at a given time
         self.__test_dir = test_dir  # this the root directory to look for the tests
         self.__run_dir = os.path.abspath(run_dir) # this is the directory to run the tests in
-        self.__gtest_site = gtest_site # any special gtest directory to look up. None uses standard one
+        self.__gtest_site = gtest_site # any special gtest directory to look up.  None uses standard one
         self.__filters = filters  # which set of tests to run
         #self.__dump_report = dump_report
-        x=""
+        x = ""
 
         # setup the thread poool to run all the tasks
         #if jobs > 1:
             #self.__pool = ThreadPool(jobs)
         
-        #set the engine to be easy to access 
+        #set the engine to be easy to access
         if glb.Engine:
             raise RuntimeError("Only one engine can be created at a time")
         glb.Engine = self
@@ -60,7 +60,8 @@ class Engine(object):
                     shutil.rmtree(self.__run_dir, onerror=remove_read_only)
                 except BaseException as e:
                     if e.args != oldExceptionArgs:
-                        # maybe this is Windows issue where antivirus won't let us remove
+                        # maybe this is Windows issue where antivirus won't let
+                        # us remove
                         # some random directory, so we're waiting & retrying
                         oldExceptionArgs = e.args
                         time.sleep(1)
@@ -93,15 +94,17 @@ class Engine(object):
         #self.__timer.stopEvent('making report')
         #self.__timer.stopEvent('total')
         #for eventName, eventDuration in self.__timer.getEvents():
-            #print 'durations', '%s - %.2f sec.' % (eventName.ljust(40), eventDuration)
-            #host.WriteVerbose('durations', '%s - %.2f sec.' % (eventName.ljust(40), eventDuration))
+            #print 'durations', '%s - %.2f sec.' % (eventName.ljust(40),
+            #eventDuration)
+            #host.WriteVerbose('durations', '%s - %.2f sec.' %
+            #(eventName.ljust(40), eventDuration))
         return result
 
     def _load_extensions(self):
         # load files of our extension type in the directory
 
         # add expected API function so they can be called
-        locals={
+        locals = {
                 'AddTestRunSet':api.ExtendTest, 
                 'AddSetupTask':api.AddSetupItem, # backward compat
                 'AddSetupItem':api.AddSetupItem,
@@ -113,16 +116,16 @@ class Engine(object):
         # Which directory to use
         if self.__gtest_site is None:
             # this is the default
-            path=os.path.join(self.__test_dir,'gtest-site')
+            path = os.path.join(self.__test_dir,'gtest-site')
         else:
             #This is a custom location
-            path=os.path.abspath(self.__gtest_site)
+            path = os.path.abspath(self.__gtest_site)
 
         # given it exists we want to load data from it
         if os.path.exists(path):
             host.WriteVerbose("engine","Loading Extensions from {0}".format(path))
             for f in os.listdir(path):
-                f=os.path.join(path,f)
+                f = os.path.join(path,f)
                 if os.path.isfile(f) and f.endswith("test.ext"):
                     execfile.execFile(f,locals,locals)
         elif self.__gtest_site is not None:
@@ -134,22 +137,25 @@ class Engine(object):
         # scan for tests in and under the provided test directory
         for root, dirs, files in os.walk(self.__test_dir):
             host.WriteVerbose("test_scan","Looking for tests in",root)
-            # Note because we are using os.walk we get the file name with our directory
-            # this mean we have to check for duplicated in names else we will have conflicts
-            # ie a test might not run as it was replaced by a test with the same name that 
+            # Note because we are using os.walk we get the file name with our
+            # directory
+            # this mean we have to check for duplicated in names else we will
+            # have conflicts
+            # ie a test might not run as it was replaced by a test with the
+            # same name that
             # was loaded at a later time.
             for f in files:
                 if f.endswith('.test.py') or f.endswith(".test"):
                     if f.endswith('.test.py'):
-                        name=f[:-len('.test.py')]
+                        name = f[:-len('.test.py')]
                     else:
-                        name=f[:-len('.test')]
-                    match=False
+                        name = f[:-len('.test')]
+                    match = False
                     for filter in self.__filters:
                         if not filter.startswith("*"):
-                            filter="*"+filter
+                            filter = "*" + filter
                         if fnmatch(os.path.join(root,name), filter):
-                            # we have a match, use this test 
+                            # we have a match, use this test
                             break
                     else:
                         # did not get a match
@@ -158,7 +164,7 @@ class Engine(object):
                     if name in self.__tests:
                         host.WriteWarning("overiding test",name, "with test in", root)
                     host.WriteVerbose("test_scan","   Found test",name)
-                    self.__tests[name]=test.Test(name,root,f,self.__run_dir,self.__test_dir)
+                    self.__tests[name] = test.Test(name,root,f,self.__run_dir,self.__test_dir)
 
     def _run_tests(self):
         if self.__jobs > 1:
@@ -199,7 +205,8 @@ class Engine(object):
             host.WriteMessage(' {0}: {1}'.format(testers.ResultType.to_string(resType), amount))
 
         #if self.__dump_report:
-            #host.WriteMessage('\n\n{JSON_REPORT}%s{/JSON_REPORT}' % reportdata.exportForJson())
+            #host.WriteMessage('\n\n{JSON_REPORT}%s{/JSON_REPORT}' %
+            #reportdata.exportForJson())
         return runResult
 
     @property

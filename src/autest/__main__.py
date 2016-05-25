@@ -95,6 +95,10 @@ def main():
                         default=1,
                         type=JobValues,
                         help="The number of test to try to run at the same time")
+
+    parser.add_argument("--env",
+                        nargs="*",
+                        help="Set a variable to be used in the local test environment. replaces value inherited from shell. Usage --env key=val key2=val2 ...")
     
     parser.add_argument("-f", "--filters", 
                         dest='filters',
@@ -116,9 +120,7 @@ def main():
     #parser should have all option defined by program and or host type defined
     args=parser.parse_args()
     hosts.output.WriteDebug("init","args=",args)
-
-    #print(args)
-
+  
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options, or maybe not
     myEngine=Engine(

@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "autest", "src/autest.pyproj", "{CDFC1861-76EF-4998-8917-9EA1BCBCAC14}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "autest", "src\autest.pyproj", "{CDFC1861-76EF-4998-8917-9EA1BCBCAC14}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{85A0A1C8-F969-4303-8BC2-1E59B8004660}"
+	ProjectSection(SolutionItems) = preProject
+		setup.py = setup.py
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
