@@ -4,10 +4,12 @@ import sys
 import os
 import argparse
 from autest.core.engine import Engine
+import autest.common.execfile as execfile
 import hosts
 import hosts.output
 from hosts.console import ConsoleHost
 import copy
+import autest
 
 class extendAction(argparse.Action):
     def __init__(self,
@@ -98,7 +100,8 @@ def main():
 
     parser.add_argument("--env",
                         nargs="*",
-                        help="Set a variable to be used in the local test environment. replaces value inherited from shell. Usage --env key=val key2=val2 ...")
+                        metavar="Key=Value",
+                        help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")
     
     parser.add_argument("-f", "--filters", 
                         dest='filters',
@@ -107,7 +110,7 @@ def main():
                         action=extendAction,
                         help="Filter the tests run by their names")
 
-    parser.add_argument('-V','--version', action='version', version='%(prog)s 1.0.0b0')
+    parser.add_argument('-V','--version', action='version', version='%(prog)s {0}'.format(autest.__version__))
     
    
     # this is a commandline tool so make the cli host
@@ -118,9 +121,22 @@ def main():
     hosts.Setup(myhost)
 
     #parser should have all option defined by program and or host type defined
-    args=parser.parse_args()
-    hosts.output.WriteDebug("init","args=",args)
+    args,unknown_args=parser.parse_known_args()
+
+    hosts.output.WriteDebugf("init","args = {0}\n unknown = {1}",args,unknown_args)
+    ##-------------------------------------------
+    #setup shell environment
+    env=None
+    if args.env:
+        env={}
+        for i in args.env:
+            try:
+                k,v = i.split("=",1)
+                env[k]=v
+            except ValueError:
+                hosts.output.WriteWarning("--env value '{0}' ignored. Needs to in the form of Key=Value".format(i))
   
+ 
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options, or maybe not
     myEngine=Engine(
@@ -128,8 +144,8 @@ def main():
                    test_dir=args.directory,
                    run_dir=args.sandbox,
                    gtest_site=args.gtest_site,
-                   filters=args.filters)
-
+                   filters=args.filters,
+                   env=env)
 
     ret=myEngine.Start()
     exit(ret)

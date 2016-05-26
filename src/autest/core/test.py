@@ -59,7 +59,7 @@ class Test(object):
                "__env",
                ]
     
-    def __init__(self,name,test_dir,test_file,run_root,test_root):
+    def __init__(self,name,test_dir,test_file,run_root,test_root,env):
         # traits
         self.__run_serial=False
         self.__summary=''
@@ -88,7 +88,7 @@ class Test(object):
         self.__setup = setup.Setup(self)
         self.__conditions=conditions.Conditions()
         # make a copy of the environment so we can modify it without issue
-        self.__env=os.environ.copy()
+        self.__env=env
         #add some default values
         self.__env['GTEST_TEST_ROOT_DIR']=self.__test_root
         self.__env['GTEST_TEST_DIR']=self.__test_dir
