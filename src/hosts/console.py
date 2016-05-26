@@ -10,7 +10,7 @@ from . import interfaces
 class ConsoleHost(interfaces.UIHost):
     """description of class"""
     def __init__(self,parser):
-        args=parser.parse_args()
+        args,unknown=parser.parse_known_args()
         
         self.__verbose=[] if args.verbose is None else args.verbose
         self.__debug=[] if args.debug is None else args.debug
@@ -35,7 +35,7 @@ class ConsoleHost(interfaces.UIHost):
 # our virtual streams
     
     def writeMessage(self,msg):
-        self.__stdout__.write(colorama.Style.BRIGHT+msg+colorama.Fore.RESET)
+        self.__stdout__.write(colorama.Style.BRIGHT+msg+colorama.Style.RESET_ALL)
 
     
     def get_contents(self, filename, lineno):
