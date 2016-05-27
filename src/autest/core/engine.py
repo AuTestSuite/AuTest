@@ -21,20 +21,16 @@ import shutil
 class Engine(object):
     """description of class"""
 
-    def __init__(self, jobs=1, test_dir='./', run_dir="./_sandbox", gtest_site=None,
+    def __init__(self, jobs=1, test_dir='./', run_dir="./_sandbox", autest_site=None,
                  filters='*', dump_report=False, env=None):
 
         self.__tests = {}  # the dict of the different tests we have {name:testobj}
         self.__jobs = jobs  # how many jobs to try to run at a given time
         self.__test_dir = test_dir  # this the root directory to look for the tests
         self.__run_dir = os.path.abspath(run_dir) # this is the directory to run the tests in
-        self.__gtest_site = gtest_site # any special gtest directory to look up.  None uses standard one
-        self.__filters = filters  # which set of tests to run
-        
-        shell_env = os.environ.copy()
-        if env:
-            shell_env.update(env) 
-        self.__ENV = shell_env
+        self.__autest_site = autest_site # any special autest directory to look up.  None uses standard one
+        self.__filters = filters  # which set of tests to run        
+        self.__ENV = env
 
         # setup the thread poool to run all the tasks
         #if jobs > 1:
@@ -117,12 +113,12 @@ class Engine(object):
 
 
         # Which directory to use
-        if self.__gtest_site is None:
+        if self.__autest_site is None:
             # this is the default
-            path = os.path.join(self.__test_dir,'gtest-site')
+            path = os.path.join(self.__test_dir,'autest-site')
         else:
             #This is a custom location
-            path = os.path.abspath(self.__gtest_site)
+            path = os.path.abspath(self.__autest_site)
 
         # given it exists we want to load data from it
         if os.path.exists(path):
@@ -131,10 +127,10 @@ class Engine(object):
                 f = os.path.join(path,f)
                 if os.path.isfile(f) and f.endswith("test.ext"):
                     execfile.execFile(f,locals,locals)
-        elif self.__gtest_site is not None:
-            host.WriteError("Custom gtest-site path note found. Looking for:\n {0}".format(path))
+        elif self.__autest_site is not None:
+            host.WriteError("Custom autest-site path note found. Looking for:\n {0}".format(path))
         else:
-            host.WriteVerbose("engine","gtest-site path not found")
+            host.WriteVerbose("engine","autest-site path not found")
 
     def _scan_for_tests(self):
         # scan for tests in and under the provided test directory
