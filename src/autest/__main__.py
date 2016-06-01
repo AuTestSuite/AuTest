@@ -190,7 +190,7 @@ def main():
                         type=JobValues,
                         help="The number of test to try to run at the same time")
 
-    setup.add_argument(["--env"],
+    setup.list_argument(["--env"],
                         nargs="*",
                         metavar="Key=Value",
                         help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")

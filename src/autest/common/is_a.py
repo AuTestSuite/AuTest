@@ -1,5 +1,4 @@
 from __future__ import absolute_import, division, print_function
-# double check this is correct for all cases
 from builtins import int
 from future.utils import native_str 
 
