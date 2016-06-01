@@ -26,13 +26,10 @@ class extendAction(argparse.Action):
                  help=None,
                  metavar=None ):
 
-        if nargs == "?" :
-            self.default = default
-            raise ValueError('nargs cannot be set to "?" for lists')
-        elif is_a.String(nargs) and nargs.isdigit() and int(nargs) <= 1:
-            raise ValueError('nargs for extend actions must be greater than 1')
-        elif is_a.Int(nargs) and nargs <= 1:
-            raise ValueError('nargs for extend actions must be greater than 1')
+        if is_a.Int(nargs) and nargs <= 1:
+            raise ValueError('Invalid value for nargs:\n must be "+" or "*" or a number greater than 1')
+        elif is_a.String(nargs) and nargs not in ("+","*"):
+            raise ValueError('Invalid value for nargs:\n must be "+" or "*" or a number greater than 1')
         elif not is_a.String(nargs) and not is_a.Int(nargs):
             raise ValueError('nargs for extend actions must be a string or int type')
 
@@ -191,7 +188,6 @@ def main():
                         help="The number of test to try to run at the same time")
 
     setup.list_argument(["--env"],
-                        nargs="*",
                         metavar="Key=Value",
                         help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")
     
