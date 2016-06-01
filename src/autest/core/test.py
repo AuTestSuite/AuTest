@@ -90,9 +90,9 @@ class Test(object):
         # make a copy of the environment so we can modify it without issue
         self.__env=env
         #add some default values
-        self.__env['GTEST_TEST_ROOT_DIR']=self.__test_root
-        self.__env['GTEST_TEST_DIR']=self.__test_dir
-        self.__env['GTEST_RUN_DIR']=self.__run_dir
+        self.__env['AUTEST_TEST_ROOT_DIR']=self.__test_root
+        self.__env['AUTEST_TEST_DIR']=self.__test_dir
+        self.__env['AUTEST_RUN_DIR']=self.__run_dir
 
         
 # public properties
