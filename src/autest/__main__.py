@@ -10,6 +10,7 @@ import hosts.output
 from hosts.console import ConsoleHost
 import copy
 import autest
+import autest.common.is_a as is_a
 
 #--------------
 class extendAction(argparse.Action):
@@ -28,10 +29,13 @@ class extendAction(argparse.Action):
         if nargs == "?" :
             self.default = default
             raise ValueError('nargs cannot be set to "?" for lists')
-
-        if nargs <= 1:
+        elif is_a.String(nargs) and nargs.isdigit() and int(nargs) <= 1:
             raise ValueError('nargs for extend actions must be greater than 1')
-        
+        elif is_a.Int(nargs) and nargs <= 1:
+            raise ValueError('nargs for extend actions must be greater than 1')
+        elif not is_a.String(nargs) and not is_a.Int(nargs):
+            raise ValueError('nargs for extend actions must be a string or int type')
+
         super(extendAction, self).__init__(option_strings=option_strings,
             dest=dest,
             nargs=nargs,
@@ -121,8 +125,8 @@ class Settings(object):
     def enum_argument( self, arguments, choices, default=None, required=None, help=None, metavar=None, dest=None ):
         self.add_argument(arguments, choices=choices, type=int, default=default, required=required, help=help, metavar=metavar, dest=dest)
     # add option for mapping x -> y values
-    def list_argument( self, arguments, choices=None, default=None, required=None, help=None, metavar=None, dest=None ):
-        self.add_argument(arguments, action=extendAction, choices=choices, type=str, default=default, required=required, help=help, metavar=metavar, dest=dest)
+    def list_argument( self, arguments,  nargs="*", choices=None, default=None, required=None, help=None, metavar=None, dest=None ):
+        self.add_argument(arguments, action=extendAction, nargs=nargs ,choices=choices, type=str, default=default, required=required, help=help, metavar=metavar, dest=dest)
 
     def get_argument( self, name ):
         return self.__arguments.get(name)
@@ -167,7 +171,6 @@ def JobValues( arg ):
 
 def main():    
     # create primary commandline parser
-    #parser = argparse.ArgumentParser()
     setup = Settings()
     
     setup.path_argument(["-D","--directory"],
@@ -192,11 +195,9 @@ def main():
                         metavar="Key=Value",
                         help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")
     
-    setup.add_argument(["-f", "--filters"], 
+    setup.list_argument(["-f", "--filters"], 
                         dest='filters',
-                        nargs='*',
                         default=['*'],
-                        action=extendAction,
                         help="Filter the tests run by their names")
 
     setup.add_argument(['-V','--version'], action='version', version='%(prog)s {0}'.format(autest.__version__))
