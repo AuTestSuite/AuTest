@@ -10,3 +10,6 @@ def String(obj):
 
 def Int(obj):
     return isinstance(obj,int)
+
+def Number(obj):
+    return isinstance(obj,int) or isinstance(obj,float)

@@ -1,45 +1,75 @@
 from __future__ import absolute_import, division, print_function
 import autest.common.process
 from autest.common import make_list
+import autest.common.is_a as is_a
 
-
-# need better name... to do later
-
+# need better name...  to do later
 class Order(object):
-    def __init__(self,*lst,**kw):
-        self.__startbefore=[]
-        self.__startafter=[]
-        self.__endbefore=[]
-        self.__endafter=[]
+    def __init__( self,*lst,**kw ):
+        self.__startbefore = {} # {process : metadata}
+        self.__startafter = {}
+        self.__endbefore = []
+        self.__endafter = []
         super(Order, self).__init__()
 
-    @property
-    def StartBefore(self):
-        return self.__startbefore
-    @StartBefore.setter
-    def StartBefore(self,obj):
-        obj=make_list(obj)
-        self.__startbefore.extend(obj)
-    @property
-    def StartAfter(self):
-        return self.__startafter
-    @StartAfter.setter
-    def StartAfter(self,obj):
-        obj=make_list(obj)
-        self.__startafter.extend(obj)
-    @property
-    def EndBefore(self):
-        return self.__endbefore
-    @EndBefore.setter
-    def EndBefore(self,obj):
-        obj=make_list(obj)
+    def StartBefore( self,*lst,**kw ):
+        if lst == () and kw == {}:
+            return self.__startbefore
+        if lst == () and kw != {}:
+            raise SyntaxError
+        
+        for obj in lst:
+            #validate this is an order object
+            if not isinstance(obj,Order):
+                host.WriteError("Object must be subclass of autest.core.order.Order")
+            readyfunc = kw.get("ready",lambda : obj._isReady())
+            if is_a.Number(readyfunc):
+                readyfunc = lambda : obj._hasRunFor(readyfunc)
+            args = kw.copy()
+            try:
+                del args["ready"]
+            except KeyError:
+                pass
+            
+            self.__startbefore[obj] = (readyfunc,args)
+
+
+    def StartAfter( self,*lst,**kw ):
+        if lst == () and kw == {}:
+            return self.__startafter
+        if lst == () and kw != {}:
+            raise SyntaxError
+        
+        for obj in lst:
+            #validate this is an order object
+            if not isinstance(obj,Order):
+                host.WriteError("Object must be subclass of autest.core.order.Order")
+            readyfunc = kw.get("ready",lambda : obj._isReady())
+            if is_a.Number(readyfunc):
+                readyfunc = lambda : obj._hasRunFor(readyfunc)
+            args = kw.copy()
+            try:
+                del args["ready"]
+            except KeyError:
+                pass
+            
+            self.__startafter[obj] = (readyfunc,args)
+
+    
+    def EndBefore( self,*lst,**kw ):
+        if lst == () and kw == {}:
+            return self.__endbefore
+        if lst == () and kw != {}:
+            raise SyntaxError
+        obj = make_list(lst)
         self.__endbefore.extend(obj)
-    @property
-    def EndAfter(self):
-        return self.__endafter
-    @EndAfter.setter
-    def EndAfter(self,obj):
-        obj=make_list(obj)
+    
+    def EndAfter( self,*lst,**kw ):
+        if lst == () and kw == {}:
+            return self.__endafter
+        if lst == () and kw != {}:
+            raise SyntaxError
+        obj = make_list(lst)
         self.__endafter.extend(obj)
 
 
