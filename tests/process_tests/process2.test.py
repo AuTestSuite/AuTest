@@ -15,8 +15,8 @@ p=t.Processes.Default
 p.Command="python app 1"
 p.ReturnCode=0
 
-p.StartBefore= Test.Processes.g1
-p.StartAfter= Test.Processes.g2
+p.StartBefore(Test.Processes.g1)
+p.StartAfter(Test.Processes.g2)
 
 
 t=Test.AddTestRun("Test Processes are running still")

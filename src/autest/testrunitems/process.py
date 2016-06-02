@@ -7,6 +7,7 @@ import autest.common.event as event
 import autest.core.eventinfo as eventinfo
 import autest.core.streamwriter as streamwriter
 import autest.common.process
+import autest.common.is_a as is_a
 from .file import File
 import os
 import string
@@ -19,6 +20,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__name = name
         self.__cmdstr = cmdstr
         self.__proc = None
+        self.__ready= None
 
         self.__output = None
         self.__stdout = None
@@ -56,6 +58,18 @@ class Process(testrunitem.TestRunItem,order.Order):
     def RawCommand(self,value):
         self.__cmdstr = value
     # ////////////////////////
+
+    def Ready(self,test):
+        if is_a.Number(test):
+            host.WriteDebugf(["process"], "Setting ready logic to wait for {0} second for process {1}",test,self.__name)
+            self.__ready=lambda : self._hasRunFor(test)
+        else:
+            self.__ready=test
+
+    def _isReady(self):
+        if self.__ready is None:
+            return True
+        return self.__ready()
 
     # testable items
     @property
@@ -103,6 +117,9 @@ class Process(testrunitem.TestRunItem,order.Order):
 
     # internal functions to control the process
 
+    def _hasRunFor(self,t):
+        #Test to see if we have run so long
+        return (time.time() - self.__start_time) >= t
     
     def _Start(self):
         

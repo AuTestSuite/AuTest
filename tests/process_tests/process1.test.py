@@ -28,7 +28,7 @@ pre2=t.Processes.Process("pre2","python app.p2 5")
 post1=t.Processes.Process("post1","python app.1 2")
 post2=t.Processes.Process("post2","python app.2 220")
 
-pre2.StartBefore= pre1 
-post2.StartBefore = post1
-p.StartBefore= pre2
-p.StartAfter=post2
+pre2.StartBefore(pre1) 
+post2.StartBefore(post1)
+p.StartBefore(pre2)
+p.StartAfter(post2)
