@@ -59,6 +59,11 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__cmdstr = value
     # ////////////////////////
 
+    @property
+    def Ready(self):
+        return self.__ready
+
+    @Ready.setter
     def Ready(self,test):
         if is_a.Number(test):
             host.WriteDebugf(["process"], "Setting ready logic to wait for {0} second for process {1}",test,self.__name)
@@ -66,11 +71,13 @@ class Process(testrunitem.TestRunItem,order.Order):
         else:
             self.__ready=test
 
-    def _isReady(self):
+    def _isReady(self,*lst,**kw):
         if self.__ready is None:
             return True
-        return self.__ready()
-
+        try:
+            return self.__ready(*lst,**kw)
+        except TypeError:
+            return self.__ready()
     # testable items
     @property
     def ReturnCode(self):

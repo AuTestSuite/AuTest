@@ -113,6 +113,7 @@ class RunTestTask(Task):
                 'Setup': self.__test.Setup,
                 'Condition': conditions.ConditionFactory(),
                 'Testers': testers,
+                'When':glb.When(),
                 })
 
         #get full path
@@ -197,7 +198,7 @@ class RunTestTask(Task):
         ret = []
         d = tr.Processes.Default
         fat_lst.extend(getlst(d.StartBefore(),[],d))
-        fat_lst.append(PD(d,lambda : True,{}))
+        fat_lst.append(PD(d,d._isReady,{}))
         fat_lst.extend(getlst(d.StartAfter(),[],d))
         
         #append_not_exist(ret,fat_lst)
@@ -215,7 +216,7 @@ class RunTestTask(Task):
             isReady = False
             while not isReady:
                 try:
-                    isReady = p.readyfunc(p.args)
+                    isReady = p.readyfunc(**p.args)
                 except TypeError:
                     isReady = p.readyfunc()
 

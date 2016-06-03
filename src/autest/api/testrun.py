@@ -9,7 +9,7 @@ def ExtendTestRun( func,name=None,setproperty=False ):
     if name is None:
         name = func.__name__
     
-    method = func#types.MethodType(func,None,TestRun)
+    method = func
     if setproperty:
         method = property(fset=method)
 

@@ -65,8 +65,8 @@ class ConditionFactory(object):
                        msg,
                        True)
 
-    def RegistryKeyEqual(self,key):
-        pass
+    #def RegistryKeyEqual(self,key,value):
+        #pass
 
     def RunCommand(self,command,msg,pass_value=0,env=None,shell=False):
         return self.Condition(lambda :subprocess.call(command,shell=False),

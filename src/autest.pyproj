@@ -16,8 +16,7 @@
     <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>
-    </CommandLineArguments>
+    <CommandLineArguments>--verbose -D../tests</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -36,6 +35,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\api\testrun.py" />
+    <Compile Include="autest\api\when.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\api\__init__.py">
       <SubType>Code</SubType>
     </Compile>

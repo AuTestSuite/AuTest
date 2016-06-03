@@ -109,6 +109,8 @@ class Engine(object):
                 'AddSetupItem':api.AddSetupItem,
                 'SetupTask':setupitem.SetupItem, # backward compat
                 'SetupItem':setupitem.SetupItem,
+                'AddTestRunMember':api.AddTestRunMember,
+                'AddWhenFunction':api.AddWhenFunction,
                 }
 
 
