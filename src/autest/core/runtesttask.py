@@ -239,7 +239,7 @@ class RunTestTask(Task):
                 try:
                     p.process._Poll()
                 except KillOnFailureError:
-                    self.stopProcess()
+                    self.stopProcess(ps)
                     self.stopGlobalProcess()
                     return
                 time.sleep(.1)
