@@ -10,7 +10,7 @@ import zipfile
 class ZipContent(tester.Tester):
     ZIP_MAGIC = '\x50\x4B\x05\x06'
     def __init__(self, includes = None, excludes=None, kill_on_failure=False, description_group=None):
-        super(ZipContent, self).__init__(test_value=True, kill_on_failure=kill_on_failure,description_group=description_group)
+        super(ZipContent, self).__init__(test_value=True, kill_on_failure=kill_on_failure,description_group=description_group, description='')
         self.__include = includes or ()
         self.__exclude = excludes or ()
 

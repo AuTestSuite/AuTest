@@ -6,9 +6,10 @@ import difflib
 import json
 
 class GoldFile(tester.Tester):
-    def __init__(self,goldfile,test_value=None,kill_on_failure=False,normalize_eol=True, description_group=None):
-        super(GoldFile,self).__init__(test_value=test_value,kill_on_failure=kill_on_failure,description_group=description_group)
-        self.Description = "Checking that {0} matches {1}".format(test_value,goldfile)
+    def __init__(self,goldfile,test_value=None,kill_on_failure=False,normalize_eol=True, description_group=None, description=None):
+        super(GoldFile,self).__init__(test_value=test_value,kill_on_failure=kill_on_failure,description_group=description_group,description=description)
+        if self.Description is None:   
+            self.Description = "Checking that {0} matches {1}".format(test_value,goldfile)
         self._goldfile = goldfile
         self._normalize_eol = normalize_eol
 
@@ -129,10 +130,11 @@ class GoldFile(tester.Tester):
         return None
 
 class GoldFileList(tester.Tester):
-    def __init__(self, goldfilesList, test_value=None, kill_on_failure=False,normalize_eol=True,description_group=None):
+    def __init__(self, goldfilesList, test_value=None, kill_on_failure=False,normalize_eol=True,description_group=None, description=None):
         super(GoldFileList, self).__init__(test_value=test_value,
                                             kill_on_failure=kill_on_failure,
-                                            description_group=description_group)
+                                            description_group=description_group,
+                                            description=description)
         self.Description = "Checking that {0} matches one of {1}".format(test_value,
                 ', '.join([str(gold) for gold in goldfilesList]))
         golds = []

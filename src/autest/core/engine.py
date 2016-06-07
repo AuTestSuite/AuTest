@@ -184,12 +184,11 @@ class Engine(object):
         #self.__timer.stopEvent('running test <{0}>'.format(task.Name))
 
     def _make_report(self):
-        import pprint
         # need to clean this up more...
         reportdata = report.TestsReport()
         for test in self.__tests.values():
             reportdata.addTestRun(test)
-        pprint.pprint(reportdata.testRuns)
+        
         host.WriteMessage("\nReport: --------------")
         for msg in reportdata.exportForConsole():
             host.WriteMessage(msg)

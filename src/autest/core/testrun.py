@@ -139,13 +139,13 @@ class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
     @property
     def _Result(self):
         if self.__result is None:
-            self.__result=0
+            self.__result=-1
             for i in self._getTesters():
                 if self.__result < i.Result:
                     self.__result = i.Result
         #if we are have no result and have nothing to test
         # we say we passed
-        if self.__result is None and len(self._getTesters()) == 0:
+        if self.__result == -1 and len(self._getTesters()) == 0:
             self.__result = testers.ResultType.Passed
         return self.__result
 

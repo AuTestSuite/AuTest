@@ -17,9 +17,8 @@ class FileContentCallback(tester.Tester):
     For more usage examples see gold_tests/run_utest-timeout/run_utest-timeout.test.py
     '''
     def __init__(self, callback, description, killOnFailure=False, description_group=None):
-        tester.Tester.__init__(self, None, kill_on_failure=killOnFailure,description_group=description_group)
+        tester.Tester.__init__(self, None, kill_on_failure=killOnFailure,description_group=description_group,description=description)
         self.__callback = callback
-        self.Description = description
 
     def test(self, eventinfo, **kw):
         absPath = self.TestValue.AbsPath

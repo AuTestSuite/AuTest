@@ -215,14 +215,43 @@ class RunTestTask(Task):
         tr = ev.TestRun
         ps = self._gen_process_list(tr)
         # run each process
-        for p in ps:
+        # note a given process might be in the list more than once
+        # this mean there are different requirements for the next process
+        # to be considered ready we want to test for
+        for idx,p in enumerate(ps):
+            # get next process if any as we will want to 
+            # use this process name to help with error messages 
+            # for the user
+            try:
+                next_process=ps[idx+1].process
+            except IndexError:
+                # we are at the last process or we only have one process to start
+                # In either case we done need to wait 
+                # for process to be ready
+                # Start the process and continue
+                p.process._Start()
+                break
+            # if we are here we have more than one process
+            # we need to start and want to wait on being ready
+            # and we are not at the end of the list.
+            p.process._waitingProcess=next_process.Name
+            #if already started, it will just return
             p.process._Start()
+            # Start timer as we have something 
+            # we have to wait on, and we need to make
+            # sure we have a fallback if something is wrong with
+            # the isReady logic never becoming ready in time
+            p.process._startReadyTimer()
             isReady = False
             while not isReady:
                 try:
                     isReady = p.readyfunc(**p.args)
                 except TypeError:
                     isReady = p.readyfunc()
+                # if it is ready set state on process
+                if isReady:
+                    p.process._stopReadyTimer()
+                    p.process._waitingProcess=None
                 # poll other processes
                 for op in ps:
                     if op.process._isRunning():

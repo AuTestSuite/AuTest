@@ -24,7 +24,7 @@ class Processes ( object ):
     def _GetProcesses(self):
         return self.__processes.values()
 
-    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=1 ):
+    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=10 ):
         from autest.testrunitems.process import Process
         #todo ... add check to make sure id a varaible safe
 
@@ -170,7 +170,7 @@ class Test(object):
     @property
     def _Result(self):
         if self.__result is None:
-            self.__result=0
+            self.__result=self.Processes._TestRun._Result
             for tr in self.__test_runs:
                 if self.__result < tr._Result:
                     self.__result = tr._Result

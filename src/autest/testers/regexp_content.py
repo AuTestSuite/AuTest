@@ -10,7 +10,7 @@ class RegexpContent(FileContentCallback):
         if isinstance(regexp, str):
             regexp = re.compile(regexp)
         self.__regexp = regexp
-        FileContentCallback.__init__(self, self.__check, description, killOnFailure,description_group=description_group)
+        FileContentCallback.__init__(self, self.__check, description, killOnFailure,description_group=description_group, description='')
     
     def __check(self, data):
         if not self.__regexp.search(data):

@@ -18,7 +18,11 @@ class Processes ( testrunitem.TestRunItem ):
     def _GetProcesses(self):
         return self.__processes
 
-    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=1):
+    def Process( self, id, 
+                cmdstr=None, 
+                returncode = None,
+                startup_timeout=10, # default to 10 second as most things should be ready by this time
+                ):
         #todo ... add check to make sure id a varaible safe
 
         tmp = Process(self._TestRun, id, cmdstr)

@@ -6,28 +6,27 @@ import traceback
 
 
 
-def get_name(obj):
+def get_name( obj ):
     if hasattr(obj, '__call__'):
         return "{0} {1}".format(obj.__self__.Name, obj.__name__)
     return obj
 
-
-class ResultType (object):
+class ResultType(object):
+    Unknown = 0
     Passed = 1
     Skipped = 2
     Warning = 3
-    Failed = 4
-    Unknown = 5
-    Exception = 6
+    Failed = 4    
+    Exception = 5
 
     @classmethod
-    def to_string(cls, v):
+    def to_string( cls, v ):
         for name, value in vars(cls).items():
             if value == v:
                 return name
         return "Unknown"
 
-class Tester (object):
+class Tester(object):
     '''
     The base tester object contains the basic properties all testers should fill in
     Description - this is what we are testing such as "Tesing return code is 5" or "Checking file file X exists"
@@ -38,16 +37,16 @@ class Tester (object):
     test more context, sould be in form of Type: name, ie Process: proc1
     '''
 
-    def __init__(self, test_value, kill_on_failure=False, description_group=None):
-        self.__description_group=description_group
-        self.__description = ''
+    def __init__( self, test_value, kill_on_failure=False, description_group=None , description=None):
+        self.__description_group = description_group
+        self.__description = description
         self.__result = ResultType.Unknown
         self.__reason = "Test was not run"
         self.__test_value = test_value
         self.__kill = kill_on_failure
 
     @property
-    def KillOnFailure(self):
+    def KillOnFailure( self ):
         '''
         If this is set to True we want to stop that main process
         from running
@@ -55,11 +54,11 @@ class Tester (object):
         return self.__kill
 
     @KillOnFailure.setter
-    def KillOnFailure(self, value):
+    def KillOnFailure( self, value ):
         self.__kill = value
 
     @property
-    def TestValue(self):
+    def TestValue( self ):
         '''
         This is the runtime value we want to test against. This
         attribute will return the value in question or a function
@@ -68,57 +67,57 @@ class Tester (object):
         return self.__test_value
 
     @TestValue.setter
-    def TestValue(self, value):
+    def TestValue( self, value ):
         self.__test_value = value
 
     @property
-    def Description(self):
+    def Description( self ):
         '''
         decription of what is being tested
         '''
         return self.__description
 
     @Description.setter
-    def Description(self, val):
+    def Description( self, val ):
         self.__description = val
 
     @property
-    def DescriptionGroup(self):
+    def DescriptionGroup( self ):
         '''
         decription of what is being tested
         '''
         return self.__description_group
 
     @DescriptionGroup.setter
-    def DescriptionGroup(self, val):
-        self.__descriptionGroup = val
+    def DescriptionGroup( self, val ):
+        self.__description_group = val
 
     @property
-    def Reason(self):
+    def Reason( self ):
         '''
         information on why something failed
         '''
         return self.__reason
 
     @Reason.setter
-    def Reason(self, val):
+    def Reason( self, val ):
         self.__reason = val
 
     @property
-    def Result(self):
+    def Result( self ):
         '''
         Should return True or False based on if the test passed                                                       
         '''
         return self.__result
 
     @Result.setter
-    def Result(self, val):
+    def Result( self, val ):
         '''
         Sets the result of a test                                                       
         '''
         self.__result = val
 
-    def __call__(self, eventinfo, **kw):
+    def __call__( self, eventinfo, **kw ):
         try:
             self.test(eventinfo, **kw)
         except KeyboardInterrupt:
@@ -130,7 +129,7 @@ class Tester (object):
             self.Reason = traceback.format_exc()
 
     @abc.abstractmethod
-    def test(self, eventinfo, **kw):
+    def test( self, eventinfo, **kw ):
         '''
         This is called to test a given event
         it should store the result of the test in the Result property 
@@ -139,7 +138,7 @@ class Tester (object):
         '''
         return
 
-    def _GetContent(self, eventinfo, test_value=None):
+    def _GetContent( self, eventinfo, test_value=None ):
         # if test_value is None
         # we set it to the this testers object
         # test value.
@@ -190,5 +189,5 @@ class Tester (object):
         return test_value
 
     @property
-    def UseInReport(self):
+    def UseInReport( self ):
         return True

@@ -29,6 +29,13 @@ class Process(testrunitem.TestRunItem,order.Order):
 
         self.__start_time = None
         self.__last_event_time = None
+        # used to help detect if we are taking to long to get ready
+        # ie we don't want the isReady test, be it bound to the process
+        # or bound as a function of Process A waiting on Process B
+        # to take to long else we could deadlock, if the test is never ready
+        self.__startup_time = None 
+        self.__waitingProcess = None
+
 
         self.StartingRun = event.Event()
         self.RunStarted = event.Event()
@@ -129,35 +136,61 @@ class Process(testrunitem.TestRunItem,order.Order):
                 return val
             else:
                 return testers.LessThan(int(val), test_value='TotalRunTime', kill_on_failure=True, description_group=des_grp)
-        self._Register("Process.{0}.ReturnCode".format(self.__name), getChecker, event=self.Running)
+        self._Register("Process.{0}.TimeOut".format(self.__name), getChecker, event=self.Running)
 
 
     @property
     def StartupTimeout(self):
-        return self._GetRegisterEvent("Process.{0}.TimeOut".format(self.__name))
+        return self._GetRegisterEvent("Process.{0}.StartupTimeout".format(self.__name))
 
     @TimeOut.setter
     def StartupTimeout(self, val):
         def getChecker():
             des_grp="{0} {1}".format("process",self.Name)
             if isinstance(val, testers.Tester):
-                val.TestValue = 'TotalRunTime'
+                val.TestValue = 'gettingReadyTime'
                 if value.DescriptionGroup is None:
                     value.DescriptionGroup=des_grp
                 return val
             else:
-                return testers.LessThan(int(val), test_value='TotalRunTime', kill_on_failure=True, description_group=des_grp)
+                return testers.LessThan(int(val),
+                    test_value='gettingReadyTime',
+                    kill_on_failure=True,
+                    description_group=des_grp,
+                    description="Checking that process is ready within {1} seconds so we can start process: {ev.waitingProcess}")
         self._Register("Process.{0}.StartupTimeout".format(self.__name), getChecker, event=self.Running)
 
 
-    # internal functions to control the process
+    # internal functions to testing is ready logic
+    def _stopReadyTimer(self):
+        self.__startup_time=None
+
+    def _startReadyTimer(self):
+        self.__startup_time=time.time()
+    
+    def _readyTime(self,curr_time):
+        if self.__startup_time is None:
+            return 0.0
+        else:
+            return curr_time-self.__startup_time
+    
+    @property
+    def _waitingProcess(self):
+        return self.__waitingProcess
+
+    @_waitingProcess.setter
+    def _waitingProcess(self,val):
+        self.__waitingProcess=val
 
     def _hasRunFor(self,t):
         #Test to see if we have run so long
         return (time.time() - self.__start_time) >= t
-    
+
+    # internal functions to control the process
     def _Start(self):
-        
+        if self._isRunning():
+            #in case we are already running
+            return 
         #create a StreamWriter which will write out the stream data of the run
         #to sorted files
         self.__output = streamwriter.StreamWriter(os.path.join(self._Test.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._Test.Name,self._TestRun.Name,self.__name)),self.Command)
@@ -200,7 +233,7 @@ class Process(testrunitem.TestRunItem,order.Order):
             curr_time = time.time()
             if curr_time - self.__last_event_time > .5:
                 #make event info object
-                event_info = eventinfo.RunningInfo(self.__start_time,curr_time)
+                event_info = eventinfo.RunningInfo(self.__start_time,curr_time,self._readyTime(curr_time),self._waitingProcess)
                 #call event
                 host.WriteDebugf(["process"],"Process: {0} - Calling Running event with {1} callbacks mapped to it", self.Name ,len(self.Running))
                 try:
@@ -242,7 +275,7 @@ class Process(testrunitem.TestRunItem,order.Order):
 
 
     def _isRunning(self):
-        return self.__proc and self.__proc.poll() is None
+        return self.__proc is not None and self.__proc.poll() is None
 
     def _wait(self,timeout):
         # wait a little while for the process to finish
