@@ -1,12 +1,13 @@
 import hosts.output as host
 from . import tester
+from autest.exceptions.killonfailure import KillOnFailureError
 
 import os
 
 
 class DirectoryExists(tester.Tester):
-    def __init__(self,exits,test_value=None,kill_on_failure=False):
-        super(DirectoryExists,self).__init__(test_value=test_value,kill_on_failure=kill_on_failure)
+    def __init__(self,exits,test_value=None,kill_on_failure=False, description_group=None):
+        super(DirectoryExists,self).__init__(test_value=test_value,kill_on_failure=kill_on_failure,description_group=description_group)
         self._exits=exits
         if exits:
             self.Description='Checking that Directory "{0}" exists'.format(tester.get_name(self.TestValue))

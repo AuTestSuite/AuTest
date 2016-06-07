@@ -25,7 +25,7 @@ class TestsReport(object):
             message = (self.ITEM_NOTRUN, str(test.Setup._Reason))
         else:
             runs = []
-            for tr in test._TestRuns:
+            for tr in test._TestRuns +[test._GlobalTestRuns]:
                 if tr._Result == ResultType.Passed:
                     runMessage = (self.ITEM_PASS, None)
                 elif tr._Result == ResultType.Skipped:
@@ -41,8 +41,12 @@ class TestsReport(object):
                             reason = None
                         else:
                             reason = str(check.Reason)
-                        checkers.append((check.Description, ResultType.to_string(check.Result),
-                                         reason, False))
+                        checkers.append((
+                                        check.DescriptionGroup, 
+                                        check.Description, 
+                                        ResultType.to_string(check.Result),
+                                        reason, 
+                                        False))
                     runMessage = (self.ITEM_OTHER, checkers)
                 runs.append((tr.Name, ResultType.to_string(tr._Result)) + runMessage)
             message = (self.ITEM_OTHER, runs)
@@ -65,10 +69,10 @@ class TestsReport(object):
                         if runMessage:
                             yield '    Reason: %s' % runMessage
                     else:
-                        for description, result, reason, streamBoth in runMessage:
+                        for des_grp, description, result, reason, streamBoth in runMessage:
                             if streamBoth and not addStreamBoth:
                                 continue
-                            yield '    Check: %s - %s' % (description, result)
+                            yield '    {0} : {1} - {2}'.format("For {0}".format(des_grp) if des_grp is not None else "checking", description, result)
                             if reason:
                                 yield '      Reason: %s' % reason
 

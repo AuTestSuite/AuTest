@@ -8,10 +8,12 @@ def AddWhenFunction( func,name=None):
         name = func.__name__
 
     def wrapper(self,*lst,**kw):
-        try:
-            return func(*lst,**kw)
-        except TypeError:
-            return func()
+        if lst != () or kw != {}:
+            # we have arguments, bind them to call with lambda
+            return lambda: func(*lst,**kw)
+        else:
+            # just pass back function
+            return func
 
     method = wrapper
 

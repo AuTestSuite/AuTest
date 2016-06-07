@@ -59,11 +59,14 @@ class Directory(testrunitem.TestRunItem):
     @Exists.setter
     def Exists(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("directory",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = self
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             elif val == True:
-                return testers.DirectoryExists(True, self)
+                return testers.DirectoryExists(True, self,description_group=des_grp)
             elif val == False:
-                return testers.DirectoryExists(False, self)
+                return testers.DirectoryExists(False, self,description_group=des_grp)
         self._Register('Directory.{0}.Exists'.format(self.__name), getChecker,self._TestRun.EndEvent)

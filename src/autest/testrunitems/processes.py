@@ -18,10 +18,16 @@ class Processes ( testrunitem.TestRunItem ):
     def _GetProcesses(self):
         return self.__processes
 
-    def Process( self, id, cmdstr=None, returncode = None ):
+    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=1):
         #todo ... add check to make sure id a varaible safe
 
         tmp = Process(self._TestRun, id, cmdstr)
+
+        if returncode is not None:
+            tmp.ReturnCode=returncode
+
+        tmp.StartupTimeout=startup_timeout
+
         if id in self.__processes:
             host.WriteWarning("Overriding process object {0}".format(id))
         self.__processes[id] = tmp

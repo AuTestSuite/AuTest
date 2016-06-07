@@ -41,6 +41,15 @@
     <Compile Include="autest\api\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\exceptions\killonfailure.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\whenitem\portopen.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\whenitem\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\__main__.py" />
     <Compile Include="autest\common\disk.py" />
     <Compile Include="autest\common\execfile.py">
@@ -173,6 +182,7 @@
     <Folder Include="autest\core\" />
     <Folder Include="autest\common\" />
     <Folder Include="autest\exceptions\" />
+    <Folder Include="autest\whenitem\" />
     <Folder Include="autest\testrunitems\" />
     <Folder Include="hosts\" />
     <Folder Include="hosts\interfaces\" />
@@ -185,6 +195,19 @@
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\2.7" />
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="..\..\test\">
+      <Id>{e42b7e6e-e665-4553-bd85-9a37f3df04a9}</Id>
+      <BaseInterpreter>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</BaseInterpreter>
+      <Version>2.7</Version>
+      <Description>test (Python 64-bit 2.7)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>Amd64</Architecture>
+    </Interpreter>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -8,6 +8,7 @@ import autest.core.eventinfo as eventinfo
 import autest.core.streamwriter as streamwriter
 import autest.common.process
 import autest.common.is_a as is_a
+from autest.exceptions.killonfailure import KillOnFailureError
 from .file import File
 import os
 import string
@@ -34,7 +35,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.Running = event.Event()
         self.RunFinished = event.Event()
 
-
+        
     @property
     def Name(self):
         return self.__name
@@ -86,11 +87,14 @@ class Process(testrunitem.TestRunItem,order.Order):
     @ReturnCode.setter
     def ReturnCode(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("process",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = 'ReturnCode'
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             else:
-                return testers.Equal(int(val), test_value='ReturnCode')
+                return testers.Equal(int(val), test_value='ReturnCode', description_group=des_grp)
         self._Register("Process.{0}.ReturnCode".format(self.__name), getChecker, event=self.RunFinished)
 
     @property
@@ -100,11 +104,14 @@ class Process(testrunitem.TestRunItem,order.Order):
     @Time.setter
     def Time(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("process",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = 'TotalTime'
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             else:
-                return testers.Equal(int(val), test_value='TotalTime')
+                return testers.Equal(int(val), test_value='TotalTime', description_group=des_grp)
         self._Register("Process.{0}.Time".format(self.__name), getChecker, event=self.RunFinished)
 
     @property
@@ -114,12 +121,33 @@ class Process(testrunitem.TestRunItem,order.Order):
     @TimeOut.setter
     def TimeOut(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("process",self.Name)
             if isinstance(val, testers.Tester):
-                val.TestValue = 'TotalTime'
+                val.TestValue = 'TotalRunTime'
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             else:
-                return testers.LessThan(int(val), test_value='TotalTime', kill=True)
+                return testers.LessThan(int(val), test_value='TotalRunTime', kill_on_failure=True, description_group=des_grp)
         self._Register("Process.{0}.ReturnCode".format(self.__name), getChecker, event=self.Running)
+
+
+    @property
+    def StartupTimeout(self):
+        return self._GetRegisterEvent("Process.{0}.TimeOut".format(self.__name))
+
+    @TimeOut.setter
+    def StartupTimeout(self, val):
+        def getChecker():
+            des_grp="{0} {1}".format("process",self.Name)
+            if isinstance(val, testers.Tester):
+                val.TestValue = 'TotalRunTime'
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
+                return val
+            else:
+                return testers.LessThan(int(val), test_value='TotalRunTime', kill_on_failure=True, description_group=des_grp)
+        self._Register("Process.{0}.StartupTimeout".format(self.__name), getChecker, event=self.Running)
 
 
     # internal functions to control the process
@@ -170,12 +198,16 @@ class Process(testrunitem.TestRunItem,order.Order):
     def _Poll(self):
         if self._isRunning():
             curr_time = time.time()
-            if curr_time - self.__last_event_time > 500:
+            if curr_time - self.__last_event_time > .5:
                 #make event info object
                 event_info = eventinfo.RunningInfo(self.__start_time,curr_time)
                 #call event
-                host.WriteDebugf(["process"],"Calling Running event with {0} callbacks mapped to it",len(self.Running))
-                test_run.Running(event_info)
+                host.WriteDebugf(["process"],"Process: {0} - Calling Running event with {1} callbacks mapped to it", self.Name ,len(self.Running))
+                try:
+                    self.Running(event_info)
+                except KillOnFailureError:
+                    self._kill()
+                    raise
                 self.__last_event_time = curr_time
             return True
         #We are not running
@@ -241,13 +273,18 @@ class Process(testrunitem.TestRunItem,order.Order):
                 def getChecker():
                     if isinstance(value, testers.Tester):
                         value.TestValue = testValue
+                        if value.DescriptionGroup is None:
+                            value.DescriptionGroup="{0} {1}".format("process",self.Name)
                         return value
                     elif isinstance(value, str):
                         return testers.GoldFile(File(self._TestRun, value, runtime=False),
-                                                test_value=testValue)
+                                                test_value=testValue,
+                                                description_group="{0} {1}".format("process",self.Name))
                     elif isinstance(value, (tuple, list)):
                         return testers.GoldFileList([File(self._TestRun, item, runtime=False)
-                                                     for item in value], test_value=testValue)
+                                                     for item in value], 
+                                                     test_value=testValue,
+                                                    description_group="{0} {1}".format("process",self.Name))
 
                 self._Register(event.format(self.__name), getChecker,self.RunFinished)
 

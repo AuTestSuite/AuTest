@@ -8,6 +8,7 @@ from autest.common.execfile import execFile
 from . import conditions
 from .eventinfo import EventInfo, StartInfo
 import autest.common.disk as disk
+from autest.exceptions.killonfailure import KillOnFailureError
 
 import os
 import traceback
@@ -126,6 +127,9 @@ class RunTestTask(Task):
         # it will go through the different "test runs" or steps
         skip_tests = None
         host.WriteMessagef("Running Test {0}:",self.__test.Name,end="")
+        # dump out events that have been registered for debugging
+        host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",self.__test.Processes._TestRun.Name, pprint.pformat(self.__test.Processes._TestRun._GetRegisteredEvents()))
+        self.__test.Processes._TestRun._BindEvents()
         for tr in self.__test._TestRuns:
             if skip_tests:
                 # we had some failure so we are skipping the rest of the tests runs
@@ -219,12 +223,26 @@ class RunTestTask(Task):
                     isReady = p.readyfunc(**p.args)
                 except TypeError:
                     isReady = p.readyfunc()
+                # poll other processes
+                for op in ps:
+                    if op.process._isRunning():
+                        try:
+                            op.process._Poll()
+                        except KillOnFailureError:
+                            self.stopProcess(ps)
+                            self.stopGlobalProcess()
+                            return
 
         # wait for default process stop
         while tr.Processes.Default._isRunning():
             for p in ps:
-                p.process._Poll()
-
+                try:
+                    p.process._Poll()
+                except KillOnFailureError:
+                    self.stopProcess()
+                    self.stopGlobalProcess()
+                    return
+                time.sleep(.1)
         # check for all processes to end with a time frame
         st = time.time()
         while 1:
@@ -245,11 +263,14 @@ class RunTestTask(Task):
             #if the time we will wait up?
             if time.time() - st > 15.0: 
                 # we kill them
-                for p in ps:
-                    if p.process._isRunning():
-                        p.process._kill()
+                self.stopProcess(ps)
                 break
     
+    def stopProcess(self,ps):
+         for p in ps:
+            if p.process._isRunning():
+                p.process._kill()
+
     def stopGlobalProcess( self ):  
         st = time.time()
         ps = self.__test.Processes._GetProcesses()

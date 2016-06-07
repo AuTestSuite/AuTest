@@ -1,5 +1,6 @@
 import hosts.output as host
 from . import tester
+from autest.exceptions.killonfailure import KillOnFailureError
 
 class FileContentCallback(tester.Tester):
     '''
@@ -15,8 +16,8 @@ class FileContentCallback(tester.Tester):
     
     For more usage examples see gold_tests/run_utest-timeout/run_utest-timeout.test.py
     '''
-    def __init__(self, callback, description, killOnFailure=False):
-        tester.Tester.__init__(self, None, kill_on_failure=killOnFailure)
+    def __init__(self, callback, description, killOnFailure=False, description_group=None):
+        tester.Tester.__init__(self, None, kill_on_failure=killOnFailure,description_group=description_group)
         self.__callback = callback
         self.Description = description
 
@@ -39,7 +40,7 @@ class FileContentCallback(tester.Tester):
         self.Result = result
         if result != tester.ResultType.Passed:
             if self.KillOnFailure:
-                raise tester.KillOnFailureError()
+                raise KillOnFailureError
         else:
             self.Reason = 'Contents of {0} match desired callback'.format(absPath)
         host.WriteVerbose(["testers.Equal","FileContentCallback"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)

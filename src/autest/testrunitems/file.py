@@ -64,13 +64,16 @@ class File(testrunitem.TestRunItem):
     @Exists.setter
     def Exists(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("file",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = self
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             elif val == True:
-                return testers.FileExists(True, self)
+                return testers.FileExists(True, self,description_group=des_grp)
             elif val == False:
-                return testers.FileExists(False, self)
+                return testers.FileExists(False, self,description_group=des_grp)
         self._Register("File.{0}.Exists".format(self.__name), getChecker,self._TestRun.EndEvent)
 
     def GetSize(self):
@@ -84,11 +87,14 @@ class File(testrunitem.TestRunItem):
     @Size.setter
     def Size(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("file",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = self
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             else:
-                return testers.Equal(int(val), test_value=self.GetSize)
+                return testers.Equal(int(val), test_value=self.GetSize,description_group=des_grp)
         self._Register("File.{0}.Size".format(self.__name), getChecker,self._TestRun.EndEvent)
 
     @property
@@ -98,15 +104,18 @@ class File(testrunitem.TestRunItem):
     @Content.setter
     def Content(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("file",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = self
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             elif isinstance(val, str):
                 return testers.GoldFile(File(self._TestRun, val, runtime=False),
-                                        test_value=self)
+                                        test_value=self,description_group=des_grp)
             elif isinstance(val, (tuple, list)):
                 return testers.GoldFileList([File(self._TestRun, item, runtime=False)
-                                             for item in val], test_value=self)
+                                             for item in val], test_value=self,description_group=des_grp)
 
         self._Register("File.{0}.Content".format(self.__name), getChecker,self._TestRun.EndEvent)
 
@@ -117,13 +126,16 @@ class File(testrunitem.TestRunItem):
     @Executes.setter
     def Executes(self, val):
         def getChecker():
+            des_grp="{0} {1}".format("file",self.Name)
             if isinstance(val, testers.Tester):
                 val.TestValue = self
+                if value.DescriptionGroup is None:
+                    value.DescriptionGroup=des_grp
                 return val
             elif val == True:
-                return testers.RunFile(True, self)
+                return testers.RunFile(True, self,description_group=des_grp)
             elif val == False:
-                return testers.RunFile(False, self)
+                return testers.RunFile(False, self,description_group=des_grp)
             else:
                 return testers.RunFile(val, self)
         self._Register("File.{0}.Execute".format(self.__name), getChecker,self._TestRun.EndEvent)

@@ -24,11 +24,16 @@ class Processes ( object ):
     def _GetProcesses(self):
         return self.__processes.values()
 
-    def Process( self, id, cmdstr=None, returncode = None ):
+    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=1 ):
         from autest.testrunitems.process import Process
         #todo ... add check to make sure id a varaible safe
 
         tmp = Process(self._TestRun, id, cmdstr)
+
+        if returncode is not None:
+            tmp.ReturnCode=returncode
+        tmp.StartupTimeout=startup_timeout
+
         if id in self.__processes:
             host.WriteWarning("Overriding process object {0}".format(id))
         self.__processes[id] = tmp
@@ -180,6 +185,10 @@ class Test(object):
     @property
     def _TestRuns(self):
         return self.__test_runs
+
+    @property
+    def _GlobalTestRuns(self):
+        return self.Processes._TestRun
 
     @property
     def _Conditions(self):

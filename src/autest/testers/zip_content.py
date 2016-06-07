@@ -1,5 +1,6 @@
 from . import tester
 import hosts.output as host
+from autest.exceptions.killonfailure import KillOnFailureError
 
 import os
 import tarfile
@@ -8,16 +9,15 @@ import zipfile
 
 class ZipContent(tester.Tester):
     ZIP_MAGIC = '\x50\x4B\x05\x06'
-    def __init__(self, includes = None, excludes=None, kill_on_failure=False):
-        super(ZipContent, self).__init__(test_value=True, kill_on_failure=kill_on_failure)
+    def __init__(self, includes = None, excludes=None, kill_on_failure=False, description_group=None):
+        super(ZipContent, self).__init__(test_value=True, kill_on_failure=kill_on_failure,description_group=description_group)
         self.__include = includes or ()
         self.__exclude = excludes or ()
 
     def test(self, eventinfo, **kw):
         self.__test()
         if self.Result == tester.ResultType.Failed and self.KillOnFailure:
-            self.Reason += "\n Kill on failure is set"
-            raise tester.KillOnFailureError()
+            raise KillOnFailureError
     
     def __test(self):
         zfile = self.TestValue.AbsPath
