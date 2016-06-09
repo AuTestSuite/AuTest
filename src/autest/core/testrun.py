@@ -167,8 +167,8 @@ class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
 
 
     def _getTesters(self):
-        return filter(lambda x: isinstance(x, testers.tester.Tester), self._GetCallBacks())
-
+        return [x for x in self._GetCallBacks() if isinstance(x, testers.tester.Tester)]
+        
     @property
     def _Test(self):
         return self.__test
