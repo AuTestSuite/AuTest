@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 import autest.common.process
 from autest.common import make_list
 import autest.common.is_a as is_a
+import hosts.output as host
 
 # need better name...  to do later
 class Order(object):
@@ -12,7 +13,7 @@ class Order(object):
         self.__endafter = []
         super(Order, self).__init__()
 
-    def StartBefore( self,*lst,**kw ):
+    def StartBefore(self, *lst, **kw):
         if lst == () and kw == {}:
             return self.__startbefore
         if lst == () and kw != {}:
@@ -20,51 +21,55 @@ class Order(object):
         
         for obj in lst:
             #validate this is an order object
-            if not isinstance(obj,Order):
+            if not isinstance(obj, Order):
                 host.WriteError("Object must be subclass of autest.core.order.Order")
-            readyfunc = kw.get("ready",lambda : obj._isReady())
-            if is_a.Number(readyfunc):
-                readyfunc = lambda : obj._hasRunFor(readyfunc)
+            readyfunc = kw.get("ready", lambda: obj._isReady())
+            value = readyfunc
+            if is_a.Number(value):
+                readyfunc = lambda: obj._hasRunFor(value)
             args = kw.copy()
+            host.WriteDebugf(["startbefore"], "Setting ready logic to wait for process {0} with readyfunc {1}", obj, readyfunc)
             try:
                 del args["ready"]
             except KeyError:
                 pass
-            
-            self.__startbefore[obj] = (readyfunc,args)
+
+            self.__startbefore[obj] = (readyfunc, args)
 
 
-    def StartAfter( self,*lst,**kw ):
+    def StartAfter(self, *lst, **kw):
         if lst == () and kw == {}:
             return self.__startafter
         if lst == () and kw != {}:
             raise SyntaxError
-        
+
         for obj in lst:
             #validate this is an order object
-            if not isinstance(obj,Order):
+            if not isinstance(obj, Order):
                 host.WriteError("Object must be subclass of autest.core.order.Order")
-            readyfunc = kw.get("ready",lambda : obj._isReady())
-            if is_a.Number(readyfunc):
-                readyfunc = lambda : obj._hasRunFor(readyfunc)
+            readyfunc = kw.get("ready", lambda: obj._isReady())
+            value = readyfunc
+            if is_a.Number(value):
+                readyfunc = lambda: obj._hasRunFor(value)
             args = kw.copy()
+            host.WriteDebugf(["startafter"], "Setting ready logic to wait for process {0} with readyfunc {1}", obj, readyfunc)
             try:
                 del args["ready"]
             except KeyError:
                 pass
-            
-            self.__startafter[obj] = (readyfunc,args)
 
-    
-    def EndBefore( self,*lst,**kw ):
+            self.__startafter[obj] = (readyfunc, args)
+
+
+    def EndBefore(self, *lst, **kw):
         if lst == () and kw == {}:
             return self.__endbefore
         if lst == () and kw != {}:
             raise SyntaxError
         obj = make_list(lst)
         self.__endbefore.extend(obj)
-    
-    def EndAfter( self,*lst,**kw ):
+
+    def EndAfter(self, *lst, **kw):
         if lst == () and kw == {}:
             return self.__endafter
         if lst == () and kw != {}:
@@ -72,8 +77,4 @@ class Order(object):
         obj = make_list(lst)
         self.__endafter.extend(obj)
 
-
-
-
-    
 
