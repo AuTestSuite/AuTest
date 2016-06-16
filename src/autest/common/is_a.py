@@ -12,4 +12,4 @@ def Int(obj):
     return isinstance(obj,int)
 
 def Number(obj):
-    return isinstance(obj,int) or isinstance(obj,float)
+    return not isinstance(obj, bool) and (isinstance(obj,int) or isinstance(obj,float))
