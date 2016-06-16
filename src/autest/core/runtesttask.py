@@ -226,7 +226,7 @@ class RunTestTask(Task):
                 next_process=ps[idx+1].process
             except IndexError:
                 # we are at the last process or we only have one process to start
-                # In either case we done need to wait 
+                # In either case we don't need to wait 
                 # for process to be ready
                 # Start the process and continue
                 p.process._Start()
