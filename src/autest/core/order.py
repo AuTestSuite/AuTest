@@ -18,22 +18,24 @@ class Order(object):
             return self.__startbefore
         if lst == () and kw != {}:
             raise SyntaxError
-        
+
         for obj in lst:
             #validate this is an order object
             if not isinstance(obj, Order):
                 host.WriteError("Object must be subclass of autest.core.order.Order")
             readyfunc = kw.get("ready", lambda: obj._isReady())
-            value = readyfunc
-            if is_a.Number(value):
-                readyfunc = lambda: obj._hasRunFor(value)
             args = kw.copy()
-            host.WriteDebugf(["startbefore"], "Setting ready logic to wait for process {0} with readyfunc {1}", obj, readyfunc)
             try:
                 del args["ready"]
             except KeyError:
                 pass
+            value = readyfunc
+            if is_a.Number(value):
+                readyfunc = lambda: obj._hasRunFor(value)
+            elif hasattr(readyfunc,"when_wrapper"):
+                readyfunc=readyfunc(**args)
 
+            host.WriteDebugf(["startbefore"], "Setting ready logic to wait for process {0} with readyfunc {1}", obj, readyfunc)
             self.__startbefore[obj] = (readyfunc, args)
 
 
@@ -47,17 +49,19 @@ class Order(object):
             #validate this is an order object
             if not isinstance(obj, Order):
                 host.WriteError("Object must be subclass of autest.core.order.Order")
-            readyfunc = kw.get("ready", lambda: obj._isReady())
-            value = readyfunc
-            if is_a.Number(value):
-                readyfunc = lambda: obj._hasRunFor(value)
+            readyfunc = kw.get("ready", lambda: obj._isReady())            
             args = kw.copy()
-            host.WriteDebugf(["startafter"], "Setting ready logic to wait for process {0} with readyfunc {1}", obj, readyfunc)
             try:
                 del args["ready"]
             except KeyError:
                 pass
+            value = readyfunc
+            if is_a.Number(value):
+                readyfunc = lambda: obj._hasRunFor(value)
+            elif hasattr(readyfunc,"when_wrapper"):
+                readyfunc=readyfunc(**args)
 
+            host.WriteDebugf(["startafter"], "Setting ready logic to wait for process {0} with readyfunc {1}", obj, readyfunc)
             self.__startafter[obj] = (readyfunc, args)
 
 

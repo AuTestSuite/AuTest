@@ -76,6 +76,8 @@ class Process(testrunitem.TestRunItem,order.Order):
         if is_a.Number(test):
             host.WriteDebugf(["process"], "Setting ready logic to wait for {0} second for process {1}",test,self.__name)
             self.__ready=lambda : self._hasRunFor(test)
+        elif hasattr(test,"when_wrapper"):
+            self.__ready=test()
         else:
             self.__ready=test
 
@@ -184,6 +186,7 @@ class Process(testrunitem.TestRunItem,order.Order):
 
     def _hasRunFor(self,t):
         #Test to see if we have run so long
+        host.WriteDebugf(["process"], "Checking if time passed has been {0} seconds", t)
         return (time.time() - self.__start_time) >= t
 
     # internal functions to control the process
