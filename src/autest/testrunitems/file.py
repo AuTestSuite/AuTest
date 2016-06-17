@@ -45,7 +45,7 @@ class File(testrunitem.TestRunItem):
     @property
     def AbsTestPath(self):
         '''
-        The absolute path of the file, based on directory relative form the test file location
+        The absolute path of the file, based on directory relative from the test file location
         '''
         return os.path.normpath(os.path.join(self._TestRun._Test.TestDirectory, self.Name))
 

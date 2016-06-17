@@ -24,7 +24,7 @@ class Processes ( object ):
     def _GetProcesses(self):
         return self.__processes.values()
 
-    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=10 ):
+    def Process( self, id, cmdstr=None, returncode = None, startup_timeout=10, ready=None ):
         from autest.testrunitems.process import Process
         #todo ... add check to make sure id a varaible safe
 
@@ -33,6 +33,11 @@ class Processes ( object ):
         if returncode is not None:
             tmp.ReturnCode=returncode
         tmp.StartupTimeout=startup_timeout
+
+        # todo ... add valation to ready for type?
+        if ready is not None:
+            tmp.Ready=ready
+        
 
         if id in self.__processes:
             host.WriteWarning("Overriding process object {0}".format(id))

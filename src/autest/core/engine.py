@@ -51,9 +51,9 @@ class Engine(object):
         # load when items
         import autest.whenitem
 
-        #self.__timer.startEvent('total')
+        
         if os.path.exists(self.__run_dir):
-            #self.__timer.startEvent('sandbox cleanup')
+            
             host.WriteVerbose("engine", "The Sandbox directory exists, will try to remove")
             oldExceptionArgs = None
             while True:
@@ -74,31 +74,23 @@ class Engine(object):
                     # no exceptions, the directory was wiped
                     break
             host.WriteVerbose("engine", "The Sandbox directory was removed")
-            #self.__timer.stopEvent('sandbox cleanup')
-        #self.__timer.startEvent('extensions load')
+        
         host.WriteVerbose("engine", "Loading Extensions")
         self._load_extensions()
-        #self.__timer.stopEvent('extensions load')
-        #self.__timer.startEvent('scanning for tests')
+        
         host.WriteVerbose("engine", "Scanning for tests")
         self._scan_for_tests()
         if not self.__tests:
             host.WriteMessage("No tests found to run")
             host.WriteMessage("If your tests are in a different directory try using --directory=<path with tests>")
             return ""
-        #self.__timer.stopEvent('scanning for tests')
+        
         host.WriteVerbose("engine", "Running tests")
         self._run_tests()
-        #self.__timer.startEvent('making report')
+        
         host.WriteVerbose("engine", "Making report")
         result = self._make_report()
-        #self.__timer.stopEvent('making report')
-        #self.__timer.stopEvent('total')
-        #for eventName, eventDuration in self.__timer.getEvents():
-            #print 'durations', '%s - %.2f sec.' % (eventName.ljust(40),
-            #eventDuration)
-            #host.WriteVerbose('durations', '%s - %.2f sec.' %
-            #(eventName.ljust(40), eventDuration))
+        
         return result
 
     def _load_extensions(self):
@@ -106,7 +98,8 @@ class Engine(object):
 
         # add expected API function so they can be called
         locals = {
-                'AddTestRunSet':api.ExtendTest, 
+                'AddTestRunSet':api.ExtendTest, #backward compat 
+                'ExtendTest':api.ExtendTest, 
                 'AddSetupTask':api.AddSetupItem, # backward compat
                 'AddSetupItem':api.AddSetupItem,
                 'SetupTask':setupitem.SetupItem, # backward compat
@@ -179,9 +172,8 @@ class Engine(object):
                 self.__run_test_task(t)
 
     def __run_test_task(self, task):
-        #self.__timer.startEvent('running test <{0}>'.format(task.Name))
         runtesttask.RunTestTask(task)()
-        #self.__timer.stopEvent('running test <{0}>'.format(task.Name))
+        
 
     def _make_report(self):
         # need to clean this up more...
