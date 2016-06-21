@@ -76,7 +76,16 @@ else:
         Terminates a process and all its children
         '''
         #pylint: disable=no-member
-        os.killpg(os.getpgid(self.pid), signal.SIGKILL)
+        # try to kill group with a ctrl-C
+        pgid=os.getpgid(self.pid)
+        os.killpg(pgid, signal.SIGINT)
+        time.sleep(1)
+        try:
+            os.killpg(pgid, signal.SIGKILL)
+        except OSError as e:
+            #If this a 3 (no such process) error we ignore it
+            if e.errno != 3:
+                raise
 
     
     def waitTimeOut(process, timeout):
