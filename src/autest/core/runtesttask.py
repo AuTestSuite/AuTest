@@ -140,7 +140,10 @@ class RunTestTask(Task):
                     # dump out events that have been registered for debugging
                     host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",tr.Name, pprint.pformat(tr._GetRegisteredEvents()))
                     # bind the events now
-                    tr._RegisterEvent("runtest", tr.StartEvent, self.runTestStep)
+                    
+                    tr._RegisterEvent("runtest", tr.StartEvent, 
+                        testers.Lambda(self.runTestStep)
+                        )
                     tr._BindEvents()
                     # run events
                     tr.SetupEvent(EventInfo())
@@ -252,6 +255,13 @@ class RunTestTask(Task):
                 if isReady:
                     p.process._stopReadyTimer()
                     p.process._waitingProcess=None
+                    continue
+                # verify we are running
+                if not p.process._isRunning():
+                    #
+                    self.stopProcess(ps)
+                    self.stopGlobalProcess()
+                    return True, 'Process "{0}" shutdown before it was ready'.format(p.process.Name)
                 # poll other processes
                 for op in ps:
                     if op.process._isRunning():
@@ -260,7 +270,7 @@ class RunTestTask(Task):
                         except KillOnFailureError:
                             self.stopProcess(ps)
                             self.stopGlobalProcess()
-                            return
+                            return (True, "Test run stopped because Kill On Failure")
 
         # wait for default process stop
         while tr.Processes.Default._isRunning():
@@ -270,7 +280,7 @@ class RunTestTask(Task):
                 except KillOnFailureError:
                     self.stopProcess(ps)
                     self.stopGlobalProcess()
-                    return
+                    return (True, "Test run stopped because Kill On Failure")
                 time.sleep(.1)
         # check for all processes to end with a time frame
         st = time.time()
@@ -294,6 +304,7 @@ class RunTestTask(Task):
                 # we kill them
                 self.stopProcess(ps)
                 break
+        return False,"All processes ran"
     
     def stopProcess(self,ps):
          for p in ps:

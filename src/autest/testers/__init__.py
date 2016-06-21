@@ -11,3 +11,4 @@ from .directory_exists import DirectoryExists
 from .zip_content import ZipContent
 from .regexp_content import RegexpContent
 from .file_callback import FileContentCallback
+from .lambda_tester import Lambda

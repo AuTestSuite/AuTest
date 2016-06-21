@@ -44,6 +44,9 @@
     <Compile Include="autest\exceptions\killonfailure.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\testers\lambda_tester.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\whenitem\portopen.py">
       <SubType>Code</SubType>
     </Compile>

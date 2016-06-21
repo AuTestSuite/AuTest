@@ -5,7 +5,6 @@ from autest.exceptions.killonfailure import KillOnFailureError
 class GreaterEqual(tester.Tester):
     def __init__( self,value,test_value=None,kill_on_failure=False, description_group=None, description=None ):
         super(GreaterEqual,self).__init__(test_value=test_value,kill_on_failure=kill_on_failure,description_group=description_group, description=description)
-        self._attribute = attribute
         if self.Description is None:   
             self.Description = "Checking that {0} >= {1}".format(tester.get_name(test_value),value)
         self._value = value
