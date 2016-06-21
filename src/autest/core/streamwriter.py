@@ -17,6 +17,7 @@ class PipeRedirector(object):
         for i in iter(self.pipein):
             i=i.decode("utf-8") 
             self.writer(i)
+            host.WriteDebug(['process_output'],i,end='')
     
                 
 
