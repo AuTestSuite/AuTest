@@ -232,14 +232,24 @@ class RunTestTask(Task):
                 # In either case we don't need to wait 
                 # for process to be ready
                 # Start the process and continue
-                p.process._Start()
+                try:
+                    p.process._Start()
+                except KillOnFailureError as e:
+                    self.stopProcess(ps)
+                    self.stopGlobalProcess()
+                    return (True, 'Started process {0}'.format(p.process.Name),e.info )
                 break
             # if we are here we have more than one process
             # we need to start and want to wait on being ready
             # and we are not at the end of the list.
             p.process._waitingProcess=next_process.Name
             #if already started, it will just return
-            p.process._Start()
+            try:
+                p.process._Start()
+            except KillOnFailureError as e:
+                self.stopProcess(ps)
+                self.stopGlobalProcess()
+                return (True, 'Started process {0}'.format(p.process.Name), e.info )
             # Start timer as we have something 
             # we have to wait on, and we need to make
             # sure we have a fallback if something is wrong with
@@ -261,7 +271,7 @@ class RunTestTask(Task):
                     #
                     self.stopProcess(ps)
                     self.stopGlobalProcess()
-                    return True, 'Process "{0}" shutdown before it was ready'.format(p.process.Name)
+                    return True, 'Waiting for process "{0}" to become ready'.format(p.process.Name), 'Shutdown before it was ready'
                 # poll other processes
                 for op in ps:
                     if op.process._isRunning():
@@ -270,7 +280,7 @@ class RunTestTask(Task):
                         except KillOnFailureError:
                             self.stopProcess(ps)
                             self.stopGlobalProcess()
-                            return (True, "Test run stopped because Kill On Failure")
+                            return (True, 'Waiting for process "{0}" to become ready'.format(p.process.Name), "Test run stopped because Kill On Failure")
 
         # wait for default process stop
         while tr.Processes.Default._isRunning():
@@ -280,7 +290,7 @@ class RunTestTask(Task):
                 except KillOnFailureError:
                     self.stopProcess(ps)
                     self.stopGlobalProcess()
-                    return (True, "Test run stopped because Kill On Failure")
+                    return (True, 'Waiting for "Default" process to finish', "Test run stopped because Kill On Failure")
                 time.sleep(.1)
         # check for all processes to end with a time frame
         st = time.time()
@@ -304,7 +314,7 @@ class RunTestTask(Task):
                 # we kill them
                 self.stopProcess(ps)
                 break
-        return False,"All processes ran"
+        return False,"Running all process for TestRun","All processes ran"
     
     def stopProcess(self,ps):
          for p in ps:
