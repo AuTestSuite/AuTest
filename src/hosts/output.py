@@ -29,7 +29,7 @@ def WriteError(*lst,**kw):
     glb.formatter.writeError(msg,**kw)
 
 def WriteErrorf(sfmt, *lst,**kw):
-    msg=common.DelayFormat(sfmt,lst)
+    msg=common.DelayFormat(sfmt,*lst,**kw)
     glb.formatter.writeError(msg,**kw)
 
 def WriteDebug(catagory, *lst,**kw):
@@ -53,7 +53,7 @@ def WriteVerbose(catagory, *lst, **kw):
 def WriteVerbosef(catagory, sfmt, *lst, **kw):
     catagory = common.make_list(catagory)
     catagory.append("all")
-    msg=common.DelayFormat(sfmt,lst)
+    msg=common.DelayFormat(sfmt,*lst,**kw)
     glb.formatter.writeVerbose(catagory,msg,**kw)
 
 def WriteProgress(task,msg=None,progress=None,completed=False):
