@@ -289,7 +289,7 @@ class Process(testrunitem.TestRunItem,order.Order):
                 #make event info object
                 event_info = eventinfo.RunningInfo(self.__start_time,curr_time,self._readyTime(curr_time),self._waitingProcess)
                 #call event
-                host.WriteDebugf(["process"],"Process: {0} - Calling Running event with {1} callbacks mapped to it", self.Name ,len(self.Running))
+                #host.WriteDebugf(["process"],"Process: {0} - Calling Running event with {1} callbacks mapped to it", self.Name ,len(self.Running))
                 try:
                     self.Running(event_info)
                 except KillOnFailureError:
@@ -305,9 +305,11 @@ class Process(testrunitem.TestRunItem,order.Order):
 
     def __cleanup( self ):
         if self.__output:
+            self.__output.Close()
+        if self.__stdout:
             self.__stdout.close()
             self.__stderr.close()
-            self.__output.Close()
+            
             #make event info object
             event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
             #call event
