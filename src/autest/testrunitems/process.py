@@ -199,22 +199,30 @@ class Process(testrunitem.TestRunItem,order.Order):
 
     def _listcmd(self,cmdstr):
         # hacky function to help deal with command that need a shell without breaking older test files
-        lex=shlex.shlex(cmdstr)
-        lex.escape+="<>|"
-        lex.wordchars+='-$%><&.'
+        lex=shlex.shlex(cmdstr,posix=True)
+        #lex.escape+="<>|"
+        lex.wordchars+='-$%><&.=:%^'
         lex.commenters=''
-        return list(lex)
+        return list(lex)        
 
     def _isShellCommand(self,cmdstr):
         
         # some command characters that suggest we wanted to run in a shell
-        shell_args = [';','&&','&','>','>>','<','|','||','cd','set','export']
+        core_operators  = ';&><|'
+        shell_args = [';','&&','&','>','>>','<','|','||','cd','set','export',]
         if os.name == 'nt':
             # extra stuff for windows.. not complete, but common stuff
             shell_args = ['echo','dir','del','rmdir','rd','move','rename','mkdir']
         for arg in self._listcmd(cmdstr):
             if arg.lower() in shell_args:
                 return True
+            # check the arg does not quoted as a string
+            # and that it does not contain a core operator
+            # allow us to get cases such as 1>&2 like cases
+            if arg[0] not in ['"\'']:
+                for o in core_operators:
+                    if o in arg:
+                        return True
         return False
 
     # internal functions to control the process
@@ -246,6 +254,8 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.StartingRun()  
         host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,self._Test.Env['PATH'])
         host.WriteDebugf(["process"], "Passing arguments to subprocess as: {0}",args)
+        if is_a.List(args):
+            host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",subprocess.list2cmdline(args))
         try:
             self.__proc = autest.common.process.Popen(args,
                 shell=shell,

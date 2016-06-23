@@ -4,24 +4,26 @@ import time
 import sys
 import argparse
 if sys.version_info >= (3,):
-	import http.server as SimpleHTTPServer
+    import http.server as SimpleHTTPServer
+    import socketserver as SocketServer
 else:
-	import SimpleHTTPServer
-
-import SocketServer
+    import SimpleHTTPServer
+    import SocketServer
 
 
 def main( name, wait_time, port ):
-    
     start = time.time()
     print(sys.argv[0], "Delay for:", wait_time, "seconds")
+    sys.stderr.flush()
     time.sleep(wait_time)
     Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     httpd = SocketServer.TCPServer(("", port), Handler)
     print("serving at port", port)
-    httpd.serve_forever()
-
-
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("exiting")
+        return
 
 if __name__ == '__main__':
 
