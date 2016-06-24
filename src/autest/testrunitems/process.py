@@ -264,9 +264,14 @@ class Process(testrunitem.TestRunItem,order.Order):
                 cwd=self._Test.RunDirectory,
                 env=self._Test.Env)
         except WindowsError as err:
+            self.__output.Close()
+            self.__output= None
             raise KillOnFailureError('Bad command line: {0}'.format(command_line))
         except OSError as err:
+            self.__output.Close()
+            self.__output= None
             raise KillOnFailureError('Bad command line: {0}'.format(command_line))
+        
         
 
         # map pipes for output
@@ -305,11 +310,9 @@ class Process(testrunitem.TestRunItem,order.Order):
 
     def __cleanup( self ):
         if self.__output:
-            self.__output.Close()
-        if self.__stdout:
             self.__stdout.close()
             self.__stderr.close()
-            
+            self.__output.Close()
             #make event info object
             event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
             #call event
@@ -467,3 +470,4 @@ autest.api.ExtendTestRun(RawCommand, setproperty=True)
 autest.api.ExtendTestRun(ReturnCode,setproperty=True)
 autest.api.ExtendTestRun(Time,setproperty=True)
 autest.api.ExtendTestRun(TimeOut,setproperty=True)
+
