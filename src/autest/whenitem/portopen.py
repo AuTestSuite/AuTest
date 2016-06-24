@@ -18,7 +18,8 @@ def PortOpen(port, address=None):
         ret = False  
     except socket.timeout:
         s = None
-    host.WriteVerbose(["portopen", "when"], "checking port {0} = {1}".format(port,ret))
+    # high volume... so we do this in debug only
+    host.WriteDebug(["portopen", "when"], "checking port {0} = {1}".format(port,ret))
     return ret
 
 AddWhenFunction(PortOpen)

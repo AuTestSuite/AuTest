@@ -16,6 +16,7 @@ def main( name, wait_time, port ):
     print(sys.argv[0], "Delay for:", wait_time, "seconds")
     sys.stderr.flush()
     time.sleep(wait_time)
+	SimpleHTTPServer.allow_reuse_address=True
     Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     httpd = SocketServer.TCPServer(("", port), Handler)
     print("serving at port", port)
