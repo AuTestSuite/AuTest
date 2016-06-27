@@ -17,6 +17,10 @@ if os.name == 'nt':
         '''
         Kills a process with all its children
         '''
+        print("kill....")
+        os.kill(self.pid, signal.CTRL_C_EVENT ) 
+        time.sleep(15)
+        print("finished")
         win32.TerminateJobObject(self._job, -1) #pylint: disable=protected-access
 
     def waitTimeOut(process, timeout):
@@ -57,7 +61,7 @@ if os.name == 'nt':
         # this is to deal with anything new
         args = list(args)
         kw = dict(kw)
-
+        kw['creationflags']=kw.get('creationflags',0)|subprocess.CREATE_NEW_PROCESS_GROUP
         # In the case of windows we want to make a job object for the given
         # process
         # on windows we want to start the process suspended so we can apply job
