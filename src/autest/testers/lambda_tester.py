@@ -9,7 +9,8 @@ class Lambda(tester.Tester):
         
     def test( self,eventinfo, **kw ):
         # run the test function
-        result,message = self._func(eventinfo)
+        result,desc,message = self._func(eventinfo)
+        self.Description=desc
         self.Reason = message
         # process results
         if result:            

@@ -4,22 +4,23 @@ import hosts.output as host
 import socket
 
 def PortOpen(port, address=None):
-
+    ret=False
     if address is None:
         address="localhost"
-    address = (address, port)
-    #host.WriteVerbose(["portopen", "when"], "checking port {0}".format(port))
+
+    address = (address, port)    
 
     try:
         s = socket.create_connection(address, timeout=.5)
         s.close()
-        return True
+        ret = True
     except socket.error:
         s = None
-        return False  
+        ret = False  
     except socket.timeout:
         s = None
-
-    return False
+    # high volume... so we do this in debug only
+    host.WriteDebug(["portopen", "when"], "checking port {0} = {1}".format(port,ret))
+    return ret
 
 AddWhenFunction(PortOpen)
