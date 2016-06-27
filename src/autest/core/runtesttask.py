@@ -96,14 +96,10 @@ class RunTestTask(Task):
         self.stopGlobalProcess()
         #if test passed as we don't want to keep the tests
         # we can remove it
-        if self.__test._Result == testers.ResultType.Passed:
+        if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
             shutil.rmtree(self.__test.RunDirectory, onerror=disk.remove_read_only)
 
     def readTest( self ):
-        #First we need to load a given test
-        #host.WriteMessage('Reading Test infomation "{0}" in
-        #{1}'.format(self.__test.Name,self.__test.TestDirectory))
-
         # load the test data.  this mean exec the data
         #create the locals we want to pass
         locals = copy.copy(glb.Locals)
