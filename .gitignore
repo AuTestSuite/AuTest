@@ -162,3 +162,4 @@ $RECYCLE.BIN/
 .DS_Store
 autest/browse.VC.db
 autest/_sandbox/
+_sandbox/
