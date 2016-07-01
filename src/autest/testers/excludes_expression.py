@@ -10,20 +10,20 @@ from autest.exceptions.killonfailure import KillOnFailureError
 
 class ExcludesExpression(tester.Tester):
     def __init__(self, regexp, description, killOnFailure = False, description_group = None, reflags=0):
-        super(ExcludesExpression, self).__init__(
-                            test_value=None,
-                            kill_on_failure=killOnFailure,
-                            description_group=description_group,
-                            description=description
-                            )
         if isinstance(regexp, str):
             if reflags:
                 regexp = re.compile(regexp,reflags)
             else:
                 regexp = re.compile(regexp)
-            
         self._multiline = regexp.flags & re.M
-        self.__regexp = regexp
+        
+        super(ExcludesExpression, self).__init__(
+                            value=regexp,
+                            test_value=None,
+                            kill_on_failure=killOnFailure,
+                            description_group=description_group,
+                            description=description
+                            )
 
     def test(self, eventinfo, **kw):
         filename=self._GetContent(eventinfo)
@@ -35,18 +35,18 @@ class ExcludesExpression(tester.Tester):
             if self._multiline:
                 with open(filename, 'r') as infile:
                     data = infile.read()
-                failed=self.__regexp.search(data)
+                failed=self.Value.search(data)
             else:
                 # if this is single expression check each line till match
                 with open(filename, 'r') as infile:
                     for l in infile:
-                        failed=self.__regexp.search(l)
+                        failed=self.Value.search(l)
                         if failed:
                             break
             if failed:
                 result = tester.ResultType.Failed
                 self.Reason = 'Contents of {0} contains expression: "{1}"'.\
-                              format(filename, self.__regexp.pattern)
+                              format(filename, self.Value.pattern)
 
         except IOError as err:
             result = tester.ResultType.Failed

@@ -51,46 +51,46 @@ class Processes ( testrunitem.TestRunItem ):
         return self.__default
 
     
-def StillRunningBefore(self,process):
-    def getChecker():
-        if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunningBefore
-            return process
-        else:
-            return testers.Equal(True, test_value=process._isRunningBefore)
-    self._Register("Process.{0}.RunningStart".format(process.Name), getChecker, event=self.SetupEvent)
+#def StillRunningBefore(self,process):
+#    def getChecker():
+#        if isinstance(process, testers.Tester):
+#            process.TestValue = process._isRunningBefore
+#            return process
+#        else:
+#            return testers.Equal(True, test_value=process._isRunningBefore)
+#    self._Register("Process.{0}.RunningStart".format(process.Name), getChecker, event=self.SetupEvent)
 
-def StillRunningAfter(self,process):
-    def getChecker():
-        if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunningAfter
-            return process
-        else:
-            return testers.Equal(True, test_value=process._isRunningAfter)
-    self._Register("Process.{0}.RunningAfter".format(process.Name), getChecker, event=self.EndEvent)
+#def StillRunningAfter(self,process):
+#    def getChecker():
+#        if isinstance(process, testers.Tester):
+#            process.TestValue = process._isRunningAfter
+#            return process
+#        else:
+#            return testers.Equal(True, test_value=process._isRunningAfter)
+#    self._Register("Process.{0}.RunningAfter".format(process.Name), getChecker, event=self.EndEvent)
 
-def NotRunningBefore(self,process):
-    def getChecker():
-        if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunningBefore
-            return process
-        else:
-            return testers.NotEqual(True, test_value=process._isRunningBefore)
-    self._Register("Process.{0}.NotRunningStart".format(process.Name), getChecker, event=self.SetupEvent)
+#def NotRunningBefore(self,process):
+#    def getChecker():
+#        if isinstance(process, testers.Tester):
+#            process.TestValue = process._isRunningBefore
+#            return process
+#        else:
+#            return testers.NotEqual(True, test_value=process._isRunningBefore)
+#    self._Register("Process.{0}.NotRunningStart".format(process.Name), getChecker, event=self.SetupEvent)
 
-def NotRunningAfter(self,process):
-    def getChecker():
-        if isinstance(process, testers.Tester):
-            process.TestValue = process._isRunningAfter
-            return process
-        else:
-            return testers.NotEqual(True, test_value=process._isRunningAfter)
-    self._Register("Process.{0}.NotRunningAfter".format(process.Name), getChecker, event=self.EndEvent)
+#def NotRunningAfter(self,process):
+#    def getChecker():
+#        if isinstance(process, testers.Tester):
+#            process.TestValue = process._isRunningAfter
+#            return process
+#        else:
+#            return testers.NotEqual(True, test_value=process._isRunningAfter)
+#    self._Register("Process.{0}.NotRunningAfter".format(process.Name), getChecker, event=self.EndEvent)
 
 import autest.api
 autest.api.AddTestRunMember(Processes)
 
-autest.api.ExtendTestRun(StillRunningBefore, setproperty=True)
-autest.api.ExtendTestRun(StillRunningAfter, setproperty=True)
-autest.api.ExtendTestRun(NotRunningBefore, setproperty=True)
-autest.api.ExtendTestRun(NotRunningAfter, setproperty=True)
+#autest.api.ExtendTestRun(StillRunningBefore, setproperty=True)
+#autest.api.ExtendTestRun(StillRunningAfter, setproperty=True)
+#autest.api.ExtendTestRun(NotRunningBefore, setproperty=True)
+#autest.api.ExtendTestRun(NotRunningAfter, setproperty=True)

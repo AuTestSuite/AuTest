@@ -2,19 +2,24 @@ from __future__ import absolute_import, division, print_function
 import autest.glb as glb
 import hosts.output as host
 import autest.common.event as event
+import autest.common as common
+import autest.common.is_a as is_a
 import autest.testers as testers
+from autest.core.testerset import TesterSet
 from future.utils import with_metaclass
 
+import pprint
 # this is base class to add common logic for when I need to
-# delay adding the event mapping. The reasonf or this woudl be cases
+# delay adding the event mapping.  The reasonf or this woudl be cases
 # in which more than one value coudl be mapped in a file, but only on can exist in the event
 # in cases like this we can make sure the correct logic exists for mapping the first
-# or last value only. Likewise handling cases in which I would want to make more than one
-# event can be handled correctly as well. The second factor this adds is some debug ablity
+# or last value only.  Likewise handling cases in which I would want to make more than one
+# event can be handled correctly as well.  The second factor this adds is some debug ablity
 # on what is being mapped to the event
 
-#todo .. move to independent file...
-class DelayedEventMapper ( object ):
+
+#todo ..  move to independent file...
+class DelayedEventMapper(object):
     '''
     This class provides the base interface for creating predefined event mappings for a
     defined concept
@@ -24,18 +29,47 @@ class DelayedEventMapper ( object ):
     def __init__( self ):
         self.__addevent = {}
 
+    def _Register( self,event_name,event_callbacks,property_name,inst=None):
+        if inst is None:
+            inst=self
+        cls=inst.__class__
+        varname="_event_name_{0}_".format(property_name)
+        setattr(inst,varname,event_name)
+        self.__addevent[event_name] = event_callbacks
+        def getter( self ):
+            return self._GetRegisteredEvent(getattr(self,varname))
+
+        def setter( self,value ):
+            if not isinstance(value, TesterSet):
+                obj = self._GetRegisteredEvent(getattr(self,varname))
+                if is_a.List(value):
+                    for v in value:
+                        obj.add(v)
+                else:
+                    obj.assign(value)
+                
+
+        property_name = common.make_list(property_name)
+        for p in property_name:
+            if not hasattr(cls,p):
+                setattr(cls,p,property(getter, setter))
+
     def _BindEvents( self ):
         '''
         Bind the event to the callbacks
         '''
-        for event, callback in self.__addevent.values():
-            event += callback
+        for obj in self.__addevent.values():
+            if not isinstance(obj, TesterSet):
+                event,callback = obj
+                event += callback
+            else:
+                obj._bind()
+            
+        #for event, callback in self.__addevent.values():
+            #event += callback
 
-    def _GetCallBacks(self):
-        ret=[]
-        for v in self.__addevent.values():
-            ret.append(v[1])
-        return ret
+    def _GetCallBacks( self ):        
+        return self.__addevent.values()            
 
     def _RegisterEvent( self, key, event, callback ):
         '''
@@ -45,11 +79,23 @@ class DelayedEventMapper ( object ):
             host.WriteDebug(['testrun'],"Replacing existing key: {0} value: {1} with\n new value: {2}".format(key,self.__addevent[key],(event, callback)))
         self.__addevent[key] = (event, callback)
 
-    def _AddRegisterEvent( self, key, event, callback ):
-        '''
-        Default set or override "named" event
-        '''
-        self.__addevent[key] += (event, callback)
+    #def _AddRegisterEvent( self, key, event, callback ):
+    #    '''
+    #    Default set or override "named" event
+    #    '''
+    #    self.__addevent[key] += (event, callback)
+
+    def dump_event_data( self ):
+        ret = ""
+        for k,v in self.__addevent.items():
+            if isinstance(v, TesterSet):
+                if len(v._testers):
+                    ret+=k + ":\n"
+                    ret+="  " + pprint.pformat(v._testers,indent=2) + "\n"
+            else:
+                ret+=k + ":\n"
+                ret+="  {0}\n".format(v)
+        return ret
 
     def _GetRegisteredEvent( self, key ):
         ''' 
@@ -60,35 +106,34 @@ class DelayedEventMapper ( object ):
         except KeyError:
             return None
 
-    def _GetRegisteredEvents(self):
+    def _GetRegisteredEvents( self ):
         return self.__addevent
 
-    def _Register( self, key, validateCallback, event ):
-        try:
-            # call callback to verify type is correct
-            checker = validateCallback()            
-            if checker:
-                self._RegisterEvent(key, event, checker)
-            else:
-                host.WriteError('Invalid type')
-        except BaseException as err:
-            import traceback
-            host.WriteError('Exception occurred: {0}'.format(traceback.format_exc()))
-
+    #def _Register( self, key, validateCallback, event ):
+    #    try:
+    #        # call callback to verify type is correct
+    #        checker = validateCallback()
+    #        if checker:
+    #            self._RegisterEvent(key, event, checker)
+    #        else:
+    #            host.WriteError('Invalid type')
+    #    except BaseException as err:
+    #        import traceback
+    #        host.WriteError('Exception occurred: {0}'.format(traceback.format_exc()))
 
 class _testrun__metaclass__(type):
-    def __call__(cls,*lst,**kw):
+    def __call__( cls,*lst,**kw ):
         #make instance of the class
-        inst=type.__call__(cls,*lst,**kw)
-        # given which class this is we look up 
+        inst = type.__call__(cls,*lst,**kw)
+        # given which class this is we look up
         # in a dictionary which items we want to add
-        cls_info=glb._runtest_items.get(cls,{})
+        cls_info = glb._runtest_items.get(cls,{})
         # add any items we want to add to the runtest item.
         for k,v in cls_info.items():
             setattr(inst,k,v(inst))
         return inst
 
-class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
+class BaseTestRun(with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
 
     def __init__( self, testobj, name, displaystr ):
         self.__displaystr = displaystr # what we display to the user
@@ -97,7 +142,7 @@ class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
         self.__exceptionMessage = '' # this is a error message given an unknown exeception
 
         # this is the result type of the test run
-        self.__result=None 
+        self.__result = None 
 
         # core events
         self.__SetupEvent = event.Event()
@@ -137,9 +182,9 @@ class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
         return self.__EndEvent
 
     @property
-    def _Result(self):
+    def _Result( self ):
         if self.__result is None:
-            self.__result=-1
+            self.__result = -1
             for i in self._getTesters():
                 if self.__result < i.Result:
                     self.__result = i.Result
@@ -150,33 +195,90 @@ class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
         return self.__result
 
     @_Result.setter
-    def _Result(self,val):
-        self.__result=val
+    def _Result( self,val ):
+        self.__result = val
 
     @property
-    def _ExceptionMessage(self):
-        if self._Result == testers.ResultType.Exception and self.__exceptionMessage=="":
+    def _ExceptionMessage( self ):
+        if self._Result == testers.ResultType.Exception and self.__exceptionMessage == "":
             for i in self._getTesters():
                 if i.Result == testers.ResultType.Exception:
                     self.__exceptionMessage = i.Reason
         return self.__exceptionMessage
 
     @_ExceptionMessage.setter
-    def _ExceptionMessage(self,val):
-        self.__exceptionMessage=val;
+    def _ExceptionMessage( self,val ):
+        self.__exceptionMessage = val
 
-
-    def _getTesters(self):
-        return [x for x in self._GetCallBacks() if isinstance(x, testers.tester.Tester)]
+    def _getTesters( self ):
+        ret = []
+        for x in self._GetCallBacks():
+            if not isinstance(x, TesterSet):
+                ret.append(x[1])
+            else:
+                ret+=[t for t in x._testers if isinstance(t, testers.tester.Tester)]
+        return ret
         
     @property
-    def _Test(self):
+    def _Test( self ):
         return self.__test
 
 
-class TestRun (BaseTestRun ):
+class TestRun(BaseTestRun):
     def __init__( self, testobj, name, displaystr ):
         super(TestRun, self).__init__(testobj, name, displaystr)
+
+        # setup testables
+         ## util object
+        class LamdaEq(object):
+            def __init__(self, func):
+                self.__func=func
+            def __eq__(self,rhs):
+                return self.__func() == rhs
+            def __ne__(self,rhs):
+                return self.__func() != rhs
+
+        # StillRunningBefore
+        self._Register(
+            "Test.Process.StillRunningBefore",
+            TesterSet(
+                    testers.Equal,
+                    True,
+                    self.SetupEvent,
+                    converter=lambda val: LamdaEq(val._isRunningBefore),
+                ),"StillRunningBefore"
+            )
+        # StillRunningAfter
+        self._Register(
+            "Test.Process.StillRunningAfter",
+            TesterSet(
+                    testers.Equal,
+                    True,
+                    self.EndEvent,
+                    converter=lambda val: LamdaEq(val._isRunningBefore),
+                ),"StillRunningAfter"
+            )
+        # NotRunningBefore
+        self._Register(
+            "Test.Process.NotRunningBefore",
+            TesterSet(
+                    testers.Equal,
+                    False,
+                    self.SetupEvent,
+                    converter=lambda val: LamdaEq(val._isRunningBefore),
+                ),"NotRunningBefore"
+            )
+        # NotRunningAfter
+        self._Register(
+            "Test.Process.NotRunningAfter",
+            TesterSet(
+                    testers.Equal,
+                    False,
+                    self.EndEvent,
+                    converter=lambda val: LamdaEq(val._isRunningBefore),
+                ),"NotRunningAfter"
+            )
+        
 
     
 

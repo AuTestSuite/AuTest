@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import hosts.output as host
 import autest.core.testrunitem as testrunitem
+from autest.core.testerset import TesterSet
 import autest.testers as testers
 import autest.core.order as order
 import autest.common.event as event
@@ -51,6 +52,45 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.RunFinished = event.Event()
 
         self.__streams = object()
+
+        #setup testables
+        # ReturnCode
+        self._Register(
+            "Process.{0}.ReturnCode".format(self.__name),
+            TesterSet(
+                    testers.Equal,
+                    "ReturnCode",
+                    self.RunFinished,
+                    converter=int,
+                    description_group="{0} {1}".format("process",self.Name)
+                ),"ReturnCode"
+            )
+        # TimeOut
+        self._Register(
+            "Process.{0}.TimeOut".format(self.__name),
+            TesterSet(
+                    testers.LessThan,
+                    "TotalRunTime",
+                    self.Running,
+                    converter=int,
+                    kill_on_failure=True,
+                    description_group="{0} {1}".format("process",self.Name)
+                ),"TimeOut"
+            )
+        # Time
+        self._Register(
+            "Process.{0}.TimeOut".format(self.__name),
+            TesterSet(
+                    testers.LessThan,
+                    "TotalTime",
+                    self.RunFinished,
+                    converter=int,
+                    kill_on_failure=True,
+                    description_group="{0} {1}".format("process",self.Name)
+                ),"Time"
+            )
+        # Startup... (remove this one, or make it so we can un bind it during runtime)
+    
         
     @property
     def Name( self ):
@@ -97,79 +137,39 @@ class Process(testrunitem.TestRunItem,order.Order):
             return self.__ready(*lst,**kw)
         except TypeError:
             return self.__ready()
-    # testable items
-    @property
-    def ReturnCode( self ):
-        return self._GetRegisterEvent("Process.{0}.ReturnCode".format(self.__name))
+    ## testable items
+    #@property
+    #def ReturnCode( self ):
+    #    return self._GetRegisterEvent("Process.{0}.ReturnCode".format(self.__name))  
 
-    @ReturnCode.setter
-    def ReturnCode( self, val ):
-        def getChecker():
-            des_grp = "{0} {1}".format("process",self.Name)
-            if isinstance(val, testers.Tester):
-                val.TestValue = 'ReturnCode'
-                if value.DescriptionGroup is None:
-                    value.DescriptionGroup = des_grp
-                return val
-            else:
-                return testers.Equal(int(val), test_value='ReturnCode', description_group=des_grp)
-        self._Register("Process.{0}.ReturnCode".format(self.__name), getChecker, event=self.RunFinished)
+    #@property
+    #def Time( self ):
+    #    return self._GetRegisterEvent("Process.{0}.Time".format(self.__name))
 
-    @property
-    def Time( self ):
-        return self._GetRegisterEvent("Process.{0}.Time".format(self.__name))
+    #@property
+    #def TimeOut( self ):
+    #    return self._GetRegisterEvent("Process.{0}.TimeOut".format(self.__name))
 
-    @Time.setter
-    def Time( self, val ):
-        def getChecker():
-            des_grp = "{0} {1}".format("process",self.Name)
-            if isinstance(val, testers.Tester):
-                val.TestValue = 'TotalTime'
-                if value.DescriptionGroup is None:
-                    value.DescriptionGroup = des_grp
-                return val
-            else:
-                return testers.Equal(int(val), test_value='TotalTime', description_group=des_grp)
-        self._Register("Process.{0}.Time".format(self.__name), getChecker, event=self.RunFinished)
+    #@property
+    #def StartupTimeout( self ):
+    #    return self._GetRegisterEvent("Process.{0}.StartupTimeout".format(self.__name))
 
-    @property
-    def TimeOut( self ):
-        return self._GetRegisterEvent("Process.{0}.TimeOut".format(self.__name))
-
-    @TimeOut.setter
-    def TimeOut( self, val ):
-        def getChecker():
-            des_grp = "{0} {1}".format("process",self.Name)
-            if isinstance(val, testers.Tester):
-                val.TestValue = 'TotalRunTime'
-                if value.DescriptionGroup is None:
-                    value.DescriptionGroup = des_grp
-                return val
-            else:
-                return testers.LessThan(int(val), test_value='TotalRunTime', kill_on_failure=True, description_group=des_grp)
-        self._Register("Process.{0}.TimeOut".format(self.__name), getChecker, event=self.Running)
-
-
-    @property
-    def StartupTimeout( self ):
-        return self._GetRegisterEvent("Process.{0}.StartupTimeout".format(self.__name))
-
-    @TimeOut.setter
-    def StartupTimeout( self, val ):
-        def getChecker():
-            des_grp = "{0} {1}".format("process",self.Name)
-            if isinstance(val, testers.Tester):
-                val.TestValue = 'gettingReadyTime'
-                if value.DescriptionGroup is None:
-                    value.DescriptionGroup = des_grp
-                return val
-            else:
-                return testers.LessThan(int(val),
-                    test_value='gettingReadyTime',
-                    kill_on_failure=True,
-                    description_group=des_grp,
-                    description="Checking that process is ready within {1} seconds so we can start process: {ev.waitingProcess}")
-        self._Register("Process.{0}.StartupTimeout".format(self.__name), getChecker, event=self.Running)
+    #@TimeOut.setter
+    #def StartupTimeout( self, val ):
+    #    def getChecker():
+    #        des_grp = "{0} {1}".format("process",self.Name)
+    #        if isinstance(val, testers.Tester):
+    #            val.TestValue = 'gettingReadyTime'
+    #            if value.DescriptionGroup is None:
+    #                value.DescriptionGroup = des_grp
+    #            return val
+    #        else:
+    #            return testers.LessThan(int(val),
+    #                test_value='gettingReadyTime',
+    #                kill_on_failure=True,
+    #                description_group=des_grp,
+    #                description="Checking that process is ready within {1} seconds so we can start process: {ev.waitingProcess}")
+    #    self._Register("Process.{0}.StartupTimeout".format(self.__name), getChecker, event=self.Running)
 
 
     # internal functions to testing is ready logic
@@ -247,7 +247,10 @@ class Process(testrunitem.TestRunItem,order.Order):
         command_line = template.substitute(self._Test.Env)
         
         # test to see that this might need a shell
-        shell = self._isShellCommand(command_line)
+        try:
+            shell = self._isShellCommand(command_line)
+        except ValueError as e:
+            raise KillOnFailureError(' Bad command line - {1}: {0}'.format(command_line,e))
         args = self._listcmd(command_line) if shell == False else command_line
         
         #call event that we are starting to run the process
@@ -264,14 +267,14 @@ class Process(testrunitem.TestRunItem,order.Order):
                 stderr=subprocess.PIPE,
                 cwd=self._Test.RunDirectory,
                 env=self._Test.Env)
-        except WindowsError as err:
+        except IOError as err:
             self.__output.Close()
             self.__output= None
-            raise KillOnFailureError('Bad command line: {0}'.format(command_line))
+            raise KillOnFailureError('Bad command line - {1}: {0}'.format(command_line,err))
         except OSError as err:
             self.__output.Close()
             self.__output= None
-            raise KillOnFailureError('Bad command line: {0}'.format(command_line))
+            raise KillOnFailureError('Bad command line - {1}: {0}'.format(command_line,err))
         
         
 

@@ -1,0 +1,7 @@
+Test.Summary="Test we error correctly on an Exclude pattern"
+
+tr=Test.AddTestRun()
+tr.Processes.Default.Command='echo "Warning! there is a not really a problem"'
+tr.Processes.Default.ReturnCode = Testers.LessThan(10)
+tr.Processes.Default.Streams.stdout=Testers.ContainsExpression("Error!","Test should contain errors")
+

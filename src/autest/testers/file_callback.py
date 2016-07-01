@@ -15,9 +15,13 @@ class FileContentCallback(tester.Tester):
     what's wrong with the file; if file is okay return '' or None from the callback
     
     '''
+
     def __init__(self, callback, description, killOnFailure=False, description_group=None):
-        super(FileContentCallback,self).__init__(None, kill_on_failure=killOnFailure,description_group=description_group,description=description)
-        self.__callback = callback
+        super(FileContentCallback,self).__init__(value=callback,
+                                                test_value=None, # set when it add the the tester member, should be a filename
+                                                kill_on_failure=killOnFailure,
+                                                description_group=description_group,
+                                                description=description)
 
     def test(self, eventinfo, **kw):
         filename=self._GetContent(eventinfo)
@@ -31,7 +35,8 @@ class FileContentCallback(tester.Tester):
             result = tester.ResultType.Failed
             self.Reason = 'Cannot read {0}: {1}'.format(filename, err)
         else:
-            errorMessage = self.__callback(data)
+            #call the callback ( as it is Value)
+            errorMessage = self.Value(data)
             if errorMessage:
                 result = tester.ResultType.Failed
                 self.Reason = 'Contents of {0} do not match desired callback: {1}'.\

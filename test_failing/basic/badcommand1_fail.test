@@ -1,0 +1,4 @@
+Test.Summary="Test bad command line.. ie command does not exist"
+
+tr=Test.AddTestRun()
+tr.Processes.Default.Command='FakeCommand --arg1=joe'

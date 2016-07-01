@@ -6,23 +6,26 @@ import os
 import tarfile
 import zipfile
 
-
+#update this to allow for basic file wildcard patterns with * and ?
 class ZipContent(tester.Tester):
     ZIP_MAGIC = '\x50\x4B\x05\x06'
-    def __init__(self, includes = None, excludes=None, kill_on_failure=False, description_group=None):
-        super(ZipContent, self).__init__(test_value=True, kill_on_failure=kill_on_failure,description_group=description_group, description='')
+    def __init__( self, includes=None, excludes=None, kill_on_failure=False, description_group=None ):
         self.__include = includes or ()
         self.__exclude = excludes or ()
+        super(ZipContent, self).__init__(value=None, # this the _include,_exclude
+                                test_value=None, # this is a file name, ie it set when it assigned to the File.content member
+                                kill_on_failure=kill_on_failure,
+                                description_group=description_group, 
+                                description='')
 
-    def test(self, eventinfo, **kw):
+    def test( self, eventinfo, **kw ):
         self.__test()
         if self.Result == tester.ResultType.Failed and self.KillOnFailure:
             raise KillOnFailureError
     
-    def __test(self):
+    def __test( self ):
         zfile = self.TestValue.AbsPath
-        self.Description = "Checking that {0} contains {1} and does not contain {2}".format(
-                zfile, self.__include, self.__exclude)
+        self.Description = "Checking that {0} contains {1} and does not contain {2}".format(zfile, self.__include, self.__exclude)
         
         # check that file exists
         if not os.path.exists(zfile):
