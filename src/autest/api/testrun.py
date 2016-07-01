@@ -18,8 +18,8 @@ def ExtendTestRun( func,name=None,setproperty=False ):
 
 def AddTestRunMember( clsobj, name=None, cls=None ):
     # helper function
-    def wrapper( self,*lst,**kw ):
-            self._add_item(item(*lst,**kw))
+    #def wrapper( self,*lst,**kw ):
+    #        self._add_item(item(*lst,**kw))
     
     if not issubclass(clsobj,TestRunItem):
         host.WriteError("Object must be subclass of autest.core.testrun.testrunitem.TestRunItem")

@@ -50,6 +50,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.Running = event.Event()
         self.RunFinished = event.Event()
 
+        self.__streams = object()
         
     @property
     def Name( self ):
@@ -354,50 +355,7 @@ class Process(testrunitem.TestRunItem,order.Order):
     def _isRunningAfter( self ):
             return self._isRunning()
 
-    # streams setup (as this is a lot of copy and paste code otherwise
-    def __defineProperties__( properties ):
-        def createStreamProperty( name, event, testValue ):
-            def getter( self ):
-                return self._GetRegisterEvent(event)
-
-            def setter( self, value ):
-                def getChecker():
-                    if isinstance(value, testers.Tester):
-                        value.TestValue = testValue
-                        if value.DescriptionGroup is None:
-                            value.DescriptionGroup = "{0} {1}".format("process",self.Name)
-                        return value
-                    elif isinstance(value, str):
-                        return testers.GoldFile(File(self._TestRun, value, runtime=False),
-                                                test_value=testValue,
-                                                description_group="{0} {1}".format("process",self.Name))
-                    elif isinstance(value, (tuple, list)):
-                        return testers.GoldFileList([File(self._TestRun, item, runtime=False)
-                                                     for item in value], 
-                                                     test_value=testValue,
-                                                    description_group="{0} {1}".format("process",self.Name))
-
-                self._Register(event.format(self.__name), getChecker,self.RunFinished)
-
-            properties[name] = property(getter, setter)
-
-        STREAMS = (#std streams
-                   ('stdout', 'Streams.{0}.stdout', 'StdOutFile'),
-                   ('stderr', 'Streams.{0}.stderr', 'StdErrFile'),
-                   #filtered streams
-                   ('All', 'Streams.{0}.All', 'AllFile'),
-                   #('Message', 'Streams.{0).Message', 'MessageFile'), Not sure
-                   #how to filter this our from stdout
-                   ('Warning', 'Streams.{0}.Warning', 'WarningFile'),
-                   ('Error', 'Streams.{0}.Error', 'ErrorFile'),
-                   ('Debug', 'Streams.{0}.Debug', 'DebugFile'),
-                   ('Verbose', 'Streams.{0}.Verbose', 'VerboseFile'),)
-
-        for name, event, testValue in STREAMS:
-            createStreamProperty(name, event, testValue)
-    __defineProperties__(locals())
-    del __defineProperties__
-
+    
 
 # some forwarding functions...
 # for backward compatiblity
@@ -419,46 +377,46 @@ class Streams(testrunitem.TestRunItem):
 
     @property
     def stdout( self ):
-        return self._TestRun.Processes.Default.stdout
+        return self._TestRun.Processes.Default.Streams.stdout
     @stdout.setter
     def stdout( self,val ):
-        self._TestRun.Processes.Default.stdout = val
+        self._TestRun.Processes.Default.Streams.stdout = val
     @property
     def stderr( self ):
-        return self._TestRun.Processes.Default.stderr
+        return self._TestRun.Processes.Default.Streams.stderr
     @stderr.setter
     def stderr( self,val ):
-        self._TestRun.Processes.Default.stderr = val
+        self._TestRun.Processes.Default.Streams.stderr = val
     @property
     def All( self ):
-        return self._TestRun.Processes.Default.All
+        return self._TestRun.Processes.Default.Streams.All
     @All.setter
     def All( self,val ):
-        self._TestRun.Processes.Default.All = val
+        self._TestRun.Processes.Default.Streams.All = val
     @property
     def Warning( self ):
-        return self._TestRun.Processes.Default.Warning
+        return self._TestRun.Processes.Default.Streams.Warning
     @Warning.setter
     def Warning( self,val ):
-        self._TestRun.Processes.Default.Warning = val
+        self._TestRun.Processes.Default.Streams.Warning = val
     @property
     def Error( self ):
-        return self._TestRun.Processes.Default.Error
+        return self._TestRun.Processes.Default.Streams.Error
     @Error.setter
     def Error( self,val ):
-        self._TestRun.Processes.Default.Error = val
+        self._TestRun.Processes.Default.Streams.Error = val
     @property
     def Debug( self ):
-        return self._TestRun.Processes.Default.Debug
+        return self._TestRun.Processes.Default.Streams.Debug
     @Debug.setter
     def Debug( self,val ):
-        self._TestRun.Processes.Default.Debug = val
+        self._TestRun.Processes.Default.Streams.Debug = val
     @property
     def Verbose( self ):
-        return self._TestRun.Processes.Default.Verbose
+        return self._TestRun.Processes.Default.Streams.Verbose
     @Verbose.setter
     def Verbose( self,val ):
-        self._TestRun.Processes.Default.Verbose = val
+        self._TestRun.Processes.Default.Streams.Verbose = val
 
 
 
@@ -470,4 +428,3 @@ autest.api.ExtendTestRun(RawCommand, setproperty=True)
 autest.api.ExtendTestRun(ReturnCode,setproperty=True)
 autest.api.ExtendTestRun(Time,setproperty=True)
 autest.api.ExtendTestRun(TimeOut,setproperty=True)
-

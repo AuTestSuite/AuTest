@@ -77,16 +77,16 @@ class DelayedEventMapper ( object ):
 
 
 class _testrun__metaclass__(type):
-        def __call__(cls,*lst,**kw):
-            #make instal of the class
-            inst=type.__call__(cls,*lst,**kw)
-            # given which class this is we look up 
-            # in a dictionary which items we want to add
-            cls_info=glb._runtest_items.get(cls,{})
-            # add any items we want to add to the runtest item.
-            for k,v in cls_info.items():
-                setattr(inst,k,v(inst))
-            return inst
+    def __call__(cls,*lst,**kw):
+        #make instance of the class
+        inst=type.__call__(cls,*lst,**kw)
+        # given which class this is we look up 
+        # in a dictionary which items we want to add
+        cls_info=glb._runtest_items.get(cls,{})
+        # add any items we want to add to the runtest item.
+        for k,v in cls_info.items():
+            setattr(inst,k,v(inst))
+        return inst
 
 class BaseTestRun (with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
 

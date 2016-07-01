@@ -5,13 +5,19 @@ from . import tester
 from .file_callback import FileContentCallback
 from autest.exceptions.killonfailure import KillOnFailureError
 
+# this is around for backwards compatiblity. Ideally this is not needed 
+# given the better ExcludeExpression and ContainExpression
+
 class RegexpContent(FileContentCallback):
     def __init__(self, regexp, description, killOnFailure=False, description_group=None):
         if isinstance(regexp, str):
             regexp = re.compile(regexp)
         self.__regexp = regexp
-        FileContentCallback.__init__(self, self.__check, description, killOnFailure,description_group=description_group, description='')
+        super(RegexpContent,self).__init__(self.__check, description, killOnFailure,description_group)
     
     def __check(self, data):
         if not self.__regexp.search(data):
-            return 'Contents of {0} do not match desired regexp'.format(self.TestValue.AbsPath)
+            return 'Search of regular expression "{0}" failed to find match'.format(self.__regexp.pattern )
+
+
+

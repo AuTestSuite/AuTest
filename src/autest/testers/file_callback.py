@@ -14,32 +14,33 @@ class FileContentCallback(tester.Tester):
     where data is file contents (read by this class) and errorMessage is a string describing
     what's wrong with the file; if file is okay return '' or None from the callback
     
-    For more usage examples see gold_tests/run_utest-timeout/run_utest-timeout.test.py
     '''
     def __init__(self, callback, description, killOnFailure=False, description_group=None):
-        tester.Tester.__init__(self, None, kill_on_failure=killOnFailure,description_group=description_group,description=description)
+        super(FileContentCallback,self).__init__(None, kill_on_failure=killOnFailure,description_group=description_group,description=description)
         self.__callback = callback
 
     def test(self, eventinfo, **kw):
-        absPath = self.TestValue.AbsPath
+        filename=self._GetContent(eventinfo)
+        if filename is None:
+            filename = self.TestValue.AbsPath
         result = tester.ResultType.Passed
         try:
-            with open(absPath, 'r') as inp:
+            with open(filename, 'r') as inp:
                 data = inp.read()
         except IOError as err:
             result = tester.ResultType.Failed
-            self.Reason = 'Cannot read {0}: {1}'.format(absPath, err)
+            self.Reason = 'Cannot read {0}: {1}'.format(filename, err)
         else:
             errorMessage = self.__callback(data)
             if errorMessage:
                 result = tester.ResultType.Failed
                 self.Reason = 'Contents of {0} do not match desired callback: {1}'.\
-                              format(absPath, errorMessage)
+                              format(filename, errorMessage)
 
         self.Result = result
         if result != tester.ResultType.Passed:
             if self.KillOnFailure:
                 raise KillOnFailureError
         else:
-            self.Reason = 'Contents of {0} match desired callback'.format(absPath)
+            self.Reason = 'Contents of {0} match desired callback'.format(filename)
         host.WriteVerbose(["testers.Equal","FileContentCallback"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
