@@ -1,0 +1,7 @@
+Test.Summary="Test ExcludesExpression() api"
+
+tr=Test.AddTestRun()
+tr.Processes.Default.Command='echo "Warning! there is no error!"'
+tr.Processes.Default.ReturnCode = Testers.LessThan(10)
+tr.Processes.Default.Streams.stdout=Testers.ExcludesExpression("Error!","Test should contain errors in output text")
+

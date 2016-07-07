@@ -7,7 +7,7 @@ from autest.exceptions.killonfailure import KillOnFailureError
 
 # this is around for backwards compatiblity. Ideally this is not needed 
 # given the better ExcludeExpression and ContainExpression
-
+# see if we can weed this one out....
 class RegexpContent(FileContentCallback):
     def __init__(self, regexp, description, killOnFailure=False, description_group=None):
         if isinstance(regexp, str):

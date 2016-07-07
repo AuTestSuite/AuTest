@@ -13,7 +13,6 @@ from autest.exceptions.killonfailure import KillOnFailureError
 import os
 import traceback
 import copy
-import pprint
 import time
 import shutil
 from collections import namedtuple
@@ -66,7 +65,7 @@ class RunTestTask(Task):
         except KeyboardInterrupt:
             raise
         except:
-            self.__test._SetResult(testers.ResultType.Failed)
+            self.__test._SetResult(testers.ResultType.Exception)
             self.__test.Setup._Reason = traceback.format_exc()
             host.WriteVerbose("run_test", "Test {0} failed\n {1}".format(self.__test.Name,self.__test.Setup._Reason))
             #host.WriteError("run_test", "Test {0} failed\n
@@ -124,7 +123,7 @@ class RunTestTask(Task):
         skip_tests = None
         host.WriteMessagef("Running Test {0}:",self.__test.Name,end="")
         # dump out events that have been registered for debugging
-        host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",self.__test.Processes._TestRun.Name, pprint.pformat(self.__test.Processes._TestRun._GetRegisteredEvents()))
+        host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",self.__test.Processes._TestRun.Name, self.__test.Processes._TestRun.dump_event_data())
         self.__test.Processes._TestRun._BindEvents()
         for tr in self.__test._TestRuns:
             if skip_tests:
@@ -134,9 +133,9 @@ class RunTestTask(Task):
                 #run the test step
                 try:
                     # dump out events that have been registered for debugging
-                    host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",tr.Name, pprint.pformat(tr._GetRegisteredEvents()))
+                    host.WriteDebugf("testrun","Registered events for test run {0}:\n {1}",tr.Name, tr.dump_event_data())
+
                     # bind the events now
-                    
                     tr._RegisterEvent("runtest", tr.StartEvent, 
                         testers.Lambda(self.runTestStep)
                         )

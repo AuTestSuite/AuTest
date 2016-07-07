@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 import hosts.output as host
 from autest.exceptions.killonfailure import KillOnFailureError
 
@@ -37,13 +38,14 @@ class Tester(object):
     test more context, sould be in form of Type: name, ie Process: proc1
     '''
 
-    def __init__( self, test_value, kill_on_failure=False, description_group=None , description=None):
+    def __init__( self, value, test_value, kill_on_failure=False, description_group=None , description=None):
         self.__description_group = description_group
         self.__description = description
         self.__result = ResultType.Unknown
         self.__reason = "Test was not run"
         self.__test_value = test_value
         self.__kill = kill_on_failure
+        self.__value = value
 
     @property
     def KillOnFailure( self ):
@@ -69,6 +71,18 @@ class Tester(object):
     @TestValue.setter
     def TestValue( self, value ):
         self.__test_value = value
+
+    @property
+    def Value(self):
+        '''
+        This is the "static" value to test for based on what was set
+        in the test file.
+        '''
+        return self.__value
+
+    @Value.setter
+    def Value(self, val):
+        self.__value=val
 
     @property
     def Description( self ):

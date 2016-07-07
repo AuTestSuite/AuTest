@@ -30,8 +30,12 @@ class TestRunItem((with_metaclass(_testrun_item__metaclass__,object))):
     def _Test(self):
         return self.__testrun._Test
 
-    def _Register(self, key, validateCallback, event):
+    def _Register(self,event_name,event_callbacks,property_name):
         #forward call to main TestRun object
         # this registers the "test" object so we can get 
         # the results later
-        self._TestRun._Register(key,validateCallback,event)
+        return self._TestRun._Register(event_name,event_callbacks,property_name,self)
+
+    def _GetRegisteredEvent( self, key ):
+        return self._TestRun._GetRegisteredEvent(key)
+

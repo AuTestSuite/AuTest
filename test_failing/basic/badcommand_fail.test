@@ -1,0 +1,4 @@
+Test.Summary="Test bad command line.. malformed command"
+
+tr=Test.AddTestRun()
+tr.Processes.Default.Command='echo "Error! there is a problem'

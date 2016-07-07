@@ -1,6 +1,6 @@
 Test.Summary="Test a case of is ready logic for start different propocesses"
 
-Test.SkipUnless(Condition.HasProgram("curl","Curl need to be installed on sytem for this test to work"))
+Test.SkipUnless(Condition.HasProgram("curl","Curl need to be installed on system for this test to work"))
 
 Setup.Copy("server.py","server")
 
