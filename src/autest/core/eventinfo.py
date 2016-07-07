@@ -21,11 +21,10 @@ class StartedInfo(EventInfo):
         pass
 
 class RunningInfo(EventInfo):
-    def __init__(self,start,current,readytime,waitingprocess):
+    def __init__(self,start,current,readytime):
         self.startTime=start
         self.currentTime=current
         self.gettingReadyTime=readytime
-        self.waitingProcess=waitingprocess
         return super(RunningInfo, self).__init__()
         
     @property
