@@ -8,7 +8,7 @@
     <StartupFile>autest\__main__.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>.</WorkingDirectory>
+    <WorkingDirectory>../</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>autest</Name>
     <RootNamespace>autest</RootNamespace>
@@ -16,7 +16,7 @@
     <InterpreterId>{e42b7e6e-e665-4553-bd85-9a37f3df04a9}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--verbose -D../tests -f process2</CommandLineArguments>
+    <CommandLineArguments>-D test_failing</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

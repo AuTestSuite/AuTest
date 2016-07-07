@@ -137,8 +137,7 @@ class RunTestTask(Task):
 
                     # bind the events now
                     tr._RegisterEvent("runtest", tr.StartEvent, 
-                        testers.Lambda(self.runTestStep)
-                        )
+                        testers.Lambda(self.runTestStep))
                     tr._BindEvents()
                     # run events
                     tr.SetupEvent(EventInfo())
@@ -208,75 +207,86 @@ class RunTestTask(Task):
         return fat_lst
 
 
+    def __start_process( self,ps ):
+        try:
+            # note a given process might be in the list more than once
+            # this mean there are different requirements for the next process
+            # to be considered ready we want to test for
+            for idx,p in enumerate(ps):
+                # get next process if any as we will want to
+                # use this process name to help with error messages
+                # for the user
+                try:
+                    next_process = ps[idx + 1].process
+                except IndexError:
+                    # we are at the last process or we only have one process to start
+                    # In either case we don't need to wait
+                    # for process to be ready
+                    # Start the process and continue
+                    p.process._Start()                    
+                    break
+                # if we are here we have more than one process
+                # we need to start and want to wait on being ready
+                # and we are not at the end of the list.
+                p.process._waitingProcess = next_process.Name
+                #if already started, it will just return
+                p.process._Start()
+                
+                # Start timer as we have something
+                # we have to wait on, and we need to make
+                # sure we have a fallback if something is wrong with
+                # the isReady logic never becoming ready in time
+                p.process._startReadyTimer()
+                isReady = False
+                while not isReady:
+                    try:
+                        isReady = p.readyfunc(**p.args)
+                    except TypeError:
+                        isReady = p.readyfunc()
+                    # if it is ready set state on process
+                    if isReady:
+                        p.process._stopReadyTimer()
+                        p.process._waitingProcess = None
+                        continue
+                    # verify we are running...
+                    if not p.process._isRunning():
+                        #
+                        self.stopProcess(ps)
+                        self.stopGlobalProcess()
+                        return True, 'Waiting for process "{0}" to become ready'.format(p.process.Name), 'Process finished before it was ready'
+                    # test that the process started in the time needed
+                    if p.process.StartupTimeout < p.process._readyTime(time.time()):
+                        self.stopProcess(ps)
+                        self.stopGlobalProcess()
+                        return (True, 
+                                "Checking that process is ready within {0} seconds so we can start process: {1}".format(p.process.StartupTimeout,next_process.Name),
+                                "Process failed to become ready in time")
+                    # poll other processes
+                    for op in ps:
+                        
+                        if op.process._isRunning():
+                            try:
+                                # Need to do poll on running processes to make sure any events or test run correctly
+                                # while we start up the set of processes
+                                op.process._Poll()
+                            except KillOnFailureError:
+                                self.stopProcess(ps)
+                                self.stopGlobalProcess()
+                                return (True, 'Waiting for process "{0}" to become ready'.format(p.process.Name), "Test run stopped because Kill On Failure")
+        except KillOnFailureError as e:
+            self.stopProcess(ps)
+            self.stopGlobalProcess()
+            return (True, 'Starting process {0}'.format(p.process.Name), e.info)
+
     def runTestStep( self,ev ):
         # get the processes we need to run in order
         tr = ev.TestRun
         ps = self._gen_process_list(tr)
         # run each process
-        # note a given process might be in the list more than once
-        # this mean there are different requirements for the next process
-        # to be considered ready we want to test for
-        for idx,p in enumerate(ps):
-            # get next process if any as we will want to 
-            # use this process name to help with error messages 
-            # for the user
-            try:
-                next_process=ps[idx+1].process
-            except IndexError:
-                # we are at the last process or we only have one process to start
-                # In either case we don't need to wait 
-                # for process to be ready
-                # Start the process and continue
-                try:
-                    p.process._Start()
-                except KillOnFailureError as e:
-                    self.stopProcess(ps)
-                    self.stopGlobalProcess()
-                    return (True, 'Started process {0}'.format(p.process.Name),e.info )
-                break
-            # if we are here we have more than one process
-            # we need to start and want to wait on being ready
-            # and we are not at the end of the list.
-            p.process._waitingProcess=next_process.Name
-            #if already started, it will just return
-            try:
-                p.process._Start()
-            except KillOnFailureError as e:
-                self.stopProcess(ps)
-                self.stopGlobalProcess()
-                return (True, 'Started process {0}'.format(p.process.Name), e.info )
-            # Start timer as we have something 
-            # we have to wait on, and we need to make
-            # sure we have a fallback if something is wrong with
-            # the isReady logic never becoming ready in time
-            p.process._startReadyTimer()
-            isReady = False
-            while not isReady:
-                try:
-                    isReady = p.readyfunc(**p.args)
-                except TypeError:
-                    isReady = p.readyfunc()
-                # if it is ready set state on process
-                if isReady:
-                    p.process._stopReadyTimer()
-                    p.process._waitingProcess=None
-                    continue
-                # verify we are running
-                if not p.process._isRunning():
-                    #
-                    self.stopProcess(ps)
-                    self.stopGlobalProcess()
-                    return True, 'Waiting for process "{0}" to become ready'.format(p.process.Name), 'Shutdown before it was ready'
-                # poll other processes
-                for op in ps:
-                    if op.process._isRunning():
-                        try:
-                            op.process._Poll()
-                        except KillOnFailureError:
-                            self.stopProcess(ps)
-                            self.stopGlobalProcess()
-                            return (True, 'Waiting for process "{0}" to become ready'.format(p.process.Name), "Test run stopped because Kill On Failure")
-
+        ret = self.__start_process(ps)
+        if ret is not None:
+           return ret
+        
         # wait for default process stop
         while tr.Processes.Default._isRunning():
             for p in ps:
@@ -311,7 +321,7 @@ class RunTestTask(Task):
                 break
         return False,"Running all process for TestRun","All processes ran"
     
-    def stopProcess(self,ps):
+    def stopProcess( self,ps ):
          for p in ps:
             if p.process._isRunning():
                 p.process._kill()
