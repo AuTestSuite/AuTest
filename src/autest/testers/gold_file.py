@@ -44,7 +44,10 @@ class GoldFile(tester.Tester):
         except KeyboardInterrupt:
             raise
         except:
-            host.WriteError("Can't open file {0}".format(tmp))
+            self.Result = tester.ResultType.Failed
+            self.Reason = "Can't open file {0}".format(tmp)
+            host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+            return
         
         if self._normalize_eol:
             val_content = val_content.replace("\r\n","\n")

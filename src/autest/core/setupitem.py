@@ -121,6 +121,27 @@ class SetupItem(object):
     def CopyFile(self, source, target=None):
         shutil.copy2(self._copy_setup(source, target))
 
+    def SymLink(self, source, target):
+        os.symlink(source,target)
+
+    def HardLink(self, source, target):
+        os.link(source,target)
+
+    def SmartLink(self, source, target):
+        '''
+        Tires to make a Hard link then a SymLink then do a copy
+        ToDo: look at making this overidable in what logic is used
+        such as hard_copy or soft_copy as some tests might want to
+        control how this smart logic is handled
+        '''
+        try:
+            self.HardLink(source,target)
+        except:
+            try:
+                self.SymLink(source,target)
+            except:
+                self.Copy(source,target)
+
     def _bind(self, test):
         '''
         Allow us to bind the Test information with the setup item
