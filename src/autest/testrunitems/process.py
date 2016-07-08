@@ -230,10 +230,11 @@ class Process(testrunitem.TestRunItem,order.Order):
         #command_line = "cd {0} && {1}".format(self._Test.RunDirectory, self.RawCommand)
         command_line = self.RawCommand
 
-        # subsitute the value of the string via the template engine
+        # substitute the value of the string via the template engine
         # as this provide a safe cross platform $subst model.
+        env=self._composeEnv() # get the correct shell env for the process
         template = string.Template(command_line)
-        command_line = template.substitute(self._Test.Env)
+        command_line = template.substitute(env)
         
         # test to see that this might need a shell
         try:
@@ -245,7 +246,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         #call event that we are starting to run the process
         host.WriteDebugf(["process"],"Calling StartingRun event with {0} callbacks mapped to it",len(self.StartingRun))
         self.StartingRun()  
-        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,self._Test.Env['PATH'])
+        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,env)
         host.WriteDebugf(["process"], "Passing arguments to subprocess as: {0}",args)
         if is_a.List(args):
             host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",subprocess.list2cmdline(args))
@@ -255,7 +256,7 @@ class Process(testrunitem.TestRunItem,order.Order):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 cwd=self._Test.RunDirectory,
-                env=self._composeEnv())
+                env=env)
         except IOError as err:
             self.__output.Close()
             self.__output= None

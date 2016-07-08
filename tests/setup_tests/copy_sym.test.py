@@ -8,8 +8,8 @@ Condition.HasProgram(
 )
 
 
-Setup.Copy.FromDirectory("data")
-Setup.Copy("data","data")
+Setup.Copy.FromDirectory("data",try_link=True)
+Setup.Copy("data","data",try_link=True)
 
 t=Test.AddTestRun("Test file existance")
 t.Command='echo "do nothing"'
