@@ -13,3 +13,9 @@ def Int(obj):
 
 def Number(obj):
     return not isinstance(obj, bool) and (isinstance(obj,int) or isinstance(obj,float))
+
+def Dictionary(obj):
+    return isinstance(obj,dict)
+
+def Dict(obj):
+    return isinstance(obj,dict)

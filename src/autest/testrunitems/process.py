@@ -45,6 +45,8 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__startup_time = None 
         self.__startup_timeout = None
 
+        # the process environment overrides
+        self.__env={}
 
         self.StartingRun = event.Event()
         self.RunStarted = event.Event()
@@ -104,6 +106,16 @@ class Process(testrunitem.TestRunItem,order.Order):
     def Command( self,value ):
         value = value.replace('/',os.sep)
         self.__cmdstr = value
+
+    @property
+    def Env(self):
+        return self.__env
+
+    @Env.setter
+    def Env(self,val):
+        if not is_a.Dict(val):
+            raise TypeError("value needs to be a dict type")
+        self.__env=val
 
     # need to remeber if this case is needed
     # ///////////////////////
@@ -192,6 +204,17 @@ class Process(testrunitem.TestRunItem,order.Order):
                         return True
         return False
 
+    def _composeEnv(self):
+        ret={}
+        # get test environment
+        ret.update(self._Test.Env)
+        # update with with testrun values
+        ret.update(self._TestRun.Env)
+        # update with process values
+        ret.update(self.__env)
+        return ret
+
+
     # internal functions to control the process
     def _Start( self ):
         if self._isRunning():
@@ -232,7 +255,7 @@ class Process(testrunitem.TestRunItem,order.Order):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 cwd=self._Test.RunDirectory,
-                env=self._Test.Env)
+                env=self._composeEnv())
         except IOError as err:
             self.__output.Close()
             self.__output= None

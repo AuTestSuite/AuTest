@@ -9,11 +9,16 @@ Condition.HasProgram(
 
 
 Setup.Copy.FromDirectory("data")
-Setup.Copy("data")
+
+Setup.Copy("data","data2")
+Setup.Copy("data","data2_link",try_link=True)
 
 t=Test.AddTestRun("Test file existance")
 t.Command='echo "do nothing"'
+
 t.Disk.Directory("data",exists=True)
 t.Disk.Directory("sub1").Exists=True
 
+t.Disk.Directory("data2",exists=True)
+t.Disk.Directory("data2_link",exists=True)
 

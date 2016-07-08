@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 from . import setup
 from . import conditions
 from . import testrun
+import autest.common.is_a as is_a
 import autest.testers.tester as testers
 
 import os
@@ -160,6 +161,11 @@ class Test(object):
     def Env(self):
         return self.__env
 
+    @Env.setter
+    def Env(self,val):
+        if not is_a.Dict(val):
+            raise TypeError("value needs to be a dict type")
+        self.__env.update(val)
 
     @property
     def Processes(self):

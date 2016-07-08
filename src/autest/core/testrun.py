@@ -148,6 +148,8 @@ class BaseTestRun(with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
         self.__SetupEvent = event.Event()
         self.__StartEvent = event.Event()
         self.__EndEvent = event.Event()
+
+        self.__env={}
                 
 
         #self.__concepts = [] # test run concepts to add to dynamically mix in
@@ -169,6 +171,16 @@ class BaseTestRun(with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
         if self.__displaystr:
             return self.__displaystr
         return self.Name
+
+    @property
+    def Env(self):
+        return self.__env
+
+    @Env.setter
+    def Env(self,val):
+        if not is_a.Dict(val):
+            raise TypeError("value needs to be a dict type")
+        self.__env=val
 
     #event accessors
     @property
