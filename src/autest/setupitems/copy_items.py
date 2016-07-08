@@ -13,10 +13,7 @@ class Copy(setupitem.SetupItem):
         self.try_link=try_link
 
     def setup(self):
-        if self.try_link:
-            self.SmartLink(self.source,self.target)
-        else:
-            self.Copy(self.source,self.target)
+        self.Copy(self.source,self.target,self.try_link)
 
 class FromDirectory(setupitem.SetupItem):
     def __init__(self,source,try_link=False):
@@ -27,10 +24,7 @@ class FromDirectory(setupitem.SetupItem):
         self.try_link=try_link
 
     def setup(self):
-        if self.try_link:
-            self.SmartLink(self.source,self.SandBoxDir)
-        else:
-            self.Copy(self.source,self.SandBoxDir)
+        self.Copy(self.source,self.SandBoxDir,self.try_link)
 
 class FromTemplate(setupitem.SetupItem):
     def __init__(self,source,try_link=False):
@@ -41,10 +35,7 @@ class FromTemplate(setupitem.SetupItem):
         self.try_link=try_link
 
     def setup(self):
-        if self.try_link:
-            self.SmartLink(os.path.join(self.TestRootDir,"templates",self.source),self.SandBoxDir)
-        else:
-            self.Copy(os.path.join(self.TestRootDir,"templates",self.source),self.SandBoxDir)
+        self.Copy(os.path.join(self.TestRootDir,"templates",self.source),self.SandBoxDir,self.try_link)
 
 
 api.AddSetupItem(Copy,"__call__",ns='Copy')

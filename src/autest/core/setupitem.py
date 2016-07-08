@@ -90,8 +90,14 @@ class SetupItem(object):
 
         return proc.returncode
 
-    def Copy(self, source, target=None):
+    def Copy(self, source, target=None, try_link=False):
         source, target = self._copy_setup(source, target)
+        if try_link:
+            try:
+                self._smartLink(source, target)
+                return
+            except:
+                pass
         host.WriteVerbose("setup", "Copying {0} to {1}".format(source, target))
         if os.path.isfile(source):
             shutil.copy2(source, target)
@@ -115,32 +121,40 @@ class SetupItem(object):
             target = os.path.join(self.SandBoxDir, os.path.basename(source))
         return (source, target)
 
-    def CopyDirectory(self, source, target=None):
-        shutil.copytree(self._copy_setup(source, target))
-
-    def CopyFile(self, source, target=None):
-        shutil.copy2(self._copy_setup(source, target))
-
     def SymLink(self, source, target):
         os.symlink(source,target)
 
     def HardLink(self, source, target):
         os.link(source,target)
 
-    def SmartLink(self, source, target):
+    def _smartLink(self, source, target):
         '''
         Tires to make a Hard link then a SymLink then do a copy
         ToDo: look at making this overidable in what logic is used
         such as hard_copy or soft_copy as some tests might want to
         control how this smart logic is handled
         '''
-        try:
-            self.HardLink(source,target)
-        except:
+        if os.path.isfile(source):
             try:
+                host.WriteVerbose("setup", "Hardlinking {0} to {1}".format(source, target))
+                self.HardLink(source,target)
+                return
+            except:
+                host.WriteVerbose("setup", "Hardlinking - Failed! Trying..")
+        if self.SandBoxDir == target:
+            files = os.listdir(source)
+            for x in files:
+                fullsrc = os.path.join(source, x)
+                fulldest = os.path.join(target, x)
+                self.Copy(fullsrc,fulldest,try_link=True)
+        else:
+            try:
+                host.WriteVerbose("setup", "Symlinking {0} to {1}".format(source, target))
                 self.SymLink(source,target)
             except:
-                self.Copy(source,target)
+                host.WriteVerbose("setup", "Symlinking - Failed! Trying..")
+                raise            
+            
 
     def _bind(self, test):
         '''
