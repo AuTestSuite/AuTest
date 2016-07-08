@@ -7,6 +7,24 @@ import autest.testers.tester as testers
 
 import os
 
+# object inherits dict type
+class Var(dict, object): 
+    def __init__(self, val={}):
+        if not is_a.Dict(val):
+            raise TypeError("value needs to be a dict type") 
+        dict.__init__(self)        
+        self.update(val)
+    
+    def __getattr__(self, name):
+        try:
+            return self[name] 
+        except KeyError:
+            raise AttributeError("%r has no attribute %r" % 
+                                 (self.__class__, name))
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
 class Processes ( object ):
 
     def __init__( self,test):
@@ -68,9 +86,10 @@ class Test(object):
                "__processes",
                "__conditions",
                "__env",
+               "__var",
                ]
     
-    def __init__(self,name,test_dir,test_file,run_root,test_root,env):
+    def __init__(self, name, test_dir, test_file, run_root, test_root, env, var):
         # traits
         self.__run_serial=False
         self.__summary=''
@@ -104,7 +123,8 @@ class Test(object):
         self.__env['AUTEST_TEST_ROOT_DIR']=self.__test_root
         self.__env['AUTEST_TEST_DIR']=self.__test_dir
         self.__env['AUTEST_RUN_DIR']=self.__run_dir
-
+        # add vars
+        self.__var=Var(var)
         
 # public properties
     @property
@@ -166,6 +186,16 @@ class Test(object):
         if not is_a.Dict(val):
             raise TypeError("value needs to be a dict type")
         self.__env.update(val)
+
+    @property
+    def Var(self):
+        return self.__var
+
+    @Var.setter
+    def Var(self,val):
+        if not is_a.Dict(val):
+            raise TypeError("value needs to be a dict type")
+        self.__var.update(val)
 
     @property
     def Processes(self):
