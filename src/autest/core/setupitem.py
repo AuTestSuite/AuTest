@@ -104,6 +104,23 @@ class SetupItem(object):
         else:
             autest.common.disk.copy_tree(source, target)
 
+    # for copying files as a different name in nonexisting directories
+    def CopyAs(self, source, targetdir, targetname=None):
+        source, targetdir = self._copy_setup(source, targetdir)
+        self.MakeDir(targetdir)
+        if targetname is None: target = targetdir
+        else: target = os.path.join(targetdir, targetname)
+        host.WriteVerbose("setup", "Copying {0} as {1}".format(source, target))
+        shutil.copy2(source, target)
+
+    def MakeDir(self, path):
+        if not os.path.isdir(path):
+            if not os.path.isfile(path):    
+                os.makedirs(path)
+                host.WriteVerbose("setup", "Making directory {0}".format(path))
+            else:
+                raise IOError('Path already exists as a file.')
+
     def _copy_setup(self, source, target=None):
         # check to see if this is absolute path or not
         if not os.path.isabs(source):
@@ -111,6 +128,7 @@ class SetupItem(object):
             # Sandbox directory
             source = os.path.join(self.TestFileDir, source)
         if target:
+        # TODO:test this is under sandbox if it is absolute directory
             if not os.path.isabs(target):
                 # this is an error
                 pass
