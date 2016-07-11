@@ -47,6 +47,9 @@
     <Compile Include="autest\exceptions\killonfailure.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\testers\container.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\testers\contains_expression.py">
       <SubType>Code</SubType>
     </Compile>

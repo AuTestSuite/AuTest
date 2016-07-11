@@ -109,18 +109,6 @@ class DelayedEventMapper(object):
     def _GetRegisteredEvents( self ):
         return self.__addevent
 
-    #def _Register( self, key, validateCallback, event ):
-    #    try:
-    #        # call callback to verify type is correct
-    #        checker = validateCallback()
-    #        if checker:
-    #            self._RegisterEvent(key, event, checker)
-    #        else:
-    #            host.WriteError('Invalid type')
-    #    except BaseException as err:
-    #        import traceback
-    #        host.WriteError('Exception occurred: {0}'.format(traceback.format_exc()))
-
 class _testrun__metaclass__(type):
     def __call__( cls,*lst,**kw ):
         #make instance of the class
@@ -134,7 +122,6 @@ class _testrun__metaclass__(type):
         return inst
 
 class BaseTestRun(with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
-
     def __init__( self, testobj, name, displaystr ):
         self.__displaystr = displaystr # what we display to the user
         self.__name = name # that name of this test run

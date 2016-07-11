@@ -113,6 +113,11 @@ class RunTestTask(Task):
                 'Setup': self.__test.Setup,
                 'Condition': conditions.ConditionFactory(),
                 'Testers': testers,
+                # break these out of tester space
+                # to make it easier to right a test
+                'Any':testers.Any,
+                'All':testers.All,
+                'Not':testers.Not,
                 'When':glb.When(),
                 })
 

@@ -1,5 +1,5 @@
 from __future__ import absolute_import, division, print_function
-import autest.testers.tester as testers
+import autest.testers as testers
 from collections import namedtuple
 
 # hold the set of testers being mapped to a given event to be bound 
@@ -23,7 +23,9 @@ class TesterSet(object):
         return super(TesterSet, self).__init__()
 
     def _create_tester(self,value):
-        if not isinstance(value, testers.Tester):
+        if isinstance(value,testers._Container):
+            value._verify(self._create_tester)
+        elif not isinstance(value, testers.Tester):
             # create a tester object
             value=self._default_tester(self._converter(value),self._testvalue)
         tester=value
@@ -39,10 +41,17 @@ class TesterSet(object):
 
     def assign(self, value):
         self._testers=[self._create_tester(value)]
+        return self
 
     def add(self, value):
         self._testers+=[self._create_tester(value)]
+        return self
 
     def _bind(self):
         for tester in self._testers:
             self._event += tester
+
+    # operators
+    def __iadd__(self,value):
+        return self.add(value)
+

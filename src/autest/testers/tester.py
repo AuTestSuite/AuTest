@@ -39,11 +39,11 @@ class Tester(object):
     '''
 
     def __init__( self, value, test_value, kill_on_failure=False, description_group=None , description=None):
-        self.__description_group = description_group
-        self.__description = description
+        self._description_group = description_group
+        self._description = description
         self.__result = ResultType.Unknown
         self.__reason = "Test was not run"
-        self.__test_value = test_value
+        self._test_value = test_value
         self.__kill = kill_on_failure
         self.__value = value
 
@@ -66,11 +66,11 @@ class Tester(object):
         attribute will return the value in question or a function
         that can get this value for us.
         '''
-        return self.__test_value
+        return self._test_value
 
     @TestValue.setter
     def TestValue( self, value ):
-        self.__test_value = value
+        self._test_value = value
 
     @property
     def Value(self):
@@ -89,22 +89,22 @@ class Tester(object):
         '''
         decription of what is being tested
         '''
-        return self.__description
+        return self._description
 
     @Description.setter
     def Description( self, val ):
-        self.__description = val
+        self._description = val
 
     @property
     def DescriptionGroup( self ):
         '''
         decription of what is being tested
         '''
-        return self.__description_group
+        return self._description_group
 
     @DescriptionGroup.setter
     def DescriptionGroup( self, val ):
-        self.__description_group = val
+        self._description_group = val
 
     @property
     def Reason( self ):
