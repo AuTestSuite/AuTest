@@ -224,10 +224,6 @@ class Process(testrunitem.TestRunItem,order.Order):
         #to sorted files
         self.__output = streamwriter.StreamWriter(os.path.join(self._Test.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._Test.Name,self._TestRun.Name,self.__name)),self.Command)
         
-        # the command line we will run.  We add the RunDirectory to the start
-        # of the command
-        #to avoid having to deal with cwddir() issues
-        #command_line = "cd {0} && {1}".format(self._Test.RunDirectory, self.RawCommand)
         command_line = self.RawCommand
 
         # substitute the value of the string via the template engine
@@ -246,7 +242,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         #call event that we are starting to run the process
         host.WriteDebugf(["process"],"Calling StartingRun event with {0} callbacks mapped to it",len(self.StartingRun))
         self.StartingRun()  
-        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,env)
+        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,env['PATH'])
         host.WriteDebugf(["process"], "Passing arguments to subprocess as: {0}",args)
         if is_a.List(args):
             host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",subprocess.list2cmdline(args))
