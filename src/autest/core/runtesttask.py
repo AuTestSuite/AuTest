@@ -50,6 +50,10 @@ class RunTestTask(Task):
                               show_stack=False)
                 self.__test._SetResult(testers.ResultType.Skipped)
 
+                # clean up any mess
+                # such as remove the sandbox if had no issues
+                self.cleanupTest()
+
         except AttributeError:
             raise
         #except SetupError:
