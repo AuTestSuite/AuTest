@@ -22,7 +22,7 @@ class Engine(object):
     """description of class"""
 
     def __init__(self, jobs=1, test_dir='./', run_dir="./_sandbox", autest_site=None,
-                 filters='*', dump_report=False, env=None, var=None):
+                 filters='*', dump_report=False, env=None, variables=None):
 
         self.__tests = {}  # the dict of the different tests we have {name:testobj}
         self.__jobs = jobs  # how many jobs to try to run at a given time
@@ -31,7 +31,7 @@ class Engine(object):
         self.__autest_site = autest_site # any special autest directory to look up.  None uses standard one
         self.__filters = filters  # which set of tests to run        
         self.__ENV = env
-        self.__VAR = var
+        self.__variables = variables
 
         # setup the thread poool to run all the tasks
         #if jobs > 1:
@@ -161,7 +161,7 @@ class Engine(object):
                     if name in self.__tests:
                         host.WriteWarning("overiding test",name, "with test in", root)
                     host.WriteVerbose("test_scan","   Found test",name)
-                    self.__tests[name] = test.Test(name,root,f,self.__run_dir,self.__test_dir,self.__ENV, self.__VAR)
+                    self.__tests[name] = test.Test(name,root,f,self.__run_dir,self.__test_dir,self.__ENV, self.__variables)
 
     def _run_tests(self):
         if self.__jobs > 1:
