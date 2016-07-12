@@ -31,7 +31,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__cmdstr = cmdstr
         self.__proc = None
         self.__ready = None
-
+        self.__use_shell=kw.get("use_shell",False)
         self.__output = None
         self.__stdout = None
         self.__stderr = None
@@ -127,6 +127,14 @@ class Process(testrunitem.TestRunItem,order.Order):
     def RawCommand( self,value ):
         self.__cmdstr = value
     # ////////////////////////
+
+    @property
+    def ForceUseShell(self):
+        return self.__use_shell
+
+    @ForceUseShell.setter
+    def ForceUseShell(self,val):
+        self.__use_shell=bool(val)
 
     @property
     def Ready( self ):
@@ -234,7 +242,10 @@ class Process(testrunitem.TestRunItem,order.Order):
         
         # test to see that this might need a shell
         try:
-            shell = self._isShellCommand(command_line)
+            if self.__use_shell:
+                shell=True
+            else:
+                shell = self._isShellCommand(command_line)
         except ValueError as e:
             raise KillOnFailureError(' Bad command line - {1}: {0}'.format(command_line,e))
         args = self._listcmd(command_line) if shell == False else command_line
