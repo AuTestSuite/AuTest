@@ -247,7 +247,7 @@ def main():
         locals = {
             'os':os,
             'ENV': env,
-            'Variables': variables, #TODO: Dictionary type check
+            'Variables': variables,
             'Arguments': setup.arguments
             }
         execfile.execFile(options_file,locals,locals)
