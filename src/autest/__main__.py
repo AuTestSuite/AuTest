@@ -11,6 +11,7 @@ from hosts.console import ConsoleHost
 import copy
 import autest
 import autest.common.is_a as is_a
+from autest.core.variables import Variables
 
 #--------------
 class extendAction(argparse.Action):
@@ -60,6 +61,7 @@ class Settings(object):
         self.__arguments = None
         self.__unknowns = None
         self.__env = None
+        self.__variables = None #TODO:add to argparse
         return super(Settings, self).__init__(*args, **kwargs)
 
     @property
@@ -210,6 +212,8 @@ def main():
     setup.partial_parse()
     hosts.output.WriteDebugf("init","Before extension load: args = {0}\n unknown = {1}",setup.arguments,setup.unknowns)
     ##-------------------------------------------
+    #setup vars
+    variables = Variables()
     #setup shell environment
     env = os.environ.copy()
     if setup.arguments.env:
@@ -243,6 +247,7 @@ def main():
         locals = {
             'os':os,
             'ENV': env,
+            'Variables': variables,
             'Arguments': setup.arguments
             }
         execfile.execFile(options_file,locals,locals)
@@ -254,7 +259,8 @@ def main():
                    run_dir=setup.arguments.sandbox,
                    autest_site=setup.arguments.autest_site,
                    filters=setup.arguments.filters,
-                   env=env)
+                   env=env,
+                   variables=variables)
 
     ret = myEngine.Start()
     exit(ret)

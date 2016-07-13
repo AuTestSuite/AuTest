@@ -27,7 +27,7 @@ class Processes ( object ):
 
     def Process( self, id, cmdstr=None, returncode = None, startup_timeout=10, ready=None ):
         from autest.testrunitems.process import Process
-        #todo ... add check to make sure id a varaible safe
+        #todo ... add check to make sure id a variable safe
 
         tmp = Process(self._TestRun, id, cmdstr)
 
@@ -68,9 +68,10 @@ class Test(object):
                "__processes",
                "__conditions",
                "__env",
+               "__variables",
                ]
     
-    def __init__(self,name,test_dir,test_file,run_root,test_root,env):
+    def __init__(self, name, test_dir, test_file, run_root, test_root, env, variables):
         # traits
         self.__run_serial=False
         self.__summary=''
@@ -104,7 +105,8 @@ class Test(object):
         self.__env['AUTEST_TEST_ROOT_DIR']=self.__test_root
         self.__env['AUTEST_TEST_DIR']=self.__test_dir
         self.__env['AUTEST_RUN_DIR']=self.__run_dir
-
+        # additional variables
+        self.__variables=variables
         
 # public properties
     @property
@@ -166,6 +168,16 @@ class Test(object):
         if not is_a.Dict(val):
             raise TypeError("value needs to be a dict type")
         self.__env.update(val)
+
+    @property
+    def Variables(self):
+        return self.__variables
+
+    @Variables.setter
+    def Variables(self,val):
+        if not is_a.Dict(val):
+            raise TypeError("value needs to be a dict type")
+        self.__variables.update(val)
 
     @property
     def Processes(self):

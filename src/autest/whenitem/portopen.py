@@ -7,6 +7,7 @@ def PortOpen(port, address=None):
     ret=False
     if address is None:
         address="localhost"
+
     address = (address, port)    
 
     try:
