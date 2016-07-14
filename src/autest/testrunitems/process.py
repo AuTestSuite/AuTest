@@ -35,6 +35,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__output = None
         self.__stdout = None
         self.__stderr = None
+        self.__call_cleanup=True
 
         self.__start_time = None
         self.__last_event_time = None
@@ -228,6 +229,7 @@ class Process(testrunitem.TestRunItem,order.Order):
         if self._isRunning():
             #in case we are already running
             return 
+        self.__call_cleanup=True # so we know we can call clean up once to get the end events testers
         #create a StreamWriter which will write out the stream data of the run
         #to sorted files
         self.__output = streamwriter.StreamWriter(os.path.join(self._Test.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._Test.Name,self._TestRun.Name,self.__name)),self.Command)
@@ -247,6 +249,7 @@ class Process(testrunitem.TestRunItem,order.Order):
             else:
                 shell = self._isShellCommand(command_line)
         except ValueError as e:
+            self.__cleanup()
             raise KillOnFailureError(' Bad command line - {1}: {0}'.format(command_line,e))
         args = self._listcmd(command_line) if shell == False else command_line
         
@@ -265,12 +268,10 @@ class Process(testrunitem.TestRunItem,order.Order):
                 cwd=self._Test.RunDirectory,
                 env=env)
         except IOError as err:
-            self.__output.Close()
-            self.__output= None
+            self.__cleanup()
             raise KillOnFailureError('Bad command line - {1}: {0}'.format(command_line,err))
         except OSError as err:
-            self.__output.Close()
-            self.__output= None
+            self.__cleanup()
             raise KillOnFailureError('Bad command line - {1}: {0}'.format(command_line,err))
         
         
@@ -310,20 +311,50 @@ class Process(testrunitem.TestRunItem,order.Order):
         return False
 
     def __cleanup( self ):
-        if self.__output:
-            self.__stdout.close()
-            self.__stderr.close()
-            self.__output.Close()
-            #make event info object
-            event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
+        if self.__call_cleanup:
+            self.__call_cleanup=False
+            if self.__proc is None:
+                event_info = eventinfo.FinishedInfo(None,0,self.__output)
+            else:
+                event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
+                self.__proc = None        
+
+            if  self.__output:
+                self.__output.Close()
+                self.__output = None
+            if  self.__stdout:
+                self.__stdout.close()
+                self.__stdout = None
+            if  self.__stderr:    
+                self.__stderr.close()
+                self.__stderr = None
+
             #call event
             host.WriteDebug(["process"],"Calling RunFinished event with {0} callbacks mapped to it".format(len(self.RunFinished)))
             self.RunFinished(event_info)
+        
 
-            self.__stdout = None
-            self.__stderr = None
-            self.__output = None
-            self.__proc = None
+    #def __cleanup( self ):
+    #    #make event info object
+    #    if self.__proc is None:
+    #        event_info = eventinfo.FinishedInfo(None,0,self.__output)
+    #    else:
+    #        event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
+    #    #call event
+    #    host.WriteDebug(["process"],"Calling RunFinished event with {0} callbacks mapped to it".format(len(self.RunFinished)))
+    #    self.RunFinished(event_info)
+
+    #    if  self.__stdout:
+    #        self.__stdout.close()
+    #        self.__stdout = None
+    #    if  self.__stderr:    
+    #        self.__stderr.close()
+    #        self.__stderr = None
+    #    if  self.__output:
+    #        self.__output.Close()
+    #        self.__output = None
+    #    if self.__proc:
+    #        self.__proc = None
 
     # pull out to base process logic
     def _start( self,*lst,**kw ):

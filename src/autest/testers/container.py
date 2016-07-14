@@ -25,6 +25,9 @@ class _Container(tester.Tester):
     @property
     def _testers(self):
         return self.__testers
+    @property
+    def isContainer(self):
+        return True
 
     @property
     def TestValue( self ):

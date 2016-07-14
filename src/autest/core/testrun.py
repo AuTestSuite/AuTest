@@ -149,9 +149,9 @@ class BaseTestRun(with_metaclass(_testrun__metaclass__,DelayedEventMapper)):
 
     @property
     def DisplayString( self ):
-        if self._displaystr:
-            return self._displaystr
-        return self.name
+        if self.__displaystr:
+            return self.__displaystr
+        return self.Name
 
     @DisplayString.setter
     def DisplayString( self ):

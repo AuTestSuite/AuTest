@@ -13,7 +13,7 @@ class Processes ( object ):
             super(Processes, self).__init__()
             # special testrun object to allow for global processes
             # probally should split the process object better
-            self._TestRun=testrun.TestRun(test, "_Global", "_interal_run")
+            self._TestRun=testrun.TestRun(test, "_Global", "Global Processes")
             self.__Test=test
             self.__processes = {}
             # this the process we will be viewed as the primary process for the

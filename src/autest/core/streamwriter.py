@@ -32,11 +32,12 @@ class PipeRedirector(object):
         self.thread.start()
         
     def close(self):
-        self.executing = False
-        self.thread.join()
-        self.pipein = None
-        self.thread = None
-        self.writer = None
+        if self.executing == True:
+            self.executing = False
+            self.thread.join()
+            self.pipein = None
+            self.thread = None
+            self.writer = None
 
 test_search=0
 test_match=1
