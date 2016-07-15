@@ -3,6 +3,8 @@ Report object that knows how to print itself and can be exported to a file
 '''
 from __future__ import absolute_import, division, print_function
 from autest.testers.tester import ResultType, Tester
+import hosts.output as host
+import colorama
 import collections
 import json
 import abc
@@ -38,7 +40,9 @@ class ReportInfo(object):
             if t._Result in [ResultType.Exception,ResultType.Failed,ResultType.Unknown]:
                 self.__grouped_tests[100].append(t)
 
-
+    @property
+    def stats(self):
+        return self.__stats
     @property
     def Unknown(self):
         return self.__grouped_tests.get(ResultType.Unknown,[])
@@ -70,7 +74,7 @@ def GenerateReport(info,):#args):
     '''default ConsoleHost based reprot'''
     
     def TestRunInfo(tr):
-        return " {0}: {1}".format(tr.DisplayString,ResultType.to_string(tr._Result))
+        return " {0}: {2}{1}{3}".format(tr.DisplayString,ResultType.to_string(tr._Result),colorama.Style.BRIGHT,colorama.Style.NORMAL)
 
     def TestInfo(test):
         return 'Test "{0}" {3}\n    File: {1}\n    Directory: {2}'.format(test.Name,test.TestFile,test.TestDirectory,ResultType.to_string(test._Result))
@@ -128,7 +132,11 @@ def GenerateReport(info,):#args):
                     if check.RanOnce:
                         print(CheckerInfo(check))
             print()
-    host.WriteMessage(' {0}: {1}'.format(testers.ResultType.to_string(resType), amount))
+    for resType in (ResultType.Unknown, ResultType.Exception,
+                        ResultType.Failed, ResultType.Warning,
+                        ResultType.Skipped, ResultType.Passed):
+            amount = info.stats[resType]
+            host.WriteMessage(' {0}: {1}'.format(ResultType.to_string(resType), amount))
            
     
 

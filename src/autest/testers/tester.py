@@ -46,6 +46,7 @@ class Tester(object):
         self._test_value = test_value
         self.__kill = kill_on_failure
         self.__value = value
+        self.__ran=False
 
     @property
     def KillOnFailure( self ):
@@ -133,6 +134,7 @@ class Tester(object):
 
     def __call__( self, eventinfo, **kw ):
         try:
+            self.__ran=True
             self.test(eventinfo, **kw)
         except KeyboardInterrupt:
             raise
@@ -205,3 +207,11 @@ class Tester(object):
     @property
     def UseInReport( self ):
         return True
+
+    @property
+    def RanOnce(self):
+        return self.__ran
+
+    @property
+    def isContainer(self):
+        return False

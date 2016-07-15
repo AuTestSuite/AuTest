@@ -177,6 +177,14 @@ class Engine(object):
         
 
     def _make_report(self):
+
+        info= report.ReportInfo(self.__tests.values())
+        host.WriteMessage("\nReport: --------------")
+
+        report.GenerateReport(info)
+
+
+        return
         # need to clean this up more...
         reportdata = report.TestsReport()
         for test in self.__tests.values():
