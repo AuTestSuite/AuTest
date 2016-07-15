@@ -28,6 +28,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="autest\api\reporter.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\api\setup.py">
       <SubType>Code</SubType>
     </Compile>
@@ -45,6 +48,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\exceptions\killonfailure.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\reporters\default.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\reporters\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\testers\container.py">
@@ -200,6 +209,7 @@
     <Folder Include="autest\core\" />
     <Folder Include="autest\common\" />
     <Folder Include="autest\exceptions\" />
+    <Folder Include="autest\reporters\" />
     <Folder Include="autest\whenitem\" />
     <Folder Include="autest\testrunitems\" />
     <Folder Include="hosts\" />

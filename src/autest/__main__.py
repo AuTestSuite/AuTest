@@ -198,6 +198,10 @@ def main():
                         default=['*'],
                         help="Filter the tests run by their names")
 
+    setup.list_argument(["-R", "--reporters"],
+                        default=['default'],
+                        help="Names of Reporters to use for report generation")
+
     setup.add_argument(['-V','--version'], action='version', version='%(prog)s {0}'.format(autest.__version__))
 
 
@@ -259,6 +263,7 @@ def main():
                    run_dir=setup.arguments.sandbox,
                    autest_site=setup.arguments.autest_site,
                    filters=setup.arguments.filters,
+                   reporters=setup.arguments.reporters,
                    env=env,
                    variables=variables)
 

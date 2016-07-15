@@ -22,16 +22,17 @@ class Engine(object):
     """description of class"""
 
     def __init__(self, jobs=1, test_dir='./', run_dir="./_sandbox", autest_site=None,
-                 filters='*', dump_report=False, env=None, variables=None):
+                 filters='*', reporters=['default'], dump_report=False, env=None, variables=None):
 
         self.__tests = {}  # the dict of the different tests we have {name:testobj}
         self.__jobs = jobs  # how many jobs to try to run at a given time
         self.__test_dir = test_dir  # this the root directory to look for the tests
         self.__run_dir = os.path.abspath(run_dir) # this is the directory to run the tests in
         self.__autest_site = autest_site # any special autest directory to look up.  None uses standard one
-        self.__filters = filters  # which set of tests to run        
+        self.__filters = filters  # which set of tests to run
         self.__ENV = env
         self.__variables = variables
+        self.__reporters = reporters
 
         # setup the thread poool to run all the tasks
         #if jobs > 1:
@@ -51,6 +52,8 @@ class Engine(object):
         import autest.testrunitems
         # load when items
         import autest.whenitem
+        # load built in reporter object
+        import autest.reporters
 
         
         if os.path.exists(self.__run_dir):
@@ -99,7 +102,7 @@ class Engine(object):
 
         # add expected API function so they can be called
         locals = {
-                'AddTestRunSet':api.ExtendTest, #backward compat 
+                'AddTestRunSet':api.ExtendTest, #backward compat
                 'ExtendTest':api.ExtendTest, 
                 'AddSetupTask':api.AddSetupItem, # backward compat
                 'AddSetupItem':api.AddSetupItem,
@@ -177,42 +180,18 @@ class Engine(object):
         
 
     def _make_report(self):
-
-        info= report.ReportInfo(self.__tests.values())
-        host.WriteMessage("\nReport: --------------")
-
-        report.GenerateReport(info)
-
-
-        return
-        # need to clean this up more...
-        reportdata = report.TestsReport()
-        for test in self.__tests.values():
-            reportdata.addTestRun(test)
         
-        host.WriteMessage("\nReport: --------------")
-        for msg in reportdata.exportForConsole():
-            host.WriteMessage(msg)
-        host.WriteMessage("")
-        if sum([reportdata.stats[resType] for resType in (testers.ResultType.Exception,
-                                                      testers.ResultType.Failed,
-                                                      testers.ResultType.Unknown,
-                                                      testers.ResultType.Warning)]) > 0:
-            host.WriteMessage('Test run had issues!')
-            runResult = 1
-        else:
-            host.WriteMessage('All tests passed')
-            runResult = 0
-        for resType in (testers.ResultType.Unknown, testers.ResultType.Exception,
-                        testers.ResultType.Failed,  testers.ResultType.Warning,
-                        testers.ResultType.Skipped, testers.ResultType.Passed):
-            amount = reportdata.stats[resType]
-            host.WriteMessage(' {0}: {1}'.format(testers.ResultType.to_string(resType), amount))
+        info = report.ReportInfo(self.__tests.values())
+        host.WriteMessage("\nGenerating Report: --------------")
 
-        #if self.__dump_report:
-            #host.WriteMessage('\n\n{JSON_REPORT}%s{/JSON_REPORT}' %
-            #reportdata.exportForJson())
-        return runResult
+        for r in self.__reporters:
+            func=glb.reporters.get(r)
+            if func:
+                func(info)
+            else:
+                host.WriteWarningf("Reported {0} not registered",r)
+
+
 
     @property
     def Host(self):

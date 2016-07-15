@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import hosts.output as host
 from autest.exceptions.killonfailure import KillOnFailureError
-
+import colorama
 import abc
 import traceback
 
@@ -26,6 +26,25 @@ class ResultType(object):
             if value == v:
                 return name
         return "Unknown"
+
+    @classmethod
+    def to_color_string( cls, v ):
+        c=colorama.Style.BRIGHT
+        if ResultType.Unknown==v:
+            c=colorama.Style.BRIGHT
+        elif ResultType.Passed==v:
+            c=colorama.Fore.GREEN
+        elif ResultType.Skipped==v:
+            c=colorama.Style.BRIGHT
+        elif ResultType.Warning==v:
+            c=colorama.Fore.YELLOW
+        elif ResultType.Failed==v:
+            c=colorama.Fore.RED
+        elif ResultType.Exception==v:
+            c=colorama.Fore.RED
+
+        ResultType.to_string(v)
+        return c+ResultType.to_string(v)+colorama.Fore.RESET
 
 class Tester(object):
     '''
