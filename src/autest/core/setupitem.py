@@ -104,8 +104,14 @@ class SetupItem(object):
         else:
             autest.common.disk.copy_tree(source, target)
 
-    # for copying files as a different name in nonexisting directories
+    
     def CopyAs(self, source, targetdir, targetname=None):
+        '''
+        For copying files as a different name in nonexisting directories
+        This is better than Copy most of the time as it makes the target directory
+        if it does not exist, and is a little more clear on if the output is renamed
+        or not.
+        '''
         source, targetdir = self._copy_setup(source, targetdir)
         self.MakeDir(targetdir)
         if targetname is None: target = targetdir

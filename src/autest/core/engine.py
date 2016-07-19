@@ -100,6 +100,15 @@ class Engine(object):
     def _load_extensions(self):
         # load files of our extension type in the directory
 
+        # Which directory to use
+        if self.__autest_site is None:
+            # this is the default
+            path = os.path.join(self.__test_dir,'autest-site')
+        else:
+            #This is a custom location
+            path = os.path.abspath(self.__autest_site)
+
+
         # add expected API function so they can be called
         locals = {
                 'AddTestRunSet':api.ExtendTest, #backward compat
@@ -110,16 +119,8 @@ class Engine(object):
                 'SetupItem':setupitem.SetupItem,
                 'AddTestRunMember':api.AddTestRunMember,
                 'AddWhenFunction':api.AddWhenFunction,
+                'AUTEST_SITE_PATH':path,
                 }
-
-
-        # Which directory to use
-        if self.__autest_site is None:
-            # this is the default
-            path = os.path.join(self.__test_dir,'autest-site')
-        else:
-            #This is a custom location
-            path = os.path.abspath(self.__autest_site)
 
         # given it exists we want to load data from it
         if os.path.exists(path):
