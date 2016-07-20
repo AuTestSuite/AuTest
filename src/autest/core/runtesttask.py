@@ -95,8 +95,12 @@ class RunTestTask(Task):
         #need to add a cleanup phase
         
         # clean up an processes that might stil be running
-
-        self.stopGlobalProcess()
+        try:
+            self.stopGlobalProcess()
+        except KeyboardInterrupt:
+            host.WriteMessage("Control-C detected! Shutting down tests processes")
+            self.stopProcess( self.__test.Processes._GetProcesses())
+            host.WriteMessage("Processes have been shutdown!")
         #if test passed as we don't want to keep the tests
         # we can remove it
         if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
