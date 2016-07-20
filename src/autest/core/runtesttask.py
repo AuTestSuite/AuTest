@@ -67,6 +67,12 @@ class RunTestTask(Task):
         #   self.__test._SetResult(testers.ResultType.)
         # everything else
         except KeyboardInterrupt:
+            host.WriteMessage("Control-C detected! Shutting down tests processes")
+            tr = ev.TestRun
+            ps = self._gen_process_list(tr)
+            self.stopProcess(ps)
+            self.stopProcess( self.__test.Processes._GetProcesses())
+            host.WriteMessage("Processes have been shutdown!")
             raise
         except:
             self.__test._SetResult(testers.ResultType.Exception)
@@ -288,56 +294,47 @@ class RunTestTask(Task):
             return (True, 'Starting process {0}'.format(p.process.Name), e.info)
 
     def runTestStep( self,ev ):
-        try:
-            # get the processes we need to run in order
-            tr = ev.TestRun
-            ps = self._gen_process_list(tr)
-            # run each process
-            ret = self.__start_process(ps)
-            if ret is not None:
-               return ret
+        # get the processes we need to run in order
+        tr = ev.TestRun
+        ps = self._gen_process_list(tr)
+        # run each process
+        ret = self.__start_process(ps)
+        if ret is not None:
+           return ret
         
-            # wait for default process stop
-            while tr.Processes.Default._isRunning():
-                for p in ps:
-                    try:
-                        p.process._Poll()
-                    except KillOnFailureError:
-                        self.stopProcess(ps)
-                        self.stopGlobalProcess()
-                        return (True, 'Waiting for "Default" process to finish', "Test run stopped because Kill On Failure")
-                    time.sleep(.1)
-            # check for all processes to end with a time frame
-            st = time.time()
-            while 1:
-                running = None
-                for p in ps:
-                    # Check to see that it is in the global process list
-                    # if it is not in the lists we will try to shut it down
-                    # this allows for process to be from different test runs
-                    # to be used in this test run..  hwoever that is OK I think..
-                    if p.process not in tr._Test.Processes._GetProcesses() and p.process._Poll():
-                        running = p.process
-            
-                if running:
-                    running._wait(1)
-                else:
-                    # everything finished
-                    break
-                #if the time we will wait up?
-                if time.time() - st > 15.0: 
-                    # we kill them
+        # wait for default process stop
+        while tr.Processes.Default._isRunning():
+            for p in ps:
+                try:
+                    p.process._Poll()
+                except KillOnFailureError:
                     self.stopProcess(ps)
-                    break
-            return False,"Running all process for TestRun","All processes ran"
-        except KeyboardInterrupt:
-            host.WriteMessage("Control-C detected! Shutting down tests processes")
-            tr = ev.TestRun
-            ps = self._gen_process_list(tr)
-            self.stopProcess(ps)
-            self.stopProcess(self.__test.Processes._GetProcesses())
-            host.WriteMessage("Processes have been shutdown!")
-            raise
+                    self.stopGlobalProcess()
+                    return (True, 'Waiting for "Default" process to finish', "Test run stopped because Kill On Failure")
+                time.sleep(.1)
+        # check for all processes to end with a time frame
+        st = time.time()
+        while 1:
+            running = None
+            for p in ps:
+                # Check to see that it is in the global process list
+                # if it is not in the lists we will try to shut it down
+                # this allows for process to be from different test runs
+                # to be used in this test run..  hwoever that is OK I think..
+                if p.process not in tr._Test.Processes._GetProcesses() and p.process._Poll():
+                    running = p.process
+            
+            if running:
+                running._wait(1)
+            else:
+                # everything finished
+                break
+            #if the time we will wait up?
+            if time.time() - st > 15.0: 
+                # we kill them
+                self.stopProcess(ps)
+                break
+        return False,"Running all process for TestRun","All processes ran"
     
     def stopProcess( self,ps ):
          for p in ps:
