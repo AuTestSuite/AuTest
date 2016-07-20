@@ -97,14 +97,16 @@ class RunTestTask(Task):
         # clean up an processes that might stil be running
         try:
             self.stopGlobalProcess()
+        
+            #if test passed as we don't want to keep the tests
+            # we can remove it
+            if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
+                shutil.rmtree(self.__test.RunDirectory, onerror=disk.remove_read_only)
         except KeyboardInterrupt:
             host.WriteMessage("Control-C detected! Shutting down tests processes")
-            self.stopProcess( self.__test.Processes._GetProcesses())
+            self.hardStopProcess(self.__test.Processes._GetProcesses())
             host.WriteMessage("Processes have been shutdown!")
-        #if test passed as we don't want to keep the tests
-        # we can remove it
-        if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
-            shutil.rmtree(self.__test.RunDirectory, onerror=disk.remove_read_only)
+            raise
 
     def readTest( self ):
         # load the test data.  this mean exec the data
@@ -160,7 +162,7 @@ class RunTestTask(Task):
                     host.WriteMessage("Control-C detected! Shutting down tests processes")
                     ps = self._gen_process_list(tr)
                     self.stopProcess(ps)
-                    self.stopProcess( self.__test.Processes._GetProcesses())
+                    self.hardStopProcess(self.__test.Processes._GetProcesses())
                     host.WriteMessage("Processes have been shutdown!")
                     raise
                 except:
@@ -340,9 +342,12 @@ class RunTestTask(Task):
         return False,"Running all process for TestRun","All processes ran"
     
     def stopProcess( self,ps ):
+        self.hardStopProcess([p.process for p in ps ])        
+
+    def hardStopProcess( self,ps ):
          for p in ps:
-            if p.process._isRunning():
-                p.process._kill()
+            if p._isRunning():
+                p._kill()
 
     def stopGlobalProcess( self ):  
         st = time.time()
