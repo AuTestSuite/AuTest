@@ -67,12 +67,6 @@ class RunTestTask(Task):
         #   self.__test._SetResult(testers.ResultType.)
         # everything else
         except KeyboardInterrupt:
-            host.WriteMessage("Control-C detected! Shutting down tests processes")
-            tr = ev.TestRun
-            ps = self._gen_process_list(tr)
-            self.stopProcess(ps)
-            self.stopProcess( self.__test.Processes._GetProcesses())
-            host.WriteMessage("Processes have been shutdown!")
             raise
         except:
             self.__test._SetResult(testers.ResultType.Exception)
@@ -159,6 +153,11 @@ class RunTestTask(Task):
                     tr.StartEvent(StartInfo(tr))
                     tr.EndEvent(EventInfo())
                 except KeyboardInterrupt:
+                    host.WriteMessage("Control-C detected! Shutting down tests processes")
+                    ps = self._gen_process_list(tr)
+                    self.stopProcess(ps)
+                    self.stopProcess( self.__test.Processes._GetProcesses())
+                    host.WriteMessage("Processes have been shutdown!")
                     raise
                 except:
                     # something went wrong..
