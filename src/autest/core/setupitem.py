@@ -8,6 +8,8 @@ import subprocess
 import string
 import shutil
 import os
+import grp
+import pwd
 
 # base class for any Setup task extension
 # contains basic API that maybe useful in defining a given task.
@@ -119,13 +121,30 @@ class SetupItem(object):
         host.WriteVerbose("setup", "Copying {0} as {1}".format(source, target))
         shutil.copy2(source, target)
 
-    def MakeDir(self, path):
+    def MakeDir(self, path, mode=None):
+        # check if the path given is in the sandbox if abs
+        self._in_sandbox(path)
+        # if abs path isn't specified then put it in the sandbox 
+        path = os.path.join(self.SandBoxDir, path) 
         if not os.path.isdir(path):
-            if not os.path.isfile(path):    
-                os.makedirs(path)
+            if not os.path.isfile(path):
+                if mode is None:
+                    os.makedirs(path)
+                else:
+                    os.makedirs(path, mode)
                 host.WriteVerbose("setup", "Making directory {0}".format(path))
             else:
-                raise IOError('Path already exists as a file.')
+                raise OSError('Path already exists as a file.')
+
+    def Chown(self, path, uid, gid):
+        if not os.path.isabs(path):
+            # assume it's in our sandbox
+            path = os.path.join(self.SandBoxDir, path)
+        if not os.path.exists(path):
+            raise OSError("File/Directory doesn't exist")
+        uid = pwd.getpwnam(uid).pw_uid
+        gid = grp.getgrnam(gid).gr_gid
+        os.chown(path, uid, gid)
 
     def _copy_setup(self, source, target=None):
         # check to see if this is absolute path or not
@@ -134,16 +153,21 @@ class SetupItem(object):
             # Sandbox directory
             source = os.path.join(self.TestFileDir, source)
         if target:
-        # TODO:test this is under sandbox if it is absolute directory
-            if not os.path.isabs(target):
-                # this is an error
-                pass
+            # check if target is permissible 
+            self._in_sandbox(target) 
             target = os.path.join(self.SandBoxDir, target)
         else:
             # given that target is None we assume that we want to copy it
             # the sandbox directory with the same name as the source
             target = os.path.join(self.SandBoxDir, os.path.basename(source))
         return (source, target)
+    
+    # check that the path give is within the sandbox
+    def _in_sandbox(self, path):
+        # the split should have the first index as empty if the prefix is the same as the SandBoxDir
+        split = path.split(self.SandBoxDir) 
+        if os.path.isabs(path) and split[0] != '':
+            raise IOError('Target path is not within sandbox')
 
     def SymLink(self, source, target):
         os.symlink(source,target)
