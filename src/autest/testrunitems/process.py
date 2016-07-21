@@ -31,10 +31,11 @@ class Process(testrunitem.TestRunItem,order.Order):
         self.__cmdstr = cmdstr
         self.__proc = None
         self.__ready = None
-
+        self.__use_shell=kw.get("use_shell",False)
         self.__output = None
         self.__stdout = None
         self.__stderr = None
+        self.__call_cleanup=True
 
         self.__start_time = None
         self.__last_event_time = None
@@ -129,6 +130,14 @@ class Process(testrunitem.TestRunItem,order.Order):
     # ////////////////////////
 
     @property
+    def ForceUseShell(self):
+        return self.__use_shell
+
+    @ForceUseShell.setter
+    def ForceUseShell(self,val):
+        self.__use_shell=bool(val)
+
+    @property
     def Ready( self ):
         return self.__ready
 
@@ -220,14 +229,11 @@ class Process(testrunitem.TestRunItem,order.Order):
         if self._isRunning():
             #in case we are already running
             return 
+        self.__call_cleanup=True # so we know we can call clean up once to get the end events testers
         #create a StreamWriter which will write out the stream data of the run
         #to sorted files
         self.__output = streamwriter.StreamWriter(os.path.join(self._Test.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._Test.Name,self._TestRun.Name,self.__name)),self.Command)
         
-        # the command line we will run.  We add the RunDirectory to the start
-        # of the command
-        #to avoid having to deal with cwddir() issues
-        #command_line = "cd {0} && {1}".format(self._Test.RunDirectory, self.RawCommand)
         command_line = self.RawCommand
 
         # substitute the value of the string via the template engine
@@ -238,15 +244,19 @@ class Process(testrunitem.TestRunItem,order.Order):
         
         # test to see that this might need a shell
         try:
-            shell = self._isShellCommand(command_line)
+            if self.__use_shell:
+                shell=True
+            else:
+                shell = self._isShellCommand(command_line)
         except ValueError as e:
+            self.__cleanup()
             raise KillOnFailureError(' Bad command line - {1}: {0}'.format(command_line,e))
         args = self._listcmd(command_line) if shell == False else command_line
         
         #call event that we are starting to run the process
         host.WriteDebugf(["process"],"Calling StartingRun event with {0} callbacks mapped to it",len(self.StartingRun))
         self.StartingRun()  
-        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,env)
+        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,env['PATH'])
         host.WriteDebugf(["process"], "Passing arguments to subprocess as: {0}",args)
         if is_a.List(args):
             host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",subprocess.list2cmdline(args))
@@ -258,12 +268,10 @@ class Process(testrunitem.TestRunItem,order.Order):
                 cwd=self._Test.RunDirectory,
                 env=env)
         except IOError as err:
-            self.__output.Close()
-            self.__output= None
+            self.__cleanup()
             raise KillOnFailureError('Bad command line - {1}: {0}'.format(command_line,err))
         except OSError as err:
-            self.__output.Close()
-            self.__output= None
+            self.__cleanup()
             raise KillOnFailureError('Bad command line - {1}: {0}'.format(command_line,err))
         
         
@@ -303,20 +311,50 @@ class Process(testrunitem.TestRunItem,order.Order):
         return False
 
     def __cleanup( self ):
-        if self.__output:
-            self.__stdout.close()
-            self.__stderr.close()
-            self.__output.Close()
-            #make event info object
-            event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
+        if self.__call_cleanup:
+            self.__call_cleanup=False
+            if self.__proc is None:
+                event_info = eventinfo.FinishedInfo(None,0,self.__output)
+            else:
+                event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
+                self.__proc = None        
+
+            if  self.__output:
+                self.__output.Close()
+                self.__output = None
+            if  self.__stdout:
+                self.__stdout.close()
+                self.__stdout = None
+            if  self.__stderr:    
+                self.__stderr.close()
+                self.__stderr = None
+
             #call event
             host.WriteDebug(["process"],"Calling RunFinished event with {0} callbacks mapped to it".format(len(self.RunFinished)))
             self.RunFinished(event_info)
+        
 
-            self.__stdout = None
-            self.__stderr = None
-            self.__output = None
-            self.__proc = None
+    #def __cleanup( self ):
+    #    #make event info object
+    #    if self.__proc is None:
+    #        event_info = eventinfo.FinishedInfo(None,0,self.__output)
+    #    else:
+    #        event_info = eventinfo.FinishedInfo(self.__proc.returncode,time.time() - self.__start_time,self.__output)
+    #    #call event
+    #    host.WriteDebug(["process"],"Calling RunFinished event with {0} callbacks mapped to it".format(len(self.RunFinished)))
+    #    self.RunFinished(event_info)
+
+    #    if  self.__stdout:
+    #        self.__stdout.close()
+    #        self.__stdout = None
+    #    if  self.__stderr:    
+    #        self.__stderr.close()
+    #        self.__stderr = None
+    #    if  self.__output:
+    #        self.__output.Close()
+    #        self.__output = None
+    #    if self.__proc:
+    #        self.__proc = None
 
     # pull out to base process logic
     def _start( self,*lst,**kw ):

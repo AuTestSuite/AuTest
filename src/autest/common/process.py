@@ -19,7 +19,7 @@ if os.name == 'nt':
         '''
         
         os.kill(self.pid, signal.CTRL_C_EVENT ) 
-        time.sleep(15)
+        time.sleep(1)
         win32.TerminateJobObject(self._job, -1) #pylint: disable=protected-access
 
     def waitTimeOut(process, timeout):

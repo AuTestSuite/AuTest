@@ -31,6 +31,7 @@ class ExcludesExpression(tester.Tester):
             filename = self.TestValue.AbsPath
         result = tester.ResultType.Passed
         try:
+            failed=True
             # if this is multi-line check
             if self._multiline:
                 with open(filename, 'r') as infile:

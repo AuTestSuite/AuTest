@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import hosts.output as host
 from autest.exceptions.killonfailure import KillOnFailureError
-
+import colorama
 import abc
 import traceback
 
@@ -27,6 +27,25 @@ class ResultType(object):
                 return name
         return "Unknown"
 
+    @classmethod
+    def to_color_string( cls, v ):
+        c=colorama.Style.BRIGHT
+        if ResultType.Unknown==v:
+            c=colorama.Style.BRIGHT
+        elif ResultType.Passed==v:
+            c=colorama.Fore.GREEN
+        elif ResultType.Skipped==v:
+            c=colorama.Style.BRIGHT
+        elif ResultType.Warning==v:
+            c=colorama.Fore.YELLOW
+        elif ResultType.Failed==v:
+            c=colorama.Fore.RED
+        elif ResultType.Exception==v:
+            c=colorama.Fore.RED
+
+        ResultType.to_string(v)
+        return c+ResultType.to_string(v)+colorama.Fore.RESET
+
 class Tester(object):
     '''
     The base tester object contains the basic properties all testers should fill in
@@ -39,13 +58,14 @@ class Tester(object):
     '''
 
     def __init__( self, value, test_value, kill_on_failure=False, description_group=None , description=None):
-        self.__description_group = description_group
-        self.__description = description
+        self._description_group = description_group
+        self._description = description
         self.__result = ResultType.Unknown
         self.__reason = "Test was not run"
-        self.__test_value = test_value
+        self._test_value = test_value
         self.__kill = kill_on_failure
         self.__value = value
+        self.__ran=False
 
     @property
     def KillOnFailure( self ):
@@ -66,11 +86,11 @@ class Tester(object):
         attribute will return the value in question or a function
         that can get this value for us.
         '''
-        return self.__test_value
+        return self._test_value
 
     @TestValue.setter
     def TestValue( self, value ):
-        self.__test_value = value
+        self._test_value = value
 
     @property
     def Value(self):
@@ -89,22 +109,22 @@ class Tester(object):
         '''
         decription of what is being tested
         '''
-        return self.__description
+        return self._description
 
     @Description.setter
     def Description( self, val ):
-        self.__description = val
+        self._description = val
 
     @property
     def DescriptionGroup( self ):
         '''
         decription of what is being tested
         '''
-        return self.__description_group
+        return self._description_group
 
     @DescriptionGroup.setter
     def DescriptionGroup( self, val ):
-        self.__description_group = val
+        self._description_group = val
 
     @property
     def Reason( self ):
@@ -133,6 +153,7 @@ class Tester(object):
 
     def __call__( self, eventinfo, **kw ):
         try:
+            self.__ran=True
             self.test(eventinfo, **kw)
         except KeyboardInterrupt:
             raise
@@ -205,3 +226,11 @@ class Tester(object):
     @property
     def UseInReport( self ):
         return True
+
+    @property
+    def RanOnce(self):
+        return self.__ran
+
+    @property
+    def isContainer(self):
+        return False

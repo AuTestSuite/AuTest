@@ -7,31 +7,13 @@ import autest.testers.tester as testers
 
 import os
 
-# object inherits dict type
-class Var(dict, object): 
-    def __init__(self, val={}):
-        if not is_a.Dict(val):
-            raise TypeError("value needs to be a dict type") 
-        dict.__init__(self)        
-        self.update(val)
-    
-    def __getattr__(self, name):
-        try:
-            return self[name] 
-        except KeyError:
-            raise AttributeError("%r has no attribute %r" % 
-                                 (self.__class__, name))
-
-    def __setattr__(self, name, value):
-        self[name] = value
-
 class Processes ( object ):
 
     def __init__( self,test):
             super(Processes, self).__init__()
             # special testrun object to allow for global processes
             # probally should split the process object better
-            self._TestRun=testrun.TestRun(test, "_Global", "_interal_run")
+            self._TestRun=testrun.TestRun(test, "_Global", "Global Processes")
             self.__Test=test
             self.__processes = {}
             # this the process we will be viewed as the primary process for the
@@ -45,7 +27,7 @@ class Processes ( object ):
 
     def Process( self, id, cmdstr=None, returncode = None, startup_timeout=10, ready=None ):
         from autest.testrunitems.process import Process
-        #todo ... add check to make sure id a varaible safe
+        #todo ... add check to make sure id a variable safe
 
         tmp = Process(self._TestRun, id, cmdstr)
 
@@ -86,10 +68,10 @@ class Test(object):
                "__processes",
                "__conditions",
                "__env",
-               "__var",
+               "__variables",
                ]
     
-    def __init__(self, name, test_dir, test_file, run_root, test_root, env, var):
+    def __init__(self, name, test_dir, test_file, run_root, test_root, env, variables):
         # traits
         self.__run_serial=False
         self.__summary=''
@@ -123,8 +105,8 @@ class Test(object):
         self.__env['AUTEST_TEST_ROOT_DIR']=self.__test_root
         self.__env['AUTEST_TEST_DIR']=self.__test_dir
         self.__env['AUTEST_RUN_DIR']=self.__run_dir
-        # add vars
-        self.__var=Var(var)
+        # additional variables
+        self.__variables=variables
         
 # public properties
     @property
@@ -188,14 +170,14 @@ class Test(object):
         self.__env.update(val)
 
     @property
-    def Var(self):
-        return self.__var
+    def Variables(self):
+        return self.__variables
 
-    @Var.setter
-    def Var(self,val):
+    @Variables.setter
+    def Variables(self,val):
         if not is_a.Dict(val):
             raise TypeError("value needs to be a dict type")
-        self.__var.update(val)
+        self.__variables.update(val)
 
     @property
     def Processes(self):

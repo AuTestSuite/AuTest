@@ -11,6 +11,7 @@ from hosts.console import ConsoleHost
 import copy
 import autest
 import autest.common.is_a as is_a
+from autest.core.variables import Variables
 
 #--------------
 class extendAction(argparse.Action):
@@ -60,7 +61,7 @@ class Settings(object):
         self.__arguments = None
         self.__unknowns = None
         self.__env = None
-        self.__var = None #TODO:add to argparse
+        self.__variables = None #TODO:add to argparse
         return super(Settings, self).__init__(*args, **kwargs)
 
     @property
@@ -197,6 +198,10 @@ def main():
                         default=['*'],
                         help="Filter the tests run by their names")
 
+    setup.list_argument(["-R", "--reporters"],
+                        default=['default'],
+                        help="Names of Reporters to use for report generation")
+
     setup.add_argument(['-V','--version'], action='version', version='%(prog)s {0}'.format(autest.__version__))
 
 
@@ -212,7 +217,7 @@ def main():
     hosts.output.WriteDebugf("init","Before extension load: args = {0}\n unknown = {1}",setup.arguments,setup.unknowns)
     ##-------------------------------------------
     #setup vars
-    var = {}
+    variables = Variables()
     #setup shell environment
     env = os.environ.copy()
     if setup.arguments.env:
@@ -246,7 +251,7 @@ def main():
         locals = {
             'os':os,
             'ENV': env,
-            'VAR': var, #TODO: Dictionary type check
+            'Variables': variables,
             'Arguments': setup.arguments
             }
         execfile.execFile(options_file,locals,locals)
@@ -258,8 +263,9 @@ def main():
                    run_dir=setup.arguments.sandbox,
                    autest_site=setup.arguments.autest_site,
                    filters=setup.arguments.filters,
+                   reporters=setup.arguments.reporters,
                    env=env,
-                   var=var)
+                   variables=variables)
 
     ret = myEngine.Start()
     exit(ret)

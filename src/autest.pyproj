@@ -13,8 +13,8 @@
     <Name>autest</Name>
     <RootNamespace>autest</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{e42b7e6e-e665-4553-bd85-9a37f3df04a9}</InterpreterId>
-    <InterpreterVersion>2.7</InterpreterVersion>
+    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
+    <InterpreterVersion>3.4</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <CommandLineArguments>-D test_failing</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
@@ -28,6 +28,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="autest\api\reporter.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\api\setup.py">
       <SubType>Code</SubType>
     </Compile>
@@ -45,6 +48,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\exceptions\killonfailure.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\reporters\default.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\reporters\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\testers\container.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\testers\contains_expression.py">
@@ -197,6 +209,7 @@
     <Folder Include="autest\core\" />
     <Folder Include="autest\common\" />
     <Folder Include="autest\exceptions\" />
+    <Folder Include="autest\reporters\" />
     <Folder Include="autest\whenitem\" />
     <Folder Include="autest\testrunitems\" />
     <Folder Include="hosts\" />
@@ -212,11 +225,11 @@
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.4" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="..\..\test\">
-      <Id>{e42b7e6e-e665-4553-bd85-9a37f3df04a9}</Id>
+    <Interpreter Include="env3.4\">
+      <Id>{bb38861f-b14a-4910-b3c1-e8e5d77e72bf}</Id>
       <BaseInterpreter>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</BaseInterpreter>
-      <Version>2.7</Version>
-      <Description>test (Python 64-bit 2.7)</Description>
+      <Version>3.4</Version>
+      <Description>env3.4 (Python 64-bit 3.4)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>

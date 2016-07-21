@@ -5,7 +5,7 @@ from autest.exceptions.killonfailure import KillOnFailureError
 class LessEqual(tester.Tester):
     def __init__( self,value,test_value=None,kill_on_failure=False, description_group=None, description=None ):
         if description is None:
-            description = "Checking that {0} <= {1}".format(tester.get_name(test_value),value)
+            description = "Checking that {0} <= {1}"
         super(LessEqual,self).__init__(value=value,
                                         test_value=test_value,
                                         kill_on_failure=kill_on_failure,

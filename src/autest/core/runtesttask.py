@@ -50,6 +50,10 @@ class RunTestTask(Task):
                               show_stack=False)
                 self.__test._SetResult(testers.ResultType.Skipped)
 
+                # clean up any mess
+                # such as remove the sandbox if had no issues
+                self.cleanupTest()
+
         except AttributeError:
             raise
         #except SetupError:
@@ -91,12 +95,18 @@ class RunTestTask(Task):
         #need to add a cleanup phase
         
         # clean up an processes that might stil be running
-
-        self.stopGlobalProcess()
-        #if test passed as we don't want to keep the tests
-        # we can remove it
-        if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
-            shutil.rmtree(self.__test.RunDirectory, onerror=disk.remove_read_only)
+        try:
+            self.stopGlobalProcess()
+        
+            #if test passed as we don't want to keep the tests
+            # we can remove it
+            if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
+                shutil.rmtree(self.__test.RunDirectory, onerror=disk.remove_read_only)
+        except KeyboardInterrupt:
+            host.WriteMessage("Control-C detected! Shutting down tests processes")
+            self.hardStopProcess(self.__test.Processes._GetProcesses())
+            host.WriteMessage("Processes have been shutdown!")
+            raise
 
     def readTest( self ):
         # load the test data.  this mean exec the data
@@ -109,6 +119,11 @@ class RunTestTask(Task):
                 'Setup': self.__test.Setup,
                 'Condition': conditions.ConditionFactory(),
                 'Testers': testers,
+                # break these out of tester space
+                # to make it easier to right a test
+                'Any':testers.Any,
+                'All':testers.All,
+                'Not':testers.Not,
                 'When':glb.When(),
                 })
 
@@ -144,6 +159,11 @@ class RunTestTask(Task):
                     tr.StartEvent(StartInfo(tr))
                     tr.EndEvent(EventInfo())
                 except KeyboardInterrupt:
+                    host.WriteMessage("Control-C detected! Shutting down tests processes")
+                    ps = self._gen_process_list(tr)
+                    self.stopProcess(ps)
+                    self.hardStopProcess(self.__test.Processes._GetProcesses())
+                    host.WriteMessage("Processes have been shutdown!")
                     raise
                 except:
                     # something went wrong..
@@ -322,9 +342,12 @@ class RunTestTask(Task):
         return False,"Running all process for TestRun","All processes ran"
     
     def stopProcess( self,ps ):
+        self.hardStopProcess([p.process for p in ps ])        
+
+    def hardStopProcess( self,ps ):
          for p in ps:
-            if p.process._isRunning():
-                p.process._kill()
+            if p._isRunning():
+                p._kill()
 
     def stopGlobalProcess( self ):  
         st = time.time()
