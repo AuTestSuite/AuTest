@@ -8,8 +8,9 @@ import subprocess
 import string
 import shutil
 import os
-import grp
-import pwd
+if os.name != 'nt':
+    import grp
+    import pwd
 
 # base class for any Setup task extension
 # contains basic API that maybe useful in defining a given task.
@@ -137,6 +138,8 @@ class SetupItem(object):
                 raise OSError('Path already exists as a file.')
 
     def Chown(self, path, uid, gid):
+        if os.name == 'nt':
+            return
         if not os.path.isabs(path):
             # assume it's in our sandbox
             path = os.path.join(self.SandBoxDir, path)
