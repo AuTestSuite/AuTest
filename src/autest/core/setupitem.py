@@ -141,10 +141,17 @@ class SetupItem(object):
             # assume it's in our sandbox
             path = os.path.join(self.SandBoxDir, path)
         if not os.path.exists(path):
-            raise OSError("File/Directory doesn't exist")
+            raise OSError("File or Directory doesn't exist")
         uid = pwd.getpwnam(uid).pw_uid
         gid = grp.getgrnam(gid).gr_gid
-        os.chown(path, uid, gid)
+        try:
+            os.chown(path, uid, gid)
+            host.WriteVerbose("setup", "Changing ownership of {0} to uid {1} gid {2}".format(path, uid, gid))
+        except OSError as e:
+            # Operation not Permitted will just pass
+            host.WriteVerbose("setup", e) 
+            if e.errno != 1:
+                raise
 
     def _copy_setup(self, source, target=None):
         # check to see if this is absolute path or not
