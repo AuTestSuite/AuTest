@@ -236,6 +236,8 @@ class TestRun(BaseTestRun):
                 return self.__func() == rhs
             def __ne__(self,rhs):
                 return self.__func() != rhs
+            def __str__(self):
+                return self.__func.__name__
 
         # StillRunningBefore
         self._Register(
