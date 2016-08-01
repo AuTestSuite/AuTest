@@ -230,10 +230,8 @@ class Process(testrunitem.TestRunItem,order.Order):
             #in case we are already running
             return 
         self.__call_cleanup=True # so we know we can call clean up once to get the end events testers
-        #create a StreamWriter which will write out the stream data of the run
-        #to sorted files
-        self.__output = streamwriter.StreamWriter(os.path.join(self._Test.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._Test.Name,self._TestRun.Name,self.__name)),self.Command)
         
+        # setup command line.. do number of subsutions etc..        
         command_line = self.RawCommand
 
         # substitute the value of the string via the template engine
@@ -252,14 +250,24 @@ class Process(testrunitem.TestRunItem,order.Order):
             self.__cleanup()
             raise KillOnFailureError(' Bad command line - {1}: {0}'.format(command_line,e))
         args = self._listcmd(command_line) if shell == False else command_line
-        
+
         #call event that we are starting to run the process
         host.WriteDebugf(["process"],"Calling StartingRun event with {0} callbacks mapped to it",len(self.StartingRun))
         self.StartingRun()  
         host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._Test.RunDirectory,env['PATH'])
         host.WriteDebugf(["process"], "Passing arguments to subprocess as: {0}",args)
         if is_a.List(args):
-            host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",subprocess.list2cmdline(args))
+            finalcmd=subprocess.list2cmdline(args)
+            host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",finalcmd)
+        else:
+            finalcmd=args
+        #create a StreamWriter which will write out the stream data of the run
+        #to sorted files, as well as make script files of the command ( might break this up later)
+        self.__output = streamwriter.StreamWriter(
+            os.path.join(self._Test.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._Test.Name,self._TestRun.Name,self.__name)),
+            finalcmd,
+            env)
+
         try:
             self.__proc = autest.common.process.Popen(args,
                 shell=shell,

@@ -105,7 +105,7 @@ class StreamWriter(object):
     stdout=0
     stderr=1
 
-    def __init__(self,path,cmd):
+    def __init__(self,path,cmd,env):
         self.__lock=threading.Lock()
         
         if os.path.exists(path)== False:
@@ -123,6 +123,9 @@ class StreamWriter(object):
         cmdfile=open(os.path.join(path,"command.txt"),'wb')
         cmdfile.write("Command= {0}\n".format(cmd).encode("utf-8"))
         cmdfile.close()
+
+        with open(os.path.join(path,"replay.sh"),'wb') as f:
+            f.write(self.gen_bash_script(cmd,env))
         
         self.both=open(self.FullFile,'wb')
         self.outfile=open(self.StdOutFile,'wb')
@@ -134,6 +137,22 @@ class StreamWriter(object):
         self.debugfile=open(self.DebugFile,'wb')
 
         self.cache= []
+
+    def gen_powershell_script(self):
+        pass
+    def gen_fish_script(self):
+        pass
+    def gen_bash_script(self,cmd,env):
+        ret="#!/bin/bash\n"
+        ret+=self.gen_set_env(env,"export {0}=\"{1}\"\n")
+        ret+=cmd+"\n"
+        return ret
+        
+    def gen_set_env(self,env,set_str):
+        ret="\n"
+        for k,v in env.items():
+            ret+=set_str.format(k,v)
+        return ret
 
     def _smart_match(self,str):
         if is_error(str):

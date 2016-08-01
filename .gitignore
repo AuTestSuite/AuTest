@@ -167,3 +167,4 @@ autest/browse.VC.db
 autest/_sandbox/
 _sandbox/
 .tox/
+src/env3.4/

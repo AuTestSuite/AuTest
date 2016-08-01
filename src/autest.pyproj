@@ -47,6 +47,7 @@
     <Compile Include="autest\core\testerset.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\core\variables.py" />
     <Compile Include="autest\exceptions\killonfailure.py">
       <SubType>Code</SubType>
     </Compile>
@@ -56,6 +57,9 @@
     <Compile Include="autest\reporters\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\setupitems\chown.py" />
+    <Compile Include="autest\setupitems\copyas.py" />
+    <Compile Include="autest\setupitems\makedir.py" />
     <Compile Include="autest\testers\container.py">
       <SubType>Code</SubType>
     </Compile>

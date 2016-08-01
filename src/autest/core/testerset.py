@@ -15,7 +15,7 @@ class TesterSet(object):
         self._default_tester=default_tester
         self._testvalue = testvalue
         if converter is None:
-            self._converter=lambda x: x
+            self._converter=lambda x: x            
         else:
             self._converter=converter
 
