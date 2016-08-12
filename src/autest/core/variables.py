@@ -1,14 +1,16 @@
 from __future__ import absolute_import, division, print_function
+from autest.common.constructor import call_base, smart_init
 import autest.common.is_a as is_a
 
 # object inherits dict type
+@smart_init
 class Variables(dict, object): 
+    @call_base(dict=(),object=())
     def __init__(self, val=None):
         if val is None:
             val = {}
         if not is_a.Dict(val):
             raise TypeError("value needs to be a dict type") 
-        dict.__init__(self)        
         self.update(val)
     
     def __getattr__(self, name):

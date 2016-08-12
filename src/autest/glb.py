@@ -9,12 +9,12 @@ class When(object):
 Locals = {}
 
 # this hold meta information for any items we will add to
-# the Setup object
-_setup_items = {}
+# any runable object
+_runable_items = {}
 
 # this hold meta information for any items we will add to
-# the runtest objects
-_runtest_items = {}
+# the Setup object
+_setup_items = {}
 
 # set of reporters that we can use to generate reports with
 reporters={}

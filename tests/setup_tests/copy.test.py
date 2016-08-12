@@ -1,12 +1,5 @@
 test.Summary="Test the setup of Setup Copy logic"
 
-Test.SkipUnless(
-Condition.HasProgram(
-                      "svn",
-                      "svn needs to be install and on the path"
-                      )
-)
-
 
 Setup.Copy.FromDirectory("data")
 Setup.Copy("data","data")

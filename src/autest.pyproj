@@ -13,10 +13,10 @@
     <Name>autest</Name>
     <RootNamespace>autest</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
+    <InterpreterId>{bb38861f-b14a-4910-b3c1-e8e5d77e72bf}</InterpreterId>
     <InterpreterVersion>3.4</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-D test_failing</CommandLineArguments>
+    <CommandLineArguments>-D .\test_failing\ -f ready1* --verbose --debug=all</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -31,17 +31,47 @@
     <Compile Include="autest\api\reporter.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\api\testrun.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\api\setup.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\api\test.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\api\testrun.py" />
+    <Compile Include="autest\api\testenity.py" />
     <Compile Include="autest\api\when.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\api\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\constructor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\listalgo.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\common\sort.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\delayeventmapper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\item.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\metaclass.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\process.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\runable.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\core\testenity.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\core\testerset.py">
@@ -55,6 +85,21 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\reporters\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\runlogic\process.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\runlogic\runlogic.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\runlogic\test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\runlogic\testrun.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="autest\runlogic\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\setupitems\chown.py" />
@@ -72,7 +117,7 @@
     <Compile Include="autest\testers\lambda_tester.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\testrunitems\streams.py">
+    <Compile Include="autest\testenities\streams.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\whenitem\portopen.py">
@@ -122,10 +167,7 @@
     <Compile Include="autest\common\event.py" />
     <Compile Include="autest\exceptions\setuperror.py" />
     <Compile Include="autest\exceptions\__init__.py" />
-    <Compile Include="autest\testrunitems\process.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="autest\core\testrunitem.py">
+    <Compile Include="autest\testenities\process.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\glb.py">
@@ -143,19 +185,19 @@
     <Compile Include="autest\core\testrun.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\testrunitems\directory.py">
+    <Compile Include="autest\testenities\directory.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\testrunitems\disk.py">
+    <Compile Include="autest\testenities\disk.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\testrunitems\file.py">
+    <Compile Include="autest\testenities\file.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\testrunitems\processes.py">
+    <Compile Include="autest\testenities\processes.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="autest\testrunitems\__init__.py">
+    <Compile Include="autest\testenities\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\core\__init__.py">
@@ -213,9 +255,10 @@
     <Folder Include="autest\core\" />
     <Folder Include="autest\common\" />
     <Folder Include="autest\exceptions\" />
+    <Folder Include="autest\runlogic\" />
     <Folder Include="autest\reporters\" />
     <Folder Include="autest\whenitem\" />
-    <Folder Include="autest\testrunitems\" />
+    <Folder Include="autest\testenities\" />
     <Folder Include="hosts\" />
     <Folder Include="hosts\interfaces\" />
     <Folder Include="autest\api\" />

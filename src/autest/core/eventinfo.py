@@ -1,17 +1,11 @@
 from __future__ import absolute_import, division, print_function
 from autest.common.event import EventInfo
+from autest.common.constructor import call_base, smart_init
 
-#core test run
-class StartInfo(EventInfo):
-    def __init__(self,testrun):
-        self.__test_run=testrun
-   
-    @property
-    def TestRun(self):
-        return self.__test_run
+class SetupInfo(EventInfo):
+    def __init__(self):
+        pass
 
-
-# process events
 class StartingInfo(EventInfo):
     def __init__(self):
         pass
@@ -21,18 +15,29 @@ class StartedInfo(EventInfo):
         pass
 
 class RunningInfo(EventInfo):
-    def __init__(self,start,current,readytime):
+    def __init__(self,start,current):
         self.startTime=start
         self.currentTime=current
-        self.gettingReadyTime=readytime
         return super(RunningInfo, self).__init__()
         
     @property
     def TotalRunTime(self):
         return self.currentTime-self.startTime
-    
-class FinishedInfo(EventInfo):
-    def __init__(self,returncode,runtime,streamwriter):
+
+@smart_init
+class FinishedInfo(EventInfo):    
+    @call_base(EventInfo=())
+    def __init__(self,runtime):
+        self.__runtime=runtime
+
+    @property
+    def TotalRunTime(self):
+        return self.__runtime
+
+@smart_init
+class ProcessFinishedInfo(FinishedInfo):
+    @call_base(FinishedInfo=('runtime',))
+    def __init__(self,runtime,returncode,streamwriter):
         self.__returncode=returncode
         self.__runtime=runtime
         self.__all_file=streamwriter.FullFile
@@ -43,10 +48,6 @@ class FinishedInfo(EventInfo):
         self.__error_file=streamwriter.ErrorFile
         self.__verbose_file=streamwriter.VerboseFile
         self.__debug_file=streamwriter.DebugFile
-
-    @property
-    def TotalRunTime(self):
-        return self.__runtime
 
     @property
     def ReturnCode(self):
@@ -76,3 +77,7 @@ class FinishedInfo(EventInfo):
     @property
     def DebugFile(self):
         return self.__debug_file
+
+class CleanupInfo(EventInfo):
+    def __init__(self):
+        pass

@@ -3,6 +3,8 @@ import autest.core.streamwriter as streamwriter
 import autest.common.process
 import hosts.output as host
 import autest.common.disk
+import autest.testers as testers
+from autest.exceptions.setuperror import SetupError
 
 import subprocess
 import string
@@ -27,6 +29,9 @@ class SetupItem(object):
             host.WriteError("itemname is not provided")
         self.__test = None
         self.cnt = 0
+
+        # assume pass unless an error happens
+        self._Result=testers.ResultType.Passed
     # basic properties values we need
 
     @property
@@ -38,6 +43,14 @@ class SetupItem(object):
     def ItemName(self, val):
         # name of the task
         self.__itemname = val
+
+    @property
+    def RanOnce(self):
+        return self.__ran
+
+    @RanOnce.setter
+    def RanOnce(self,val):
+        self.__ran=val
 
     @property
     def SandBoxDir(self):
@@ -61,7 +74,11 @@ class SetupItem(object):
         # create a StreamWriter which will write out the stream data of the run
         # to sorted files
         output = streamwriter.StreamWriter(os.path.join(
-            self.__test.RunDirectory, "_setup_tmp_{0}_{1}".format(self.ItemName.replace(" ", "_"), self.cnt)), cmd)
+            self.__test.RunDirectory, 
+            "_setup_tmp_{0}_{1}".format(
+                self.ItemName.replace(" ", "_"), self.cnt)), 
+            cmd,
+            self.__test.Env)
         self.cnt += 1
         # the command line we will run. We add the RunDirectory to the start of the command
         # to avoid having to deal with cwddir() issues
@@ -102,11 +119,17 @@ class SetupItem(object):
             except:
                 pass
         host.WriteVerbose("setup", "Copying {0} to {1}".format(source, target))
-        if os.path.isfile(source):
-            shutil.copy2(source, target)
-        else:
-            autest.common.disk.copy_tree(source, target)
-
+        try:
+            if os.path.isfile(source):
+                if os.path.exists(target):
+                    host.WriteVerbose("setup", "target already exists! Replacing...")
+            
+                shutil.copy2(source, target)
+            
+            else:
+                autest.common.disk.copy_tree(source, target)
+        except Exception as e:
+            raise SetupError("Cannot copy {0} because {1}".format(source,str(e)))
     
     def CopyAs(self, source, targetdir, targetname=None):
         '''
@@ -120,7 +143,10 @@ class SetupItem(object):
         if targetname is None: target = targetdir
         else: target = os.path.join(targetdir, targetname)
         host.WriteVerbose("setup", "Copying {0} as {1}".format(source, target))
-        shutil.copy2(source, target)
+        try:
+            shutil.copy2(source, target)
+        except Exception as e:
+            raise SetupError("Cannot copy {0} to {1} because {3}".format(source, targetdir,str(e)))
 
     def MakeDir(self, path, mode=None):
         # check if the path given is in the sandbox if abs
@@ -135,7 +161,7 @@ class SetupItem(object):
                     os.makedirs(path, mode)
                 host.WriteVerbose("setup", "Making directory {0}".format(path))
             else:
-                raise OSError('Path already exists as a file.')
+                raise SetupError('Path already exists as a file.')
 
     def Chown(self, path, uid, gid):
         if os.name == 'nt':

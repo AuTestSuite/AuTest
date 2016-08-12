@@ -31,7 +31,7 @@ class ZipContent(tester.Tester):
         if not os.path.exists(zfile):
             self.Result = tester.ResultType.Failed
             self.Reason = 'File {0} does not exist, cannot check contents'.format(zfile)
-            host.WriteVerbose(["testers.ZipContent","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+            host.WriteVerbose(["testers.ZipContent","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
             return 
 
         fileName = zfile.lower()
@@ -67,16 +67,16 @@ class ZipContent(tester.Tester):
             if contain not in names:
                 self.Result = tester.ResultType.Failed
                 self.Reason = 'File "{0}" not found in archive "{1}"'.format(contain, zfile)
-                host.WriteVerbose(["testers.ZipContent","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+                host.WriteVerbose(["testers.ZipContent","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
                 return
 
         for notContain in self.__exclude:
             if notContain in names:
                 self.Result = tester.ResultType.Failed
                 self.Reason = 'File "{0}" found in archive "{1}"'.format(notContain, zfile)
-                host.WriteVerbose(["testers.ZipContent","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+                host.WriteVerbose(["testers.ZipContent","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
                 return
 
         self.Result = tester.ResultType.Passed
         self.Reason = "Archive file contents match requested filters"
-        host.WriteVerbose(["testers.ZipContent","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+        host.WriteVerbose(["testers.ZipContent","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)

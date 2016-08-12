@@ -29,5 +29,5 @@ class Equal(tester.Tester):
         else:
             self.Result = tester.ResultType.Passed
             self.Reason = "Returned Value: {0} == {1}".format(val,self.Value)
-        host.WriteVerbose(["testers.Equal","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+        host.WriteVerbose(["testers.Equal","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
 

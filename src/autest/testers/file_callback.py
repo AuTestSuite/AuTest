@@ -48,4 +48,4 @@ class FileContentCallback(tester.Tester):
                 raise KillOnFailureError
         else:
             self.Reason = 'Contents of {0} match desired callback'.format(filename)
-        host.WriteVerbose(["testers.Equal","FileContentCallback"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+        host.WriteVerbose(["testers.Equal","FileContentCallback"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)

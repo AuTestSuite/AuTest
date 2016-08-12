@@ -1,21 +1,23 @@
 from __future__ import absolute_import, division, print_function
-import autest.core.testrunitem as testrunitem
+from autest.common.constructor import call_base, smart_init
+from autest.core.testenity import TestEnity
 from .directory import Directory
 from .file import File
 import hosts.output as host
 
-class Disk(testrunitem.TestRunItem):
+@smart_init
+class Disk(TestEnity):
     '''
     allows use to define what kind of disk based test we want to do
     '''
-    def __init__(self,testrun):
-        super(Disk, self).__init__(testrun)
+    @call_base(TestEnity=("runable",))
+    def __init__(self,runable):
         self.__files={}
         self.__dirs={}
 
     def File(self, name, exists=None, size=None, content=None, execute=None, id=None,
              runtime=True):
-        tmp = File(self._TestRun, name, exists, size, content, execute, runtime)
+        tmp = File(self._Runable, name, exists, size, content, execute, runtime)
         if name in self.__files:
             host.WriteWarning("Overriding file object {0}".format(name))
         self.__files[name] = tmp
@@ -24,7 +26,7 @@ class Disk(testrunitem.TestRunItem):
         return tmp
 
     def Directory(self, name, exists=None, id=None, runtime=True):
-        tmp = Directory(self._TestRun, name, exists, runtime)
+        tmp = Directory(self._Runable, name, exists, runtime)
         if name in self.__dirs:
             host.WriteWarning("Overriding directory object {0}".format(name))
         self.__dirs[name] = tmp
@@ -34,4 +36,4 @@ class Disk(testrunitem.TestRunItem):
 
 
 import autest.api
-autest.api.AddTestRunMember(Disk)
+autest.api.AddTestEnityMember(Disk)

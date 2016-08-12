@@ -6,6 +6,8 @@ import colorama
 
 from . import interfaces
 
+# clean this up
+reset_stream="{{host.reset-stream}}"
 
 class ConsoleHost(interfaces.UIHost):
     """description of class"""
@@ -27,7 +29,7 @@ class ConsoleHost(interfaces.UIHost):
 #class C io streams
     
     def writeStdOut(self,msg):
-        self.__stdout__.write(msg)
+        self.__stdout__.write(msg.format(reset_stream=""))
             
     def writeStdErr(self,msg):
         self.__stderr__.write(msg)
@@ -35,7 +37,11 @@ class ConsoleHost(interfaces.UIHost):
 # our virtual streams
     
     def writeMessage(self,msg):
-        self.__stdout__.write(colorama.Style.BRIGHT+msg+colorama.Style.RESET_ALL)
+        stream_color=colorama.Style.BRIGHT
+        stream_reset=colorama.Style.RESET_ALL+stream_color
+        reset=colorama.Style.RESET_ALL
+        self.__stdout__.write(stream_color+msg.replace(reset_stream,stream_reset)+reset)
+        
 
     
     def get_contents(self, filename, lineno):
@@ -51,13 +57,17 @@ class ConsoleHost(interfaces.UIHost):
         return content
 
     def writeWarning(self,msg,stack=None,show_stack=True):
-
-        self.__stdout__.write(colorama.Fore.LIGHTYELLOW_EX+msg+colorama.Fore.RESET)
+        stream_color=colorama.Fore.LIGHTYELLOW_EX
+        stream_reset=colorama.Style.RESET_ALL+stream_color
+        reset=colorama.Style.RESET_ALL
+        self.__stdout__.write(stream_color+msg.replace(reset_stream,stream_reset)+reset)
 
     
     def writeError(self,msg,stack=None,show_stack=True):
-
-        self.__stderr__.write(colorama.Fore.LIGHTRED_EX+msg+colorama.Fore.RESET)
+        stream_color=colorama.Fore.LIGHTRED_EX
+        stream_reset=colorama.Style.RESET_ALL+stream_color
+        reset=colorama.Style.RESET_ALL
+        self.__stderr__.write(stream_color+msg.replace(reset_stream,stream_reset)+reset)
 
     
     def writeDebug(self,catagory,msg):
@@ -70,7 +80,10 @@ class ConsoleHost(interfaces.UIHost):
         The host can use this value help orginize messages, it is suggested
         that a given message is clearly formatted with the catagory type.
         '''
-        self.__stdout__.write(colorama.Fore.GREEN+msg+colorama.Fore.RESET)
+        stream_color=colorama.Fore.GREEN
+        stream_reset=colorama.Style.RESET_ALL+stream_color
+        reset=colorama.Style.RESET_ALL
+        self.__stdout__.write(stream_color+msg.replace(reset_stream,stream_reset)+reset)
 
     
     def writeVerbose(self,catagory,msg):
@@ -83,7 +96,10 @@ class ConsoleHost(interfaces.UIHost):
         The host can use this value help orginize messages, it is suggested
         that a given message is clearly formatted with the catagory type. 
         '''
-        self.__stdout__.write(colorama.Fore.CYAN+msg+colorama.Fore.RESET)
+        stream_color=colorama.Fore.CYAN
+        stream_reset=colorama.Style.RESET_ALL+stream_color
+        reset=colorama.Style.RESET_ALL
+        self.__stdout__.write(stream_color+msg.replace(reset_stream,stream_reset)+reset)
 
     
     def writeProgress(self,task,msg=None,progress=None,completed=False):

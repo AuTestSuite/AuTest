@@ -44,7 +44,7 @@ class ResultType(object):
             c=colorama.Fore.RED
 
         ResultType.to_string(v)
-        return c+ResultType.to_string(v)+colorama.Fore.RESET
+        return colorama.Style.RESET_ALL+c+ResultType.to_string(v)+"{{host.reset-stream}}"
 
 class Tester(object):
     '''
@@ -53,7 +53,7 @@ class Tester(object):
     Result - this returns a ResultType object telling us how to process the result of the test
     Reason - this is a string (possibly multiline) with information about why the result happened. This maybe as 
     simple as "Return code equal to 5" or it might be more complex with diffs of what was different in a text file
-    DescriptionGroup - this is extra information about teh file, process, etc that might be useful to give the 
+    DescriptionGroup - this is extra information about the file, process, etc that might be useful to give the 
     test more context, sould be in form of Type: name, ie Process: proc1
     '''
 

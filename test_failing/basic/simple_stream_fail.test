@@ -1,0 +1,23 @@
+
+Test.Summary="Test the output text to different streams and test against gold files"
+
+# continue on failure...
+Test.ContinueOnFail=True
+
+t=Test.AddTestRun("multiline")
+
+if Condition.IsPlatform('win32'):
+    t.Command='echo Hello '
+else:
+    t.Command='echo "Hello "'
+t.ReturnCode=0
+t.Streams.All="gold/multiline.gold"
+
+
+t=Test.AddTestRun("space")
+if Condition.IsPlatform('win32'):
+    t.Command='echo Hello 7'
+else:
+    t.Command='echo "Hello 7"'
+t.ReturnCode=0
+t.Streams.All="gold/hello.gold"

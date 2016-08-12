@@ -1,4 +1,6 @@
+from __future__ import absolute_import, division, print_function
 import autest.core.setupitem as setupitem
+from autest.exceptions.setuperror import SetupError
 import autest.api as api
 
 class CopyAs(setupitem.SetupItem):
@@ -11,6 +13,9 @@ class CopyAs(setupitem.SetupItem):
         self.targetname=targetname
 
     def setup(self):
-        self.CopyAs(self.source, self.targetdir, self.targetname)
+        try:
+            self.CopyAs(self.source, self.targetdir, self.targetname)
+        except Exception as e :
+            raise SetupError('Cannot copy {0} to {1} as {2} because:\n {3}'.format(self.source, self.targetdir, self.targetname,str(e)))
 
 api.AddSetupItem(CopyAs,"__call__",ns='CopyAs')

@@ -1,7 +1,9 @@
-import os
-
+from __future__ import absolute_import, division, print_function
 import autest.core.setupitem as setupitem
+from autest.exceptions.setuperror import SetupError
 import autest.api as api
+
+import os
 
 class Copy(setupitem.SetupItem):
     def __init__(self,source,target=None,try_link=False):
@@ -13,7 +15,10 @@ class Copy(setupitem.SetupItem):
         self.try_link=try_link
 
     def setup(self):
-        self.Copy(self.source,self.target,self.try_link)
+        try:
+            self.Copy(self.source,self.target,self.try_link)
+        except Exception as e :
+            raise SetupError('Cannot copy {0} to {1} because:\n {2}'.format(self.source,self.target,str(e)))
 
 class FromDirectory(setupitem.SetupItem):
     def __init__(self,source,try_link=False):
@@ -24,7 +29,10 @@ class FromDirectory(setupitem.SetupItem):
         self.try_link=try_link
 
     def setup(self):
-        self.Copy(self.source,self.SandBoxDir,self.try_link)
+        try:
+            self.Copy(self.source,self.SandBoxDir,self.try_link)
+        except Exception as e :
+            raise SetupError('Cannot copy Directory {0} to {1} because:\n {2}'.format(self.source,self.SandBoxDir,str(e)))
 
 class FromTemplate(setupitem.SetupItem):
     def __init__(self,source,try_link=False):
@@ -35,7 +43,13 @@ class FromTemplate(setupitem.SetupItem):
         self.try_link=try_link
 
     def setup(self):
-        self.Copy(os.path.join(self.TestRootDir,"templates",self.source),self.SandBoxDir,self.try_link)
+        try:
+            src=os.path.join(self.TestRootDir,"templates",self.source)
+            dest=self.SandBoxDir
+            self.Copy(src,dest,self.try_link)
+        except Exception as e :
+            raise SetupError('Cannot copy {0} to {1} because:\n {2}'.format(src,dest,str(e)))
+
 
 
 api.AddSetupItem(Copy,"__call__",ns='Copy')

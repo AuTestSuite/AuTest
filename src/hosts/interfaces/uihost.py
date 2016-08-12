@@ -7,24 +7,24 @@ class UIHost(object):
 #class C io streams
     @abc.abstractmethod
     def writeStdOut(self,msg):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def writeStdErr(self,msg):
-        pass
+        raise NotImplementedError
 
 # our virtual streams
     @abc.abstractmethod
     def writeMessage(self,msg):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def writeWarning(self,msg,stack=None,show_stack=False):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def writeError(self,msg,stack=None,show_stack=True):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def writeDebug(self,catagory,msg):
@@ -37,7 +37,7 @@ class UIHost(object):
         The host can use this value help orginize messages, it is suggested
         that a given message is clearly formatted with the catagory type.
         '''
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def writeVerbose(self,catagory,msg):
@@ -50,7 +50,7 @@ class UIHost(object):
         The host can use this value help orginize messages, it is suggested
         that a given message is clearly formatted with the catagory type. 
         '''
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def writeProgress(self,task,msg=None,progress=None,completed=False):
@@ -66,7 +66,7 @@ class UIHost(object):
         time_left - a value to tell us an ETA in some time value
 
         '''
-        pass
+        raise NotImplementedError
 
     @abc.abstractproperty
     def debugCatagories(self):

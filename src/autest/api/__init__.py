@@ -1,6 +1,7 @@
 
 from .setup import AddSetupItem
-from .testrun import AddTestRunMember, ExtendTestRun
+from .testenity import AddTestEnityMember
 from .test import ExtendTest
 from .reporter import RegisterReporter
 from .when import AddWhenFunction
+from .testrun import ExtendTestRun

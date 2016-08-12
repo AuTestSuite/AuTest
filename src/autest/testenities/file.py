@@ -1,15 +1,19 @@
 from __future__ import absolute_import, division, print_function
-import autest.core.testrunitem as testrunitem
+from autest.common.constructor import call_base, smart_init
+
+from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
 import autest.testers as testers
+
 import os 
 
-class File(testrunitem.TestRunItem):
+@smart_init
+class File(TestEnity):
     '''
     Allows us to test for a file. We can test for size, existance and content
     '''
-    def __init__(self, testrun, name, exists = None, size = None, content_tester = None,execute=False,runtime=True):
-        super(File, self).__init__(testrun)
+    @call_base(TestEnity=("runable",))
+    def __init__(self, runable, name, exists = None, size = None, content_tester = None,execute=False,runtime=True):
         self.__name = name
         self.__runtime=runtime
         
@@ -21,7 +25,7 @@ class File(testrunitem.TestRunItem):
             TesterSet(
                     testers.FileExists,
                     self,
-                    self._TestRun.EndEvent,
+                    self._Runable.FinishedEvent,
                     converter=bool,
                     description_group=des_grp
                 ),"Exists"
@@ -32,7 +36,7 @@ class File(testrunitem.TestRunItem):
             TesterSet(
                     testers.Equal,
                     self.GetSize,
-                    self._TestRun.EndEvent,
+                    self._Runable.FinishedEvent,
                     converter=int,
                     description_group=des_grp,
                     description="File size is {0.Value} bytes"
@@ -44,8 +48,8 @@ class File(testrunitem.TestRunItem):
             TesterSet(
                     testers.GoldFile,
                     self,
-                    self._TestRun.EndEvent,
-                    converter=lambda x: File(self._TestRun, x, runtime=False),
+                    self._Runable.FinishedEvent,
+                    converter=lambda x: File(self._Runable, x, runtime=False),
                     description_group=des_grp
                 ),"Content"
             )
@@ -94,14 +98,14 @@ class File(testrunitem.TestRunItem):
         '''
         The absolute path of the file, based on Runtime sandbox location
         '''
-        return os.path.normpath(os.path.join(self._TestRun._Test.RunDirectory, self.Name))
+        return os.path.normpath(os.path.join(self._RootRunable.RunDirectory, self.Name))
 
     @property
     def AbsTestPath(self):
         '''
         The absolute path of the file, based on directory relative from the test file location
         '''
-        return os.path.normpath(os.path.join(self._TestRun._Test.TestDirectory, self.Name))
+        return os.path.normpath(os.path.join(self._RootRunable.TestDirectory, self.Name))
 
     @property
     def Name(self):
@@ -111,40 +115,8 @@ class File(testrunitem.TestRunItem):
     def Name(self, val):
         self.__name = val
 
-    #@property
-    #def Exists(self):
-    #    return self._GetRegisterEvent("File.{0}.Exists".format(self.__name))
-
     def GetSize(self):
         statinfo = os.stat(self.AbsPath)
         return statinfo.st_size
 
-    #@property
-    #def Size(self):
-    #    return self._GetRegisterEvent("File.{0}.Size".format(self.__name))
    
-    #@property
-    #def Content(self):
-    #    return self._GetRegisterEvent("File.{0}.Content".format(self.__name))
-
-    #@Content.setter
-    #def Content(self, val):
-    #    def getChecker():
-    #        des_grp="{0} {1}".format("file",self.Name)
-    #        if isinstance(val, testers.Tester):
-    #            val.TestValue = self
-    #            if value.DescriptionGroup is None:
-    #                value.DescriptionGroup=des_grp
-    #            return val
-    #        elif isinstance(val, str):
-    #            return testers.GoldFile(File(self._TestRun, val, runtime=False),
-    #                                    test_value=self,description_group=des_grp)
-    #        elif isinstance(val, (tuple, list)):
-    #            return testers.GoldFileList([File(self._TestRun, item, runtime=False)
-    #                                         for item in val], test_value=self,description_group=des_grp)
-
-    #    self._Register("File.{0}.Content".format(self.__name), getChecker,self._TestRun.EndEvent)
-
-    #@property
-    #def Executes(self):
-    #    return self._GetRegisterEvent("File.{0}.Execute".format(self.__name))

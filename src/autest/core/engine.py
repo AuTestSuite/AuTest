@@ -9,7 +9,7 @@ import autest.testers.tester as testers
 from autest.common.disk import remove_read_only
 from . import report 
 from . import test
-
+from autest.runlogic.test import Test_RunLogic
 
 import os
 from fnmatch import fnmatch
@@ -49,7 +49,7 @@ class Engine(object):
         # load setup items
         import autest.setupitems
         # load testrun items
-        import autest.testrunitems
+        import autest.testenities
         # load when items
         import autest.whenitem
         # load built in reporter object
@@ -104,6 +104,11 @@ class Engine(object):
         if self.__autest_site is None:
             # this is the default
             path = os.path.join(self.__test_dir,'autest-site')
+            # hack to deal with backward compatiblity
+            old_path=os.path.join(self.__test_dir,'gtest-site')
+            if not os.path.exists(path) and os.path.exists(old_path):
+                host.WriteWarning("Depracated gest-site found!\n Please rename to autest-site".format(path))
+                path = os.path.join(self.__test_dir,'gtest-site')
         else:
             #This is a custom location
             path = os.path.abspath(self.__autest_site)
@@ -117,7 +122,8 @@ class Engine(object):
                 'AddSetupItem':api.AddSetupItem,
                 'SetupTask':setupitem.SetupItem, # backward compat
                 'SetupItem':setupitem.SetupItem,
-                'AddTestRunMember':api.AddTestRunMember,
+                'AddTestRunMember':api.AddTestEnityMember, # backward compat
+                'AddTestEnityMember':api.AddTestEnityMember,
                 'AddWhenFunction':api.AddWhenFunction,
                 'AUTEST_SITE_PATH':path,
                 }
@@ -173,15 +179,16 @@ class Engine(object):
                 self.__pool.addTask(self.__run_test_task, t)
             self.__pool.waitCompletion()
         else:
-            for t in self.__tests.values():
-                self.__run_test_task(t)
+            tmp=list(self.__tests.keys())
+            tmp.sort()
+            for t in tmp:
+                self.__run_test_task(self.__tests[t])
 
     def __run_test_task(self, task):
-        runtesttask.RunTestTask(task)()
+        runtesttask.RunTestTask(task,Test_RunLogic)()
         
 
     def _make_report(self):
-        
         info = report.ReportInfo(self.__tests.values())
         host.WriteMessage("\nGenerating Report: --------------")
 
@@ -191,9 +198,11 @@ class Engine(object):
                 func(info)
             else:
                 host.WriteWarningf("Reported {0} not registered",r)
-
-
-
-    @property
-    def Host(self):
-        return self.__host
+        
+        # test to see if we have some failures or all failures
+        if info.TotalPassCount == 0 and info.TotalTestCount:
+            return 10 # everything failed && we had some test
+        elif info.TotalNotPassCount:
+            return 1 # something failed
+        else:
+            return 0

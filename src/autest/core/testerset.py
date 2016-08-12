@@ -1,12 +1,15 @@
 from __future__ import absolute_import, division, print_function
 import autest.testers as testers
 from collections import namedtuple
+from autest.common.constructor import call_base, smart_init
 
-# hold the set of testers being mapped to a given event to be bound 
+# hold a set of testers being mapped to a given event to be bound 
+@smart_init
 class TesterSet(object):
     '''
     hold the set of items to be bound for a given named object
     '''
+    @call_base()
     def __init__(self, default_tester, testvalue, event, converter=None, kill_on_failure=False, description_group=None, description=None,):
         self._event=event
         self._kill_on_failure=kill_on_failure
@@ -20,7 +23,6 @@ class TesterSet(object):
             self._converter=converter
 
         self._testers=[]
-        return super(TesterSet, self).__init__()
 
     def _create_tester(self,value):
         if isinstance(value,testers._Container):

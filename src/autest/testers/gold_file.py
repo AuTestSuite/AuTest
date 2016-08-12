@@ -20,9 +20,6 @@ class GoldFile(tester.Tester):
         self._normalize_eol = normalize_eol
 
     def test(self,eventinfo,**kw):
-        #if not self._test_attibute(eventinfo,self.test_value):
-         #   return
-        #val=getattr(eventinfo,self.test_value)
 
         # get the attribute file context
         tmp = self._GetContent(eventinfo)
@@ -46,7 +43,7 @@ class GoldFile(tester.Tester):
         except:
             self.Result = tester.ResultType.Failed
             self.Reason = "Can't open file {0}".format(tmp)
-            host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+            host.WriteVerbose(["testers.GoldFile","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
             return
         
         if self._normalize_eol:
@@ -55,12 +52,13 @@ class GoldFile(tester.Tester):
 
         # make seqerncer differ
         seq = difflib.SequenceMatcher(None,val_content,gf_content)
+        #seq = difflib.SequenceMatcher(None,gf_content,val_content)
         #do we have a match
         if seq.ratio() == 1.0:
             #The says ratio everything matched
             self.Result = tester.ResultType.Passed
             self.Reason = "Values match"
-            host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+            host.WriteVerbose(["testers.GoldFile","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
             return
         # if we are here we don't have a match at the moment.  At this point we
         # process difference to see if they
@@ -96,18 +94,20 @@ class GoldFile(tester.Tester):
             #The says ratio everything matched
             self.Result = tester.ResultType.Passed
             self.Reason = "Values match"
-            host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+            host.WriteVerbose(["testers.GoldFile","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
             return
         # this makes a nice string value..
         diff = difflib.Differ()
         self.Result = tester.ResultType.Failed
         tmp_result = "\n".join(diff.compare(val_content.splitlines(),
                                               newtext.splitlines()))
+        tmp_result = "\n".join(diff.compare(newtext.splitlines(),
+                                              val_content.splitlines()))
         
-        self.Reason = "File differences\nData File : {0}\nGold File : {1}\n{2}".format(self._GetContent(eventinfo),
-                            self._GetContent(eventinfo,self._goldfile),
+        self.Reason = "File differences\nGold File : {0}\nData File : {1}\n{2}".format(self._GetContent(eventinfo,self._goldfile),
+                            self._GetContent(eventinfo),
                             tmp_result)
-        host.WriteVerbose(["testers.GoldFile","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+        host.WriteVerbose(["testers.GoldFile","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
         if self.KillOnFailure:
             raise KillOnFailureError
 

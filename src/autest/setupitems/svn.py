@@ -47,7 +47,7 @@ class ImportDirectory(SetupItem):
             raise
         except:
             # error if we don't have a value for this.. meaning they did not create or define a repository
-            raise SetupError('SVN repository "{}" does not exist for importing'.format(self.name))
+            raise SetupError('SVN repository "{0}" does not exist for importing'.format(self.ItemName))
         
         repo_path+="/"+self._sub_dir
         # add directory

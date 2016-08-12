@@ -1,5 +1,6 @@
-# this is the Console Application form of the autest (gold test) package
+
 from __future__ import absolute_import, division, print_function
+import autest.core.testrun
 import sys
 import os
 import argparse
@@ -12,6 +13,8 @@ import copy
 import autest
 import autest.common.is_a as is_a
 from autest.core.variables import Variables
+
+import inspect
 
 #--------------
 class extendAction(argparse.Action):
@@ -273,9 +276,4 @@ def main():
     
 if __name__ == '__main__':
     main()
-
-
-
-
-
 

@@ -55,4 +55,4 @@ class ContainsExpression(tester.Tester):
                 raise KillOnFailureError
         else:
             self.Reason = 'Contents of {0} contained expression'.format(filename)
-        host.WriteVerbose(["testers.ContainsExpression","ContainsExpression"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+        host.WriteVerbose(["testers.ContainsExpression","ContainsExpression"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)

@@ -1,16 +1,19 @@
 from __future__ import absolute_import, division, print_function
-import autest.core.testrunitem as testrunitem
+from autest.common.constructor import call_base, smart_init
+from autest.core.testenity import TestEnity
 import autest.testers as testers
 from autest.core.testerset import TesterSet
 
+
 import os
 
-class Directory(testrunitem.TestRunItem):
+@smart_init
+class Directory(TestEnity):
     '''
     Allows us to test for a file. We can test for existance
     '''
-    def __init__( self, testrun, name, exists=True, runtime=True ):
-        super(Directory, self).__init__(testrun)
+    @call_base(TestEnity=("runable",))
+    def __init__( self, runable, name, exists=True, runtime=True ):
         self.__name = name
         self.__runtime = runtime
     
@@ -21,7 +24,7 @@ class Directory(testrunitem.TestRunItem):
             TesterSet(
                     testers.DirectoryExists,
                     self,
-                    self._TestRun.EndEvent,
+                    self._Runable.FinishedEvent,
                     converter=bool,
                     description_group="{0} {1}".format("directory",self.__name)
                 ),
@@ -51,25 +54,18 @@ class Directory(testrunitem.TestRunItem):
         '''
         The absolute path of the file, based on Runtime sandbox location
         '''
-        return os.path.normpath(os.path.join(self._TestRun._Test.RunDirectory, self.Name))
+        return os.path.normpath(os.path.join(self._RootRunable.RunDirectory, self.Name))
 
     @property
     def AbsTestPath( self ):
         '''
         The absolute path of the file, based on directory relative form the test file location
         '''
-        return os.path.normpath(os.path.join(self._TestRun._Test.TestDirectory, self.Name))
+        return os.path.normpath(os.path.join(self._RootRunable.TestDirectory, self.Name))
 
     @property
     def Name( self ):
         return self.__name
 
-    #@Name.setter
-    #def Name( self, val ):
-    #    self.__name = val
-
-    #@property
-    #def Exists( self ):
-    #    return self._GetRegisterEvent("Directory.{0}.Exists".format(self.__name))
 
 

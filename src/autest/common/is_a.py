@@ -5,6 +5,12 @@ from future.utils import native_str
 def List(obj):
     return isinstance(obj,list)
 
+def Tuple(obj):
+    return isinstance(obj,tuple)
+
+def OrderedSequence(obj):
+    return List(obj) or Tuple(obj)
+
 def String(obj):
     return isinstance(obj,native_str)
 

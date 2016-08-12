@@ -125,7 +125,7 @@ class StreamWriter(object):
         cmdfile.close()
 
         with open(os.path.join(path,"replay.sh"),'wb') as f:
-            f.write(self.gen_bash_script(cmd,env))
+            f.write(self.gen_bash_script(cmd,env).encode("utf-8"))
         
         self.both=open(self.FullFile,'wb')
         self.outfile=open(self.StdOutFile,'wb')

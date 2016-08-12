@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function
+from .constructor import call_base, smart_init
+
 # simple event class
 # need to look at extending this or 
 # finding a usable existing solution
@@ -41,6 +43,8 @@ class Event(object):
 
 
 #util class
+@smart_init
 class EventInfo(object):
+    @call_base()
     def __init__(self):
         pass

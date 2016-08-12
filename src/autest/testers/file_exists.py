@@ -34,4 +34,4 @@ class FileExists(tester.Tester):
             else:
                 self.Result = tester.ResultType.Passed
                 self.Reason = 'File "{0}" does not exists'.format(self.TestValue)
-        host.WriteVerbose(["testers.FileExists","testers"],"Passed - " if self.Result == tester.ResultType.Passed else "Failed - ",self.Reason)
+        host.WriteVerbose(["testers.FileExists","testers"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)

@@ -7,7 +7,7 @@ import types
 def ExtendTest(func,name=None):
     if name is None:
         name=func.__name__
-    method=func#types.MethodType(func,None,Test)
+    method=func
     setattr(Test,name,method)
     host.WriteVerbose("api",'Added Test extension function "{0}"'.format(name))
 

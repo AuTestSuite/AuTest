@@ -1,6 +1,6 @@
 test.Summary="Test that the enviroment logic works"
 
-Test.Env={'a':'a','b':'b','c':'c'}
+Test.Env.update({'a':'a','b':'b','c':'c'})
 
 t=Test.AddTestRun("Test file existance")
 t.Env['a']="testrun"

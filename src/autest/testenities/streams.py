@@ -1,17 +1,16 @@
 from __future__ import absolute_import, division, print_function
-import autest.core.testrunitem as testrunitem
+from autest.common.constructor import call_base, smart_init
+from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
 import hosts.output as host
 import autest.testers as testers
 from .file import File
 
-class Streams(testrunitem.TestRunItem):
-    def __init__(self,testrun,parent):
-        super(Streams, self).__init__(testrun)
-        self._process=parent
-        
+@smart_init
+class Streams(TestEnity):
+    @call_base(TestEnity=("runable",))
+    def __init__(self,runable): 
         # setup testers
-
         STREAMS = (#std streams
                    ('stdout', 'Streams.{0}.stdout', 'StdOutFile'),
                    ('stderr', 'Streams.{0}.stderr', 'StdErrFile'),
@@ -23,22 +22,22 @@ class Streams(testrunitem.TestRunItem):
                    ('Error', 'Streams.{0}.Error', 'ErrorFile'),
                    ('Debug', 'Streams.{0}.Debug', 'DebugFile'),
                    ('Verbose', 'Streams.{0}.Verbose', 'VerboseFile'),)
-        
+
         for name, eventname, testValue in STREAMS:
             #tweak to add property for all testable events
             self._Register(
-                eventname.format(self._process.Name),
+                eventname.format(self._Runable.Name),
                 TesterSet(
                         testers.GoldFile,
                         testValue,
-                        self._process.RunFinished,
-                        converter=lambda x: File(self._TestRun, x, runtime=False),
-                        description_group="{0} {1}".format("process",self._process.Name)
+                        self._Runable.FinishedEvent,
+                        converter=lambda x: File(self._Runable, x, runtime=False),
+                        description_group="{0} {1}".format("Stream",name)
                     ),
                 name
                 )
 
 import autest.api
-from . import process
-autest.api.AddTestRunMember(Streams,cls=process.Process)
+from .process import Process
+autest.api.AddTestEnityMember(Streams,classes=[Process])
 
