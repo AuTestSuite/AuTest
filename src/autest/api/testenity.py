@@ -4,13 +4,12 @@ import hosts.output as host
 from autest.core.testenity import TestEnity
 from autest.core.test import Test
 from autest.core.testrun import TestRun
-from autest.core.process import Process
+
 import types
 
 def AddTestEnityMember( clsobj, name=None, classes=None ):
-    # helper function
-    #def wrapper( self,*lst,**kw ):
-    #        self._add_item(item(*lst,**kw))
+    # imported here to break import cycle
+    from autest.testenities.process import Process
     
     if not issubclass(clsobj,TestEnity):
         host.WriteError("Object must be subclass of autest.core.testenity.TestEnity")

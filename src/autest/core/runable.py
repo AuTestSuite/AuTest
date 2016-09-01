@@ -103,7 +103,7 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
 
     @property
     def Variables(self):
-        return self.__env
+        return self.__variables
 
     @Variables.setter
     def Variables(self,val):
