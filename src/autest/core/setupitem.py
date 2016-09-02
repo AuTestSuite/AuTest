@@ -27,11 +27,16 @@ class SetupItem(object):
             self.__itemname = taskname
         else:
             host.WriteError("itemname is not provided")
-        self.__test = None
+        self.__runable = None
         self.cnt = 0
+
+        # description of what we are trying to do
+        self.__description="actions description not defined"
 
         # assume pass unless an error happens
         self._Result=testers.ResultType.Passed
+    
+
     # basic properties values we need
 
     @property
@@ -45,6 +50,16 @@ class SetupItem(object):
         self.__itemname = val
 
     @property
+    def Description(self):
+        # name of the task
+        return self.__description
+
+    @Description.setter
+    def Description(self, val):
+        # name of the task
+        self.__description = val
+
+    @property
     def RanOnce(self):
         return self.__ran
 
@@ -55,17 +70,17 @@ class SetupItem(object):
     @property
     def SandBoxDir(self):
         # directory we run the test in
-        return self.__test.RunDirectory
-
+        return self.__runable._RootRunable.RunDirectory
+    
     @property
     def TestRootDir(self):
         # the directory location given to scan for files for all the tests
-        return self.__test.TestRoot
+        return self.__runable._RootRunable.TestRoot
 
     @property
     def TestFileDir(self):
         # the directory the test file was defined in
-        return self.__test.TestDirectory
+        return self.__runable._RootRunable.TestDirectory
 
     # useful util functions
     def RunCommand(self, cmd):
@@ -74,26 +89,26 @@ class SetupItem(object):
         # create a StreamWriter which will write out the stream data of the run
         # to sorted files
         output = streamwriter.StreamWriter(os.path.join(
-            self.__test.RunDirectory, 
+            self.__runable.RunDirectory, 
             "_setup_tmp_{0}_{1}".format(
                 self.ItemName.replace(" ", "_"), self.cnt)), 
             cmd,
-            self.__test.Env)
+            self.__runable.Env)
         self.cnt += 1
         # the command line we will run. We add the RunDirectory to the start of the command
         # to avoid having to deal with cwddir() issues
-        command_line = "cd {0} && {1}".format(self.__test.RunDirectory, cmd)
+        command_line = "cd {0} && {1}".format(self.SandBoxDir, cmd)
         # subsitute the value of the string via the template engine
         # as this provide a safe cross platform $subst model.
         template = string.Template(command_line)
-        command_line = template.substitute(self.__test.Env)
+        command_line = template.substitute(self.__runable.Env)
 
         proc = autest.common.process.Popen(
             command_line,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=self.__test.Env)
+            env=self.__runable.Env)
 
         # get the output stream from the process we created and redirect to
         # files
@@ -146,7 +161,7 @@ class SetupItem(object):
         try:
             shutil.copy2(source, target)
         except Exception as e:
-            raise SetupError("Cannot copy {0} to {1} because {3}".format(source, targetdir,str(e)))
+            raise SetupError("Cannot copy {0} to {1} because {2}".format(source, targetdir,str(e)))
 
     def MakeDir(self, path, mode=None):
         # check if the path given is in the sandbox if abs
@@ -245,11 +260,21 @@ class SetupItem(object):
         Allow us to bind the Test information with the setup item
         This is done before we try to execute the setup logic
         '''
-        self.__test = test
+        self.__runable = test
 
     def cleanup(self):
         pass
 
     @property
     def Env(self):
-        return self.__test.Env
+        return self.__runable.Env
+
+    @property
+    def Variables(self):        
+        return self.__runable.Variables
+    
+    def ComposeEnv(self):
+        return self.__runable.ComposeEnv()
+
+    def ComposeVariables(self):        
+        return self.__runable.ComposeVariables()

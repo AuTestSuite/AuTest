@@ -35,15 +35,16 @@ class TestRun_RunLogic(RunLogic):
         self._default = self.__tr.Processes.Default
         # order processes
         proc_list = GenerateStartOrderedList(self._default)
+        if len(proc_list) == 0:
+            return (True,"Generating Process list of processes to start",'List came back empty.\n Did you define a process for test run "{0}"'.format(self.__tr.DisplayString))
         idx = 0
         for i in proc_list:
             if i.object == self._default:
                 break
             idx+=1
         # start processes
-        
         tmp = self.StartOrderedItemsAync(proc_list,Process_RunLogic)
-
+        
         if is_a.String(tmp[0]):
             # we had a startup failure
             host.WriteVerbosef("testrun_logic","TestRun {0}: Starting of processes Failed!",self.__tr.Name)

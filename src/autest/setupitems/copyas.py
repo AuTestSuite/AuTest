@@ -11,6 +11,10 @@ class CopyAs(setupitem.SetupItem):
         self.source=source
         self.targetdir=targetdir
         self.targetname=targetname
+        if targetname:
+            self.Description="Copy {0} to {1} as {2}".format(self.source, self.targetdir, self.targetname)
+        else:
+            self.Description="Copy {0} to {1}".format(self.source, self.targetdir)
 
     def setup(self):
         try:

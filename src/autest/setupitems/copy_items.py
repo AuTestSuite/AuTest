@@ -13,6 +13,7 @@ class Copy(setupitem.SetupItem):
         self.source=source
         self.target=target
         self.try_link=try_link
+        self.Description="Copy {0} to {1}".format(self.source,self.target)
 
     def setup(self):
         try:
@@ -27,6 +28,7 @@ class FromDirectory(setupitem.SetupItem):
                     )
         self.source=source
         self.try_link=try_link
+        self.Description="Copy {0} to sandbox directory".format(self.source)
 
     def setup(self):
         try:
@@ -41,6 +43,7 @@ class FromTemplate(setupitem.SetupItem):
                     )
         self.source=source
         self.try_link=try_link
+        self.Description="Copy {0} to sandbox directory".format(os.path.join("templates",self.source))
 
     def setup(self):
         try:

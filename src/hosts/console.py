@@ -29,7 +29,7 @@ class ConsoleHost(interfaces.UIHost):
 #class C io streams
     
     def writeStdOut(self,msg):
-        self.__stdout__.write(msg.format(reset_stream=""))
+        self.__stdout__.write(msg.replace(reset_stream,""))
             
     def writeStdErr(self,msg):
         self.__stderr__.write(msg)

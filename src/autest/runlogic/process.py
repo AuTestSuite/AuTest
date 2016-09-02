@@ -93,7 +93,7 @@ class Process_RunLogic(RunLogic):
 
         # substitute the value of the string via the template engine
         # as this provide a safe cross platform $subst model.
-        env=self._process._ComposeEnv() # get the correct shell env for the process
+        env=self._process.ComposeEnv() # get the correct shell env for the process
         template = string.Template(command_line)
         command_line = template.substitute(env)
         
@@ -163,6 +163,12 @@ class Process_RunLogic(RunLogic):
             self._process._isRunning(False)
             self.__call_cleanup=False
             if self.__proc is None:
+                if self.__output is None:
+                    self.__output = streamwriter.StreamWriter(
+                                            self._process.StreamOutputDirectory,
+                                            self._process.RawCommand,
+                                            self._process.ComposeEnv())
+            
                 event_info = eventinfo.ProcessFinishedInfo(0,None,self.__output)
             else:
                 event_info = eventinfo.ProcessFinishedInfo(time.time() - self.__start_time,self.__proc.returncode,self.__output)

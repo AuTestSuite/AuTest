@@ -77,10 +77,10 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
     def _do_run(self):        
         self._run()
     
-    def _ComposeEnv(self):
+    def ComposeEnv(self):
         ret={}
         if self.__parent:
-            ret=self.__parent._ComposeEnv()
+            ret=self.__parent.ComposeEnv()
         ret.update(self.__env)
         return ret
 
@@ -94,11 +94,11 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
             raise TypeError("value needs to be a dict type")
         self.__env=val
     
-    def _ComposeVariables(self):
-        ret={}
+    def ComposeVariables(self):
+        ret=Variables()
         if self.__parent:
-            ret=self.__parent._ComposeVariables()
-        ret.update(self.__env)
+            ret=self.__parent.ComposeVariables()
+        ret.update(self.__variables)
         return ret
 
     @property

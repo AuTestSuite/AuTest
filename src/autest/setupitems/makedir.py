@@ -8,6 +8,7 @@ class MakeDir(setupitem.SetupItem):
         )
         self.path=path
         self.mode=mode
+        self.Description="Making Directory {0}".format(self.path)
 
     def setup(self):
         self.MakeDir(self.path, self.mode)

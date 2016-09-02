@@ -10,6 +10,9 @@ from autest.common.disk import remove_read_only
 from . import report 
 from . import test
 from autest.runlogic.test import Test_RunLogic
+from autest.exceptions.setuperror import SetupError
+import autest.testers as testers
+from autest.core import conditions
 
 import os
 from fnmatch import fnmatch
@@ -126,6 +129,16 @@ class Engine(object):
                 'AddTestEnityMember':api.AddTestEnityMember,
                 'AddWhenFunction':api.AddWhenFunction,
                 'AUTEST_SITE_PATH':path,
+                'SetupError':SetupError,
+                # make it easy to define extension
+                'Condition': conditions.ConditionFactory(),
+                'Testers': testers,
+                # break these out of tester space
+                # to make it easier to right a test
+                'Any':testers.Any,
+                'All':testers.All,
+                'Not':testers.Not,
+                'When':glb.When(),
                 }
 
         # given it exists we want to load data from it

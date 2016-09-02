@@ -31,23 +31,31 @@ class ExcludesExpression(tester.Tester):
             filename = self.TestValue.AbsPath
         result = tester.ResultType.Passed
         try:
-            failed=True
+            failed=False
+            details=[]
             # if this is multi-line check
             if self._multiline:
                 with open(filename, 'r') as infile:
                     data = infile.read()
                 failed=self.Value.search(data)
             else:
-                # if this is single expression check each line till match
+                # if this is single expression check each line till match                
                 with open(filename, 'r') as infile:
-                    for l in infile:
-                        failed=self.Value.search(l)
-                        if failed:
-                            break
+                    for cnt,l in enumerate(infile):
+                        tmp=self.Value.search(l)
+                        if tmp:
+                            details+=[(cnt+1,l[:-1])]
+                            failed=True
             if failed:
                 result = tester.ResultType.Failed
-                self.Reason = 'Contents of {0} contains expression: "{1}"'.\
-                              format(filename, self.Value.pattern)
+                tmpstr=""
+                if details:
+                    tmpstr="\n  Details:\n"
+                    for line,text in details:
+                        tmpstr+="    {0} : {1}\n".format(text,line)
+
+                self.Reason = 'Contents of {0} contains expression: "{1}"{2}'.\
+                              format(filename, self.Value.pattern,tmpstr)
 
         except IOError as err:
             result = tester.ResultType.Failed

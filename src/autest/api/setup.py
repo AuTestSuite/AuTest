@@ -3,6 +3,8 @@ import autest.glb as glb
 import autest.common.namespace as namespace
 import types
 import hosts.output as host
+from autest.core.setupitem import SetupItem
+from autest.core.setup import Setup
 
 # this api allow users to add new items to Setup
 # the user can add a namespace as well to allow for
@@ -17,8 +19,10 @@ def AddSetupItem(item,name=None,ns=None):
     # helper function
     def wrapper(self,*lst,**kw):
             self._add_item(item(*lst,**kw))
-    ## todo add check to make sure this is a SetupItem type
-    
+    # check to make sure this is a SetupItem type
+    if not issubclass(item,SetupItem):
+        host.WriteError("Object must be subclass of autest.core.setupitem.SetupItem")    
+
     #get name of task if user did not provide a value
     if name is None:
         name=item.__name__

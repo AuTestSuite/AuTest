@@ -34,7 +34,7 @@ class Process(process.Process,TestEnity):
                     testers.Equal,
                     "ReturnCode",
                     self.FinishedEvent,
-                    converter=int
+                    converter=lambda x: int(x) if x is not None else None
                 ),"ReturnCode"
             )
         # TimeOut

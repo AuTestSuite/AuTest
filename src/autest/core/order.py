@@ -214,7 +214,7 @@ def GenerateStartOrderedList(item):
         make a flatten list of ordered items
         item -- this is the starting default point everything flows around
     '''
-                
+       
     def append_not_exist( olst,nlst ):
         for l in nlst:
             if l not in olst:

@@ -60,7 +60,7 @@ class TestRun(Order,Item,Runable):
                     testers.Equal,
                     True,
                     self.FinishedEvent,
-                    converter=lambda val: LamdaEq(val._isRunningBefore),
+                    converter=lambda val: LamdaEq(val._isRunningAfter),
                 ),"StillRunningAfter"
             )
         # NotRunningBefore
@@ -80,7 +80,7 @@ class TestRun(Order,Item,Runable):
                     testers.Equal,
                     False,
                     self.FinishedEvent,
-                    converter=lambda val: LamdaEq(val._isRunningBefore),
+                    converter=lambda val: LamdaEq(val._isRunningAfter),
                 ),"NotRunningAfter"
             )
         
