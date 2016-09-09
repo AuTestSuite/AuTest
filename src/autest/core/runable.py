@@ -31,7 +31,7 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
         self.__CleanupEvent = event.Event()
 
         self.__env={}
-        self.__variables=Variables()
+        self.__variables=Variables(parent=parent.Variables if parent else None)
         self.__parent=parent
         self.__result=None
         self.__reason=None
@@ -168,3 +168,14 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
     @_Reason.setter
     def _Reason(self, value):
         self.__reason = value
+
+    # for more detailed extention handling
+    def _AddMethod(self,func,name=None):    
+        m=func.__get__(self)
+        name = name if name is not None else func.__name__
+        setattr(self,name,m)
+
+    def _AddObject(self,obj,name=None):            
+        name = name if name is not None else obj.__name__
+        setattr(self,name,obj)
+        obj.Bind(self)

@@ -6,7 +6,8 @@ import autest.common.is_a as is_a
 @smart_init
 class Variables(dict, object): 
     @call_base(dict=(),object=())
-    def __init__(self, val=None):
+    def __init__(self, val=None, parent=None):
+        self.__parent=parent
         if val is None:
             val = {}
         if not is_a.Dict(val):
@@ -17,7 +18,10 @@ class Variables(dict, object):
         try:
             return self[name] 
         except KeyError:
-            raise AttributeError("%r has no attribute %r" % 
+            if self.__parent:
+                return self.__parent[name]
+            else:
+                raise AttributeError("%r has no attribute %r" % 
                                  (self.__class__, name))
 
     def __setattr__(self, name, value):

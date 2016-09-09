@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 from autest.common.constructor import call_base, smart_init
 
+import autest.common.is_a as is_a
 from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
 import autest.testers as testers
@@ -16,7 +17,7 @@ class File(TestEnity):
     def __init__(self, runable, name, exists = None, size = None, content_tester = None,execute=False,runtime=True):
         self.__name = name
         self.__runtime=runtime
-        
+        self._count=0
         # setup testables
         des_grp="{0} {1}".format("file",self.__name)
         # exists
@@ -118,5 +119,70 @@ class File(TestEnity):
     def GetSize(self):
         statinfo = os.stat(self.AbsPath)
         return statinfo.st_size
+
+    def WriteOn(self,content,event=None):
+        # content is a string or function taking a file handle
+        def action(ev):
+            path=os.path.split(self.Name)[0]
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(self.Name,mode="w") as outfile:
+                if is_a.String(content):
+                    outfile.writelines(content)
+                else:
+                    content(outfile)
+            return (False,"Writing file {0}".format(self.Name),"Success")
+
+        if event is None:
+            event = self._Runable.StartingEvent
+
+        self._Runable._RegisterEvent("File.{0}.WriteOn.{1}".format(self.__name,self._count), 
+                            event, 
+                            testers.Lambda(action,
+                                    description_group="Writing File {0}".format(self.__name))
+                            )
+        
+
+    def WriteAppendOn(self,content,event=None):
+        # content is a string or function taking a file handle
+        def action(ev):
+            path=os.path.split(self.Name)[0]
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(self.Name,mode="a+") as outfile:
+                if is_a.String(content):
+                    outfile.writelines(content)
+                else:
+                    content(outfile)
+            return (False,"Appending file {0}".format(self.Name),"Success")
+
+        if event is None:
+            event = self._Runable.StartingEvent
+
+        # content is a string or function taking a file handle
+        self._count+=1
+        self._Runable._RegisterEvent("File.{0}.WriteAppendOn.{1}".format(self.__name,self._count), 
+                            event, 
+                            testers.Lambda(action,
+                                    description_group="Appending File {0}".format(self.__name))
+                            )
+    
+    def WriteCustomOn(self,func,event=None):
+        # content is a string or function taking a file handle
+        def action(ev):
+            return func(self.Name)
+
+        if event is None:
+            event = self._Runable.StartingEvent
+
+        # content is a string or function taking a file handle
+        self._count+=1
+        self._Runable._RegisterEvent("File.{0}.WriteCustomOn.{1}".format(self.__name,self._count), 
+                            event, 
+                            testers.Lambda(action,
+                                    description_group="Appending File {0}".format(self.__name))
+                            )
+
+        
 
    

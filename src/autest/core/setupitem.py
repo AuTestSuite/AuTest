@@ -35,7 +35,9 @@ class SetupItem(object):
 
         # assume pass unless an error happens
         self._Result=testers.ResultType.Passed
-    
+        
+        # did we run this item
+        self.__ran=val=False
 
     # basic properties values we need
 
@@ -261,9 +263,23 @@ class SetupItem(object):
         This is done before we try to execute the setup logic
         '''
         self.__runable = test
+        self.onBind() # in case the item need to do something once we bind to the setup object
+
+    def onBind(self):
+        pass
 
     def cleanup(self):
         pass
+
+    def _AddMethod(self,func,name=None):    
+        m=func.__get__(self)
+        name = name if name is not None else func.__name__
+        setattr(self,name,m)
+
+    def _AddObject(self,obj,name=None):            
+        name = name if name is not None else obj.__name__
+        setattr(self,name,obj)
+        obj.Bind(self)
 
     @property
     def Env(self):

@@ -255,7 +255,8 @@ def main():
             'os':os,
             'ENV': env,
             'Variables': variables,
-            'Arguments': setup.arguments
+            'Arguments': setup.arguments,
+            "host":hosts.output,
             }
         execfile.execFile(options_file,locals,locals)
 

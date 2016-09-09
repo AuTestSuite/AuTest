@@ -4,6 +4,9 @@ from autest.core.testenity import TestEnity
 from .directory import Directory
 from .file import File
 import hosts.output as host
+import autest.glb as glb
+
+import os
 
 @smart_init
 class Disk(TestEnity):
@@ -16,8 +19,17 @@ class Disk(TestEnity):
         self.__dirs={}
 
     def File(self, name, exists=None, size=None, content=None, execute=None, id=None,
-             runtime=True):
-        tmp = File(self._Runable, name, exists, size, content, execute, runtime)
+             runtime=True,typename=None):
+        if typename is None:
+            ext=os.path.splitext(name)
+            # auto select file based on ext
+            cls=glb.FileExtMap.get(ext,File)
+        else:
+            # select file based on typename
+            cls=glb.FileTypeMap.get(typename,File)
+        
+        tmp = cls(self._Runable, name, exists, size, content, execute, runtime)
+
         if name in self.__files:
             host.WriteWarning("Overriding file object {0}".format(name))
         self.__files[name] = tmp

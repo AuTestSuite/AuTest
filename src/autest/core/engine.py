@@ -14,6 +14,7 @@ from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
 
+
 import os
 from fnmatch import fnmatch
 import time
@@ -101,6 +102,8 @@ class Engine(object):
         return result
 
     def _load_extensions(self):
+        # avoid import issues
+        from autest.testenities.file import File
         # load files of our extension type in the directory
 
         # Which directory to use
@@ -119,6 +122,7 @@ class Engine(object):
 
         # add expected API function so they can be called
         locals = {
+                'RegisterFileType':api.RegisterFileType,
                 'AddTestRunSet':api.ExtendTest, #backward compat
                 'ExtendTest':api.ExtendTest, 
                 'AddSetupTask':api.AddSetupItem, # backward compat
@@ -139,6 +143,8 @@ class Engine(object):
                 'All':testers.All,
                 'Not':testers.Not,
                 'When':glb.When(),
+                'File':File,
+                "host":host,
                 }
 
         # given it exists we want to load data from it

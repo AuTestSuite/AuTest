@@ -25,7 +25,7 @@ class Process(process.Process,TestEnity):
     @call_base(TestEnity=(),Process=("runable","name","cmdstr"))
     def __init__( self, runable, name, cmdstr=None):
         self.__streams = object()
-
+        self.__is_running = False
         #setup testables
         # ReturnCode
         self._Register(

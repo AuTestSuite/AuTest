@@ -13,7 +13,7 @@
     <Name>autest</Name>
     <RootNamespace>autest</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{bb38861f-b14a-4910-b3c1-e8e5d77e72bf}</InterpreterId>
+    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
     <InterpreterVersion>3.4</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <CommandLineArguments>-D .\test_failing\ -f ready1* --verbose --debug=all</CommandLineArguments>
@@ -28,13 +28,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="autest\api\file.py" />
     <Compile Include="autest\api\reporter.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="autest\api\setup.py" />
     <Compile Include="autest\api\testrun.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="autest\api\setup.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="autest\api\test.py">
@@ -104,6 +103,7 @@
     </Compile>
     <Compile Include="autest\setupitems\chown.py" />
     <Compile Include="autest\setupitems\copyas.py" />
+    <Compile Include="autest\setupitems\lambdaitem.py" />
     <Compile Include="autest\setupitems\makedir.py" />
     <Compile Include="autest\testers\container.py">
       <SubType>Code</SubType>
@@ -273,7 +273,7 @@
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env3.4\">
-      <Id>{bb38861f-b14a-4910-b3c1-e8e5d77e72bf}</Id>
+      <Id>{4e92d801-8d64-4f34-b036-2f046b8f4323}</Id>
       <BaseInterpreter>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</BaseInterpreter>
       <Version>3.4</Version>
       <Description>env3.4 (Python 64-bit 3.4)</Description>
