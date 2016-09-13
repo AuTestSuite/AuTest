@@ -51,8 +51,7 @@ class GoldFile(tester.Tester):
             gf_content = gf_content.replace("\r\n","\n")
 
         # make seqerncer differ
-        seq = difflib.SequenceMatcher(None,val_content,gf_content)
-        #seq = difflib.SequenceMatcher(None,gf_content,val_content)
+        seq = difflib.SequenceMatcher(None,val_content,gf_content,autojunk=False)
         #do we have a match
         if seq.ratio() == 1.0:
             #The says ratio everything matched
@@ -99,8 +98,7 @@ class GoldFile(tester.Tester):
         # this makes a nice string value..
         diff = difflib.Differ()
         self.Result = tester.ResultType.Failed
-        tmp_result = "\n".join(diff.compare(val_content.splitlines(),
-                                              newtext.splitlines()))
+
         tmp_result = "\n".join(diff.compare(newtext.splitlines(),
                                               val_content.splitlines()))
         
