@@ -2,8 +2,10 @@ from autest.api import AddWhenFunction
 import hosts.output as host
 
 import socket
-
+reported=0
 def PortOpen(port, address=None):
+    global reported
+    reported=0
     ret=False
     if address is None:
         address="localhost"
@@ -19,8 +21,10 @@ def PortOpen(port, address=None):
         ret = False  
     except socket.timeout:
         s = None
-    # high volume... so we do this in debug only
-    host.WriteDebug(["portopen", "when"], "checking port {0} = {1}".format(port,ret))
+    # high volume... so we do this in debug only    
+    if ret or reported%100==0:
+        host.WriteDebug(["portopen", "when"], "checking port {0} = {1}".format(port,ret))
+        reported+=1
     return ret
 
 AddWhenFunction(PortOpen)

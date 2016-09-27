@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 import autest.glb as glb
+import hosts.output as host
 from autest.common.constructor import call_base, smart_init
 from autest.exceptions.killonfailure import KillOnFailureError
 import time
@@ -62,7 +63,7 @@ class RunLogic(object):
         # This is great for items such as processes which more than 
         # one would be running at a given time
         started_items=[]
-        
+        host.WriteDebug(["runlogic"],"Starting objects")
         try:
             # note a given Item might be in the list more than once
             # this mean there are different requirements for the next item
@@ -85,24 +86,32 @@ class RunLogic(object):
                 # * have more than one process
                 # * are not at the end of the list
                 # * need to start and want to wait on being ready
-            
-                #if already started, it will just return                
-                started_items.append(logic_cls.Run(ready_item.object))
+                host.WriteDebugf(["runlogic"],"Starting object {0}",ready_item.object.Name)
+                starting_obj=logic_cls.Run(ready_item.object)
+                started_items.append(starting_obj)
                 
                 # Start timer as we have something
                 # we have to wait on, and we need to make
                 # sure we have a fallback if something is wrong with
                 # the isReady logic never becoming ready in time
                 ready_item.object._startReadyTimer()
+                try:
+                    hasRunFor = starting_obj.hasRunFor
+                except AttributeError:
+                    hasRunFor=None
                 isReady = False
                 while not isReady:
                     try:
-                        isReady = ready_item.readyfunc(**ready_item.args)
+                        isReady = ready_item.readyfunc(hasRunFor=hasRunFor,**ready_item.args)
                     except TypeError:
-                        isReady = ready_item.readyfunc()
+                        try:
+                            isReady = ready_item.readyfunc(**ready_item.args)
+                        except TypeError:
+                            isReady = ready_item.readyfunc()
                     # if it is ready set state on process
                     if isReady:
                         ready_item.object._stopReadyTimer()
+                        host.WriteDebugf(["runlogic"],"Object {0} is ready!",ready_item.object.Name)
                         continue
                     # verify we are running...
                     if not started_items[-1].isRunning():

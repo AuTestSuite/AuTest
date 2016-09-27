@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function
 from . import tester
 import hosts.output as host
 from autest.exceptions.killonfailure import KillOnFailureError
@@ -66,20 +67,27 @@ class GoldFile(tester.Tester):
         #get diffs
         results = seq.get_opcodes()
         newtext = ''
+        sub=False # true is we are doign a {} and have not had non-white space to replace
         for tag, i1, i2, j1, j2 in results:
             # technically we can see that we might have a real diff
             # but we continue as this allow certain values to be replaced
             # helping to make the
             # finial diff string more readable
+            data = gf_content[j1:j2].strip()
+            if data.strip() == '{}' or (data == '' and sub==True):
+                sub=True
+                data='{}'
+                if tag != 'insert':
+                    tag = "replace"
+            else:
+                sub=False
             if tag == "replace" :
-                data = gf_content[j1:j2]
                 tmp = self._do_action_replace(data,val_content[i1:i2])
                 if tmp:
                     newtext+=tmp
                     continue
 
             if tag == "insert" :
-                data = gf_content[j1:j2]
                 tmp = self._do_action_add(data,val_content[i1:i2])
                 if tmp is not None:
                     newtext+=tmp
@@ -130,7 +138,7 @@ class GoldFile(tester.Tester):
 
     def _do_action_add(self,data,text):
         try:        
-            if data == "{}":
+            if data.strip() == "{}":
                 return ''
         except KeyError:
             pass

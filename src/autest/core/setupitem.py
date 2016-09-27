@@ -195,7 +195,7 @@ class SetupItem(object):
             host.WriteVerbose("setup", "Changing ownership of {0} to uid {1} gid {2}".format(path, uid, gid))
         except OSError as e:
             # Operation not Permitted will just pass
-            host.WriteVerbose("setup", e) 
+            host.WriteVerbose("setup", "Chown-",e) 
             if e.errno != 1:
                 raise
 

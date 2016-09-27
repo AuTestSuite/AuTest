@@ -37,7 +37,7 @@ class Order(object):
             pass
         value = readyfunc
         if is_a.Number(value):
-            readyfunc = lambda: obj._hasRunFor(value)
+            readyfunc = lambda hasRunFor: hasRunFor(value)
         elif hasattr(readyfunc,"when_wrapper"):
             readyfunc=readyfunc(**args)
         return readyfunc,args
@@ -54,7 +54,7 @@ class Order(object):
             pass
         value = readyfunc
         if is_a.Number(value):
-            readyfunc = lambda: obj._hasRunFor(value)
+            readyfunc = lambda hasRunFor: hasRunFor(value)
         elif hasattr(readyfunc,"when_wrapper"):
             readyfunc=readyfunc(**args)
         return readyfunc,args        
@@ -107,10 +107,9 @@ class Order(object):
 
     @Ready.setter
     def Ready( self,test ):
-        #todo  need to fix this as this is process based.....
         if is_a.Number(test):
             host.WriteDebugf(["order"], "Setting ready logic to wait for {0} second for item {1}",test,self._ID)
-            self.__ready = lambda : self._hasRunFor(test)
+            self.__ready = lambda hasRunFor: hasRunFor(test)
         elif hasattr(test,"when_wrapper"):
             host.WriteDebugf(["order"], "Setting ready logic to {0} second for item {1}",test,self._ID)
             self.__ready = test()
@@ -118,8 +117,9 @@ class Order(object):
             host.WriteDebugf(["order"], "Setting ready logic to {0} second for item {1}",test,self._ID)
             self.__ready = test
 
-    def _isReady( self,*lst,**kw ):
+    def _isReady( self,*lst,**kw ):        
         if self.__ready is None:
+            host.WriteDebugf(["order",'when','process'], "Calling Default isReady() function",)
             return True
         try:
             return self.__ready(*lst,**kw)

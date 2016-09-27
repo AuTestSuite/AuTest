@@ -7,10 +7,10 @@ from .constructor import call_base, smart_init
 class Event(object):
     
     def __init__(self):
-        self.__callbacks = set()
+        self.__callbacks = []
 
     def Connect(self, callback):
-        self.__callbacks.add(callback)
+        self.__callbacks.append(callback)
         return self
 
     def __iadd__(self, callback):
