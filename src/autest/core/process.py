@@ -15,7 +15,7 @@ import os
 class Process(Runable,Order,Item):
     __slots__ = []
     @call_base(Runable=("runable",),Order=(),Item=(None,"name"))
-    def __init__( self, runable, name, cmdstr=None,use_shell=False ):         
+    def __init__( self, runable, name, cmdstr=None,use_shell=None ):         
         self.__cmdstr = cmdstr
         self.__use_shell = use_shell
         self.__streams = object()

@@ -1,8 +1,8 @@
 Test.Summary="Test a case of deafult ready logic for start different propocesses"
 
-Test.SkipUnless(Condition.HasProgram("curl","Curl need to be installed on system for this test to work"))
+Test.SkipUnless(Condition.HasProgram("curl", "Curl need to be installed on system for this test to work"))
 
-Setup.Copy("server.py","server")
+Setup.Copy("server.py", "server")
 
 tr=Test.AddTestRun()
 s=tr.Processes.Process("server","python server --time=1 --port 8080",returncode=None)

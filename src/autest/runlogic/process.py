@@ -99,8 +99,8 @@ class Process_RunLogic(RunLogic):
         
         # test to see that this might need a shell
         try:
-            if self._process.ForceUseShell:
-                shell=True
+            if self._process.ForceUseShell is not None:
+                shell=self._process.ForceUseShell
             else:
                 shell = self.isShellCommand(command_line)
             
@@ -117,7 +117,7 @@ class Process_RunLogic(RunLogic):
         host.WriteDebugf(["process"],"Calling StartingRun event with {0} callbacks mapped to it",len(self._process.StartingEvent))
         self._process.StartingEvent(eventinfo.StartingInfo())  
 
-        #host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._process._RootRunable.RunDirectory,env['PATH'])
+        host.WriteVerbosef(["process"],"Running command:\n '{0}'\n in directory='{1}'\n Path={2}",command_line,self._process._RootRunable.RunDirectory,env['PATH'])
         host.WriteDebugf(["process"], "Passing arguments to subprocess as: {0}",args)
         if is_a.List(args):
             finalcmd=subprocess.list2cmdline(args)

@@ -22,8 +22,8 @@ class RunLogic(object):
 
     def StopItems(self,items,longwait=None,shortwait=None):
         for i in self.ShutdownItems(items,longwait,shortwait):
-                if not i: 
-                    break
+            if not i: 
+                break
 
     def ShutdownItems(self,items,longwait=None,shortwait=None):
         if longwait is None:
