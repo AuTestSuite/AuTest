@@ -53,12 +53,40 @@ class RunLogic(object):
     def PollItems(self,items):
         ret=False
         for i in items:
-            # tmp= i.Poll()
-            tmp= i.Poll()
+            tmp = i.Poll()
             ret |= tmp
         yield ret
             
+
+    def isReady(self,item,hasrunfor):
+        '''
+            Test the item mapped ready function as well as the
+            the object own ready function (given it has one) 
+        '''
+        obj=item.object
+        isReady=True
+        isObjReady=True
+        args=item.args
+        try:
+            isObjReady = obj._isReady(hasRunFor=hasrunfor,**args)
+        except TypeError:
+            try:
+                isObjReady = obj._isReady(**args)
+            except TypeError:
+                isObjReady = obj._isReady()
+
+        try:
+            isReady = item.readyfunc(hasRunFor=hasrunfor,**args)
+        except TypeError:
+            try:
+                isReady = item.readyfunc(**args)
+            except TypeError:
+                isReady = item.readyfunc()
+        
+        return isReady and isObjReady
+
     def StartOrderedItemsAync(self,items,logic_cls):
+        
         # this function start a bunch of item at the same time
         # This is great for items such as processes which more than 
         # one would be running at a given time
@@ -100,14 +128,25 @@ class RunLogic(object):
                 except AttributeError:
                     hasRunFor=None
                 isReady = False
+                
+                #check to see if should delay the start of the object for some reason
+                if ready_item.object.DelayStart:
+                    delay_start=time.time()
+                    while delay_time < ready_item.object.DelayStart:
+                        # poll other items
+                        for f in started_items:
+                            if f.isRunning():
+                                try:
+                                    # Need to do poll on running processes to make sure any events or test run correctly
+                                    # while we start up the set of processes
+                                    f.Poll()
+                                except KillOnFailureError:
+                                    self.StopItems(started_items)
+                                    return 'Delaying start of {0}'.format(ready_item.object.Name), "Test run stopped because Kill On Failure from {0}".format(f.Name)
+                        delay_time=time-time()-delay_start
+
                 while not isReady:
-                    try:
-                        isReady = ready_item.readyfunc(hasRunFor=hasRunFor,**ready_item.args)
-                    except TypeError:
-                        try:
-                            isReady = ready_item.readyfunc(**ready_item.args)
-                        except TypeError:
-                            isReady = ready_item.readyfunc()
+                    isReady = self.isReady(ready_item,hasRunFor)                                        
                     # if it is ready set state on process
                     if isReady:
                         ready_item.object._stopReadyTimer()
@@ -136,5 +175,8 @@ class RunLogic(object):
         except KillOnFailureError as e:
             self.StopItems(started_items)
             return 'KillOnFailure while starting {0} {1}'.format(typename,ready_item.object.Name), e.info
+        except:
+            self.StopItems(started_items)
+            raise
         return started_items
 

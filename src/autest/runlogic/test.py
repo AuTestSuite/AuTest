@@ -35,6 +35,7 @@ class Test_RunLogic(RunLogic):
         self.__test = None # The test object
         self._default = None # the default process object (info)
         self.__start_time = None # When did we start running.
+        self.__delay_time = None # when we have to delay start of the test run
     
     def isRunning( self ):
         return  self.__running
@@ -132,6 +133,15 @@ class Test_RunLogic(RunLogic):
         self.Poll()
         self.__running = False
 
+    def startTestRun(self): 
+        # start item
+        self.__current_run = TestRun_RunLogic.Run(self.__task_stack[0])
+        # map any processes that are defined by the test, but are started by the test run
+        self.__tr_running_processes+=self.__current_run.TestProcesses
+        #pop off first item
+        self.__task_stack = self.__task_stack[1:]
+        self.__delay_time=None
+
     def Poll( self ):
         while not self.__running:
             return False
@@ -142,14 +152,19 @@ class Test_RunLogic(RunLogic):
         ret = False
         stack_len = len(self.__task_stack)
         
-        if self.__current_run is None and stack_len:
-            # we don't have a anything running start up first item on list
-            self.__current_run = TestRun_RunLogic.Run(self.__task_stack[0])
-            # map any processes that are defined by the test, but are started by the test run
-            self.__tr_running_processes+=self.__current_run.TestProcesses
-            #pop off first item
-            self.__task_stack = self.__task_stack[1:]
+        if self.__delay_time:
+            if time.time() - self.__delay_time > self.__task_stack[0].DelayStart:
+                self.startTestRun()
             ret = True
+        elif self.__current_run is None and stack_len:
+            # we don't have a anything running start up first item on list
+            # check for DelayStart
+            if self.__task_stack[0].DelayStart and self.__delay_time is None:
+                host.WriteVerbosef(["test_logic"],"Delaying start of test run {0} by {1} sec",self.__task_stack[0].Name,self.__task_stack[0].DelayStart)
+                self.__delay_time=time.time()    
+            else:
+               self.startTestRun()
+            ret= True
         elif self.__current_run and self.__current_run.Poll(): # are we still running
             # poll running processes
             try:
@@ -198,6 +213,7 @@ class Test_RunLogic(RunLogic):
 
             # do we have another item to run
             if stack_len:
+                # are we skipping tests if we have a failure
                 if skip:
                     host.WriteVerbosef(["test_logic"],"Skipping rest of the test: {0}",self.__test.Name)
                     # skip test
@@ -208,12 +224,13 @@ class Test_RunLogic(RunLogic):
                         self.__task_stack = self.__task_stack[1:]
                     ret = False
                 else:
-                    # start and run test new test run
-                    self.__current_run = TestRun_RunLogic.Run(self.__task_stack[0])
-                    # map any processes that are defined by the test, but are started by the test run
-                    self.__tr_running_processes+=self.__current_run.TestProcesses
-                    self.__task_stack = self.__task_stack[1:]
-                    ret = True
+                    # start next test
+                    if self.__task_stack[0].DelayStart and self.__delay_time is None:
+                        host.WriteVerbosef(["test_logic"],"Delaying start of test run {0} by {1} sec",self.__task_stack[0].Name,self.__task_stack[0].DelayStart)
+                        self.__delay_time=time.time()    
+                    else:
+                        self.startTestRun()
+                    ret= True
 
         if ret == False:
             # all the test runs are done

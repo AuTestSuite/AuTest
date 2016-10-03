@@ -42,8 +42,9 @@ class Process_RunLogic(RunLogic):
 
     def hasRunFor( self,t ):
         #Test to see if we have run so long
-        host.WriteDebugf(["process"], "Checking if time passed has been {0} seconds", t)
-        return (time.time() - self.__start_time) >= t
+        runtime=time.time() - self.__start_time
+        host.WriteDebugf(["process"], "Checking if time passed has been {0} seconds: ran for {1} sec", t,runtime)
+        return runtime >= t
 
     def ListCmd(self,cmdstr):
         # hacky function to help deal with command that need a shell without breaking older test files

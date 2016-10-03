@@ -24,6 +24,8 @@ class Order(object):
         #ready logic
         self.__ready=None
         self.__startup_time=None
+        #delay logic
+        self.__delay_start=None
 
     def _setupReadyStart(self,obj,*lst,**kw):        
         #validate this is an order object
@@ -100,6 +102,14 @@ class Order(object):
             readyfunc, args=self._setupReady(obj,*lst,**kw)
             host.WriteDebugf(["endafter"], "Setting ready logic to wait for object {0} with readyfunc {1}", obj, readyfunc)
             self.__endafter[obj] = (readyfunc, args)
+
+    @property
+    def DelayStart(self):
+        return self.__delay_start
+
+    @DelayStart.setter
+    def DelayStart(self,time):
+        self.__delay_start=time
 
     @property
     def Ready( self ):
