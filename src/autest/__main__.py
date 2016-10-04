@@ -79,7 +79,7 @@ class Settings(object):
     def unknowns( self ):
         return self.__unknowns
 
-    def finial_parse( self ):
+    def final_parse( self ):
         self.__arguments = self.__parser.parse_args()
 
     def partial_parse( self ):
@@ -245,7 +245,7 @@ def main():
         locals = {'Settings': setup}
         execfile.execFile(options_file,locals,locals)
     ## parse the options and error if we have unknown options
-    setup.finial_parse()
+    setup.final_parse()
     hosts.output.WriteDebugf("init","After extension load: args = {0}",setup.arguments)
     
     ## see if we have any custom setup we want to do globally.
