@@ -18,16 +18,16 @@ import inspect
 #--------------
 class extendAction(argparse.Action):
     def __init__( self,
-                 option_strings,
-                 dest,
-                 nargs=None,
-                 const=None,
-                 default=None,
-                 type=None,
-                 choices=None,
-                 required=False,
-                 help=None,
-                 metavar=None ):
+                  option_strings,
+                  dest,
+                  nargs=None,
+                  const=None,
+                  default=None,
+                  type=None,
+                  choices=None,
+                  required=False,
+                  help=None,
+                  metavar=None ):
 
         if is_a.Int(nargs) and nargs <= 1:
             raise ValueError('Invalid value for nargs:\n must be "+" or "*" or a number greater than 1')
