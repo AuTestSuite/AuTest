@@ -16,6 +16,7 @@ from autest.core import conditions
 
 
 import os
+import sys
 from fnmatch import fnmatch
 import time
 import shutil
@@ -147,6 +148,9 @@ class Engine(object):
                 "host":host,
                 }
 
+        old_path=sys.path[:]
+        sys.path.append(path)
+
         # given it exists we want to load data from it
         if os.path.exists(path):
             host.WriteVerbose("engine","Loading Extensions from {0}".format(path))
@@ -158,6 +162,7 @@ class Engine(object):
             host.WriteError("Custom autest-site path note found. Looking for:\n {0}".format(path))
         else:
             host.WriteVerbose("engine","autest-site path not found")
+        sys.path=old_path
 
     def _scan_for_tests(self):
         # scan for tests in and under the provided test directory

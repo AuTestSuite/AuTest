@@ -9,7 +9,6 @@ import autest.common.execfile as execfile
 import hosts
 import hosts.output
 from hosts.console import ConsoleHost
-import copy
 import autest
 import autest.common.is_a as is_a
 from autest.core.variables import Variables
@@ -239,10 +238,15 @@ def main():
         #This is a custom location
         path = os.path.abspath(setup.arguments.autest_site)
 
+    old_path=sys.path[:]
+    sys.path.append(path)
     ## see if we have a file to load to get new options
     options_file = os.path.join(path,"init.cli.ext")
     if os.path.exists(options_file):
-        locals = {'Settings': setup}
+        locals = {
+            'Settings': setup,
+            'AutestSitePath':path
+            }
         execfile.execFile(options_file,locals,locals)
     ## parse the options and error if we have unknown options
     setup.final_parse()
@@ -257,9 +261,10 @@ def main():
             'Variables': variables,
             'Arguments': setup.arguments,
             "host":hosts.output,
+            'AutestSitePath':path
             }
         execfile.execFile(options_file,locals,locals)
-
+    sys.path=old_path
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options, or maybe not
     myEngine = Engine(jobs=setup.arguments.jobs,
