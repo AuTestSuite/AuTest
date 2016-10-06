@@ -50,7 +50,7 @@ class Process_RunLogic(RunLogic):
         # hacky function to help deal with command that need a shell without breaking older test files
         lex=shlex.shlex(cmdstr,posix=True)
         #lex.escape+="<>|"
-        lex.wordchars+='-$%><&.=:%^'
+        lex.wordchars+='-$%><&.=:%^/\\'
         lex.commenters=''
         return list(lex)        
 
@@ -97,7 +97,6 @@ class Process_RunLogic(RunLogic):
         env=self._process.ComposeEnv() # get the correct shell env for the process
         template = string.Template(command_line)
         command_line = template.substitute(env)
-        
         # test to see that this might need a shell
         try:
             if self._process.ForceUseShell is not None:
