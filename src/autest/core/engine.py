@@ -42,7 +42,7 @@ class Engine(object):
         # setup the thread poool to run all the tasks
         #if jobs > 1:
             #self.__pool = ThreadPool(jobs)
-        
+
         #set the engine to be easy to access
         if glb.Engine:
             raise RuntimeError("Only one engine can be created at a time")
@@ -62,7 +62,7 @@ class Engine(object):
 
         
         if os.path.exists(self.__run_dir):
-            
+
             host.WriteVerbose("engine", "The Sandbox directory exists, will try to remove")
             oldExceptionArgs = None
             while True:
@@ -133,6 +133,7 @@ class Engine(object):
                 'AddTestRunMember':api.AddTestEnityMember, # backward compat
                 'AddTestEnityMember':api.AddTestEnityMember,
                 'AddWhenFunction':api.AddWhenFunction,
+                'AddMethodToInstance':api.AddMethodToInstance,
                 'AUTEST_SITE_PATH':path,
                 'SetupError':SetupError,
                 # make it easy to define extension

@@ -40,7 +40,7 @@ class Process_RunLogic(RunLogic):
         self.__startup_timeout = None
         
 
-    def hasRunFor( self,t ):
+    def hasRunFor(self,t):
         #Test to see if we have run so long
         runtime=time.time() - self.__start_time
         host.WriteDebugf(["process"], "Checking if time passed has been {0} seconds: ran for {1} sec", t,runtime)
@@ -58,10 +58,10 @@ class Process_RunLogic(RunLogic):
         
         # some command characters that suggest we wanted to run in a shell
         core_operators  = ';&><|'
-        shell_args = [';','&&','&','>','>>','<','|','||','cd','set','export',]
+        shell_args = [';', '&&', '&', '>', '>>', '<', '|', '||', 'cd', 'set', 'export', ]
         if os.name == 'nt':
             # extra stuff for windows.. not complete, but common stuff
-            shell_args = ['echo','dir','del','rmdir','rd','move','rename','mkdir']
+            shell_args = ['echo', 'dir', 'del', 'rmdir', 'rd', 'move', 'rename', 'mkdir']
         for arg in self.ListCmd(cmdstr):
             if arg.lower() in shell_args:
                 return True
