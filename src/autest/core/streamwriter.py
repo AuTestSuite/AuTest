@@ -6,31 +6,46 @@ import threading
 import re
 import os
 import sys
-   
+
 class PipeRedirector(object):
     '''
     This class redirects and output stream to stream handler that can then process the data on
-    the different streams provided by the uihost. In the case of the command that this is used 
+    the different streams provided by the uihost. In the case of the command that this is used
     for this primarly lets us sort the data into different stream files for testing purposes
     '''
     def _readerthread(self):
-        for i in iter(self.pipein):
-            i=i.decode("utf-8") 
-            self.writer(i)
-            host.WriteDebug(['process_output'],i,end='')
-    
-                
 
-    def __init__(self,pipein,writer):
+        line = ' '
+        try:
+            while line:
+                line = self.pipein.readline()
+                if line:
+                    self.writer(line)
+                    host.WriteDebug(['process_output'], line, end='')
+        except:
+            # There was an error... that shouldn't happen, but still it did. So we report it
+            # to the caller and close our pipe end so that spawned program won't block
+            self.error = traceback.format_exc()
+            self.pipein.close()
+            self.pipein = None
+
+        #for i in iter(self.pipein):
+#            i=i.decode("utf-8")
+#            self.writer(i)
+#            host.WriteDebug(['process_output'],i,end='')
+
+
+
+    def __init__(self, pipein, writer):
         self.pipein = pipein
         self.writer = writer
         self.thread = threading.Thread(
-                            target=self._readerthread,
-                            args=()
+                            target = self._readerthread,
+                            args = ()
                             )
         self.executing = True
         self.thread.start()
-        
+
     def close(self):
         if self.executing == True:
             self.executing = False
