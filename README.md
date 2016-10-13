@@ -25,10 +25,17 @@ How do I get set up?
 ----------------------------------
 Make sure you have python installed
 
-To install run the command:
+To install run the command to get latest published version:
 ~~~~
  pip install autest
 ~~~~
+
+To install the latest development version, run the command:
+~~~~
+pip install git+https://dragon512@bitbucket.org/dragon512/reusable-gold-testing-system.git
+~~~~
+
+
 
 Basic usage
 ----------------------------------
