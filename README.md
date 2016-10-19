@@ -45,8 +45,8 @@ In the directory containing the tests run:
 autest
 ~~~~
 
-Read documentation to learn how to use write and use autest in more detail
-<fill in once we have documenation written>
+Read [documentation](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/Home) to learn how to use write and use AuTest in more detail
+[here.](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/Home)
 
 Contribution guidelines
 ----------------------------------
