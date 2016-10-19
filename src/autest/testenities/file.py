@@ -117,8 +117,11 @@ class File(TestEnity):
         self.__name = val
 
     def GetSize(self):
-        statinfo = os.stat(self.AbsPath)
-        return statinfo.st_size
+        try:
+            statinfo = os.stat(self.AbsPath)
+            return statinfo.st_size
+        except:
+            return None
 
     def WriteOn(self,content,event=None):
         # content is a string or function taking a file handle

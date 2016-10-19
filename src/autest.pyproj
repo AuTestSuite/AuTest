@@ -29,6 +29,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="autest\api\file.py" />
+    <Compile Include="autest\api\global.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="autest\api\reporter.py">
       <SubType>Code</SubType>
     </Compile>

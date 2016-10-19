@@ -44,7 +44,7 @@ class Process(process.Process,TestEnity):
                     testers.LessThan,
                     "TotalRunTime",
                     self.RunningEvent,
-                    converter=int,
+                    converter=float,
                     kill_on_failure=True
                 ),"TimeOut"
             )
@@ -55,7 +55,7 @@ class Process(process.Process,TestEnity):
                     testers.LessThan,
                     "TotalTime",
                     self.FinishedEvent,
-                    converter=int,
+                    converter=float,
                     kill_on_failure=True
                 ),"Time"
             )
