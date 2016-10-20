@@ -7,13 +7,12 @@ from . import setupitem
 from . import runtesttask
 import autest.testers.tester as testers
 from autest.common.disk import remove_read_only
-from . import report 
+from . import report
 from . import test
 from autest.runlogic.test import Test_RunLogic
 from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
-
 
 import os
 import sys
@@ -22,18 +21,27 @@ import time
 import shutil
 
 
-
 class Engine(object):
     """description of class"""
 
-    def __init__(self, jobs=1, test_dir='./', run_dir="./_sandbox", autest_site=None,
-                 filters='*', reporters=['default'], dump_report=False, env=None, variables=None):
+    def __init__(self,
+                 jobs=1,
+                 test_dir='./',
+                 run_dir="./_sandbox",
+                 autest_site=None,
+                 filters='*',
+                 reporters=['default'],
+                 dump_report=False,
+                 env=None,
+                 variables=None):
 
-        self.__tests = {}  # the dict of the different tests we have {name:testobj}
+        self.__tests = {
+        }  # the dict of the different tests we have {name:testobj}
         self.__jobs = jobs  # how many jobs to try to run at a given time
         self.__test_dir = test_dir  # this the root directory to look for the tests
-        self.__run_dir = os.path.abspath(run_dir) # this is the directory to run the tests in
-        self.__autest_site = autest_site # any special autest directory to look up.  None uses standard one
+        self.__run_dir = os.path.abspath(
+            run_dir)  # this is the directory to run the tests in
+        self.__autest_site = autest_site  # any special autest directory to look up.  None uses standard one
         self.__filters = filters  # which set of tests to run
         self.__ENV = env
         self.__variables = variables
@@ -41,13 +49,12 @@ class Engine(object):
 
         # setup the thread poool to run all the tasks
         #if jobs > 1:
-            #self.__pool = ThreadPool(jobs)
+        #self.__pool = ThreadPool(jobs)
 
         #set the engine to be easy to access
         if glb.Engine:
             raise RuntimeError("Only one engine can be created at a time")
         glb.Engine = self
-       
 
     def Start(self):
 
@@ -60,10 +67,10 @@ class Engine(object):
         # load built in reporter object
         import autest.reporters
 
-        
         if os.path.exists(self.__run_dir):
 
-            host.WriteVerbose("engine", "The Sandbox directory exists, will try to remove")
+            host.WriteVerbose(
+                "engine", "The Sandbox directory exists, will try to remove")
             oldExceptionArgs = None
             while True:
                 try:
@@ -83,23 +90,25 @@ class Engine(object):
                     # no exceptions, the directory was wiped
                     break
             host.WriteVerbose("engine", "The Sandbox directory was removed")
-        
+
         host.WriteVerbose("engine", "Loading Extensions")
         self._load_extensions()
-        
+
         host.WriteVerbose("engine", "Scanning for tests")
         self._scan_for_tests()
         if not self.__tests:
             host.WriteMessage("No tests found to run")
-            host.WriteMessage("If your tests are in a different directory try using --directory=<path with tests>")
+            host.WriteMessage(
+                "If your tests are in a different directory try using --directory=<path with tests>"
+            )
             return ""
-        
+
         host.WriteVerbose("engine", "Running tests")
         self._run_tests()
-        
+
         host.WriteVerbose("engine", "Making report")
         result = self._make_report()
-        
+
         return result
 
     def _load_extensions(self):
@@ -110,65 +119,69 @@ class Engine(object):
         # Which directory to use
         if self.__autest_site is None:
             # this is the default
-            path = os.path.join(self.__test_dir,'autest-site')
+            path = os.path.join(self.__test_dir, 'autest-site')
             # hack to deal with backward compatiblity
-            old_path=os.path.join(self.__test_dir,'gtest-site')
+            old_path = os.path.join(self.__test_dir, 'gtest-site')
             if not os.path.exists(path) and os.path.exists(old_path):
-                host.WriteWarning("Depracated gest-site found!\n Please rename to autest-site".format(path))
-                path = os.path.join(self.__test_dir,'gtest-site')
+                host.WriteWarning(
+                    "Depracated gest-site found!\n Please rename to autest-site".
+                    format(path))
+                path = os.path.join(self.__test_dir, 'gtest-site')
         else:
             #This is a custom location
             path = os.path.abspath(self.__autest_site)
 
-
         # add expected API function so they can be called
         locals = {
-                'RegisterFileType':api.RegisterFileType,
-                'AddTestRunSet':api.ExtendTest, #backward compat
-                'ExtendTest':api.ExtendTest, 
-                'AddSetupTask':api.AddSetupItem, # backward compat
-                'AddSetupItem':api.AddSetupItem,
-                'SetupTask':setupitem.SetupItem, # backward compat
-                'SetupItem':setupitem.SetupItem,
-                'AddTestRunMember':api.AddTestEnityMember, # backward compat
-                'AddTestEnityMember':api.AddTestEnityMember,
-                'AddWhenFunction':api.AddWhenFunction,
-                'AddMethodToInstance':api.AddMethodToInstance,
-                'AUTEST_SITE_PATH':path,
-                'SetupError':SetupError,
-                # make it easy to define extension
-                'Condition': conditions.ConditionFactory(),
-                'Testers': testers,
-                # break these out of tester space
-                # to make it easier to right a test
-                'Any':testers.Any,
-                'All':testers.All,
-                'Not':testers.Not,
-                'When':glb.When(),
-                'File':File,
-                "host":host,
-                }
+            'RegisterFileType': api.RegisterFileType,
+            'AddTestRunSet': api.ExtendTest,  #backward compat
+            'ExtendTest': api.ExtendTest,
+            'AddSetupTask': api.AddSetupItem,  # backward compat
+            'AddSetupItem': api.AddSetupItem,
+            'SetupTask': setupitem.SetupItem,  # backward compat
+            'SetupItem': setupitem.SetupItem,
+            'AddTestRunMember': api.AddTestEnityMember,  # backward compat
+            'AddTestEnityMember': api.AddTestEnityMember,
+            'AddWhenFunction': api.AddWhenFunction,
+            'AddMethodToInstance': api.AddMethodToInstance,
+            'AUTEST_SITE_PATH': path,
+            'SetupError': SetupError,
+            # make it easy to define extension
+            'Condition': conditions.ConditionFactory(),
+            'Testers': testers,
+            # break these out of tester space
+            # to make it easier to right a test
+            'Any': testers.Any,
+            'All': testers.All,
+            'Not': testers.Not,
+            'When': glb.When(),
+            'File': File,
+            "host": host,
+        }
 
-        old_path=sys.path[:]
+        old_path = sys.path[:]
         sys.path.append(path)
 
         # given it exists we want to load data from it
         if os.path.exists(path):
-            host.WriteVerbose("engine","Loading Extensions from {0}".format(path))
+            host.WriteVerbose("engine",
+                              "Loading Extensions from {0}".format(path))
             for f in os.listdir(path):
-                f = os.path.join(path,f)
+                f = os.path.join(path, f)
                 if os.path.isfile(f) and f.endswith("test.ext"):
-                    execfile.execFile(f,locals,locals)
+                    execfile.execFile(f, locals, locals)
         elif self.__autest_site is not None:
-            host.WriteError("Custom autest-site path note found. Looking for:\n {0}".format(path))
+            host.WriteError(
+                "Custom autest-site path note found. Looking for:\n {0}".
+                format(path))
         else:
-            host.WriteVerbose("engine","autest-site path not found")
-        sys.path=old_path
+            host.WriteVerbose("engine", "autest-site path not found")
+        sys.path = old_path
 
     def _scan_for_tests(self):
         # scan for tests in and under the provided test directory
         for root, dirs, files in os.walk(self.__test_dir):
-            host.WriteVerbose("test_scan","Looking for tests in",root)
+            host.WriteVerbose("test_scan", "Looking for tests in", root)
             # Note because we are using os.walk we get the file name with our
             # directory
             # this mean we have to check for duplicated in names else we will
@@ -186,17 +199,21 @@ class Engine(object):
                     for filter in self.__filters:
                         if not filter.startswith("*"):
                             filter = "*" + filter
-                        if fnmatch(os.path.join(root,name), filter):
+                        if fnmatch(os.path.join(root, name), filter):
                             # we have a match, use this test
                             break
                     else:
                         # did not get a match
-                        host.WriteVerbose("test_scan","   Skipping test",name)
+                        host.WriteVerbose("test_scan", "   Skipping test",
+                                          name)
                         continue
                     if name in self.__tests:
-                        host.WriteWarning("overiding test",name, "with test in", root)
-                    host.WriteVerbose("test_scan","   Found test",name)
-                    self.__tests[name] = test.Test(name,root,f,self.__run_dir,self.__test_dir,self.__ENV, self.__variables)
+                        host.WriteWarning("overiding test", name,
+                                          "with test in", root)
+                    host.WriteVerbose("test_scan", "   Found test", name)
+                    self.__tests[name] = test.Test(
+                        name, root, f, self.__run_dir, self.__test_dir,
+                        self.__ENV, self.__variables)
 
     def _run_tests(self):
         if self.__jobs > 1:
@@ -204,30 +221,29 @@ class Engine(object):
                 self.__pool.addTask(self.__run_test_task, t)
             self.__pool.waitCompletion()
         else:
-            tmp=list(self.__tests.keys())
+            tmp = list(self.__tests.keys())
             tmp.sort()
             for t in tmp:
                 self.__run_test_task(self.__tests[t])
 
     def __run_test_task(self, task):
-        runtesttask.RunTestTask(task,Test_RunLogic)()
-        
+        runtesttask.RunTestTask(task, Test_RunLogic)()
 
     def _make_report(self):
         info = report.ReportInfo(self.__tests.values())
         host.WriteMessage("\nGenerating Report: --------------")
 
         for r in self.__reporters:
-            func=glb.reporters.get(r)
+            func = glb.reporters.get(r)
             if func:
                 func(info)
             else:
-                host.WriteWarningf("Reported {0} not registered",r)
-        
+                host.WriteWarningf("Reported {0} not registered", r)
+
         # test to see if we have some failures or all failures
         if info.TotalPassCount == 0 and info.TotalTestCount:
-            return 10 # everything failed && we had some test
+            return 10  # everything failed && we had some test
         elif info.TotalNotPassCount:
-            return 1 # something failed
+            return 1  # something failed
         else:
             return 0

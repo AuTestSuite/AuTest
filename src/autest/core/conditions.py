@@ -11,8 +11,9 @@ import stat
 
 from builtins import object
 
+
 class Condition(object):
-    def __init__(self, testfunc, reason, pass_value,neg_reason=None):
+    def __init__(self, testfunc, reason, pass_value, neg_reason=None):
         self.__func = testfunc
         self.__msg = reason
         self.__pass_value = pass_value
@@ -37,7 +38,7 @@ class Condition(object):
     # where isPlatform would normal give a message that we
     # need to be platform X and we on platfom X to a different
     # message that we should not be platform X
-    @property   
+    @property
     def NegitiveMessage(self):
         if self.__neg_msg is not None:
             return self.__neg_msg
@@ -46,10 +47,10 @@ class Condition(object):
 
 
 class ConditionFactory(object):
-    def __call__(self,function,reason,pass_value=True,neg_reason=None):
-        return self.Condition(function,reason,pass_value,neg_reason)
+    def __call__(self, function, reason, pass_value=True, neg_reason=None):
+        return self.Condition(function, reason, pass_value, neg_reason)
 
-    def Condition(self,function,reason,pass_value=True,neg_reason=None):
+    def Condition(self, function, reason, pass_value=True, neg_reason=None):
         '''This is a general function for any condition testing
         it takes a a function that will return true or false
         a message to report why this condition failed ( and as such we skipped the test)
@@ -57,65 +58,58 @@ class ConditionFactory(object):
         the condition. defaults to True.. ie False is failure and True is passing.
         '''
 
-        ret = Condition(function,reason,pass_value,neg_reason)
+        ret = Condition(function, reason, pass_value, neg_reason)
         return ret
 
-    def HasRegKey(self,root,keys,msg):
-        return self.Condition(lambda : reg.has_regkey(root,keys),
-                       msg,
-                       True)
+    def HasRegKey(self, root, keys, msg):
+        return self.Condition(lambda: reg.has_regkey(root, keys), msg, True)
 
     #def RegistryKeyEqual(self,key,value):
-        #pass
+    #pass
 
-    def RunCommand(self,command,msg,pass_value=0,env=None,shell=False):
+    def RunCommand(self, command, msg, pass_value=0, env=None, shell=False):
         return self.Condition(lambda :subprocess.call(command,shell=False),
                        msg,
                        pass_value)
 
-    def HasProgram(self,program,msg,pass_value=True,path=None):
-        return self.Condition(lambda :ospath.has_program(program,path),
-                       msg,
-                       pass_value)
+    def HasProgram(self, program, msg, pass_value=True, path=None):
+        return self.Condition(lambda: ospath.has_program(program, path), msg,
+                              pass_value)
 
-    def IsPlatform(self,*lst):
-        return self.Condition(lambda :sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
-                       'Platform must be one of {0}, reported value was "{1}" or "{2}"'.format(lst,
-                                                                                              platform.system().lower(),
-                                                                                              os.name),
-                       True,
-                        'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.format(lst,
-                                                                                                  platform.system().lower(),
-                                                                                                  os.name),)
+    def IsPlatform(self, *lst):
+        return self.Condition(
+            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
+            'Platform must be one of {0}, reported value was "{1}" or "{2}"'.
+            format(lst, platform.system().lower(), os.name),
+            True,
+            'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.
+            format(lst, platform.system().lower(), os.name), )
 
-    def IsNotPlatform(self,*lst):
-        return self.Condition(lambda :sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
-                       'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.format(lst,
-                                                                                                  platform.system().lower(),
-                                                                                                  os.name),
-                       False,
-                        'Platform must be one of {0}, reported value was "{1}" or "{2}"'.format(lst,
-                                                                                              platform.system().lower(),
-                                                                                              os.name),)
+    def IsNotPlatform(self, *lst):
+        return self.Condition(
+            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
+            'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.
+            format(lst, platform.system().lower(), os.name),
+            False,
+            'Platform must be one of {0}, reported value was "{1}" or "{2}"'.
+            format(lst, platform.system().lower(), os.name), )
 
-    def true(self,msg):
-        return self.Condition(lambda : True,
-                       msg,
-                       True)
-
+    def true(self, msg):
+        return self.Condition(lambda: True, msg, True)
 
 
 class Conditions(object):
     """description of class"""
+
     def __init__(self):
         self.__condition_if = []
         self.__condition_unless = []
         self.__reason = None
 
-    def _AddConditionIf(self,conditions=[]):
+    def _AddConditionIf(self, conditions=[]):
         self.__condition_if.extend(conditions)
 
-    def _AddConditionUnless(self,conditions=[]):
+    def _AddConditionUnless(self, conditions=[]):
         self.__condition_unless.extend(conditions)
 
     # internal functions properties
@@ -147,4 +141,3 @@ class Conditions(object):
     def _Empty(self):
         '''Removes all condtions tests that have been defined'''
         self.__conditions = []
-
