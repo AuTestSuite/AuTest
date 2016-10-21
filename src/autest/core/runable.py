@@ -17,11 +17,13 @@ import abc
 
 # This is the base class needed to define some runable event object
 # in the frame work
+
+
 @smart_init
-class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
-   
+class Runable(with_metaclass(_test_enity__metaclass__, DelayedEventMapper)):
+
     @call_base(DelayedEventMapper=())
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
          # core events
         self.__SetupEvent = event.Event()
         self.__StartingEvent = event.Event()
@@ -30,30 +32,36 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
         self.__FinishedEvent = event.Event()
         self.__CleanupEvent = event.Event()
 
-        self.__env={}
-        self.__variables=Variables(parent=parent.Variables if parent else None)
-        self.__parent=parent
-        self.__result=None
-        self.__reason=None
+        self.__env = {}
+        self.__variables = Variables(
+            parent=parent.Variables if parent else None)
+        self.__parent = parent
+        self.__result = None
+        self.__reason = None
 
-    #event accessors
+    # event accessors
     @property
-    def SetupEvent( self ):
+    def SetupEvent(self):
         return self.__SetupEvent
+
     @property
-    def StartingEvent( self ):
+    def StartingEvent(self):
         return self.__StartingEvent
+
     @property
-    def StartedEvent( self ):
+    def StartedEvent(self):
         return self.__StartedEvent
+
     @property
-    def RunningEvent( self ):
+    def RunningEvent(self):
         return self.__RunningEvent
+
     @property
-    def FinishedEvent( self ):
+    def FinishedEvent(self):
         return self.__FinishedEvent
+
     @property
-    def CleanupEvent( self ):
+    def CleanupEvent(self):
         return self.__CleanupEvent
 
     @property
@@ -74,13 +82,13 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
     def _Run(self):
         raise NotImplementedError
 
-    def _do_run(self):        
+    def _do_run(self):
         self._run()
-    
+
     def ComposeEnv(self):
-        ret={}
+        ret = {}
         if self.__parent:
-            ret=self.__parent.ComposeEnv()
+            ret = self.__parent.ComposeEnv()
         ret.update(self.__env)
         return ret
 
@@ -89,15 +97,15 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
         return self.__env
 
     @Env.setter
-    def Env(self,val):
+    def Env(self, val):
         if not is_a.Dict(val):
             raise TypeError("value needs to be a dict type")
-        self.__env=val
-    
+        self.__env = val
+
     def ComposeVariables(self):
-        ret=Variables()
+        ret = Variables()
         if self.__parent:
-            ret=self.__parent.ComposeVariables()
+            ret = self.__parent.ComposeVariables()
         ret.update(self.__variables)
         return ret
 
@@ -106,22 +114,23 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
         return self.__variables
 
     @Variables.setter
-    def Variables(self,val):
+    def Variables(self, val):
         if not is_a.Dict(val):
             raise TypeError("value needs to be a dict type")
         self.__variables.update(val)
 
     @property
-    def _Testers( self ):
+    def _Testers(self):
         ret = []
         for x in self._GetCallBacks():
             if not isinstance(x, TesterSet):
                 # this is probally a lambda tester used internally in the code
                 ret.append(x[1])
             else:
-                ret+=[t for t in x._testers if isinstance(t, testers.tester.Tester)]
+                ret += [t for t in x._testers if isinstance(
+                    t, testers.tester.Tester)]
         return ret
-    
+
     @property
     def _ChildRunables(self):
         ''' 
@@ -136,12 +145,12 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
         if self.__result is None:
 
             # get any children
-            children=self._ChildRunables
+            children = self._ChildRunables
 
             # we have no tests to run?
-            if len(self._Testers) == 0 and len(children)==0:
-                self.__result=testers.ResultType.Passed
-                self.__result=testers.ResultType.Unknown
+            if len(self._Testers) == 0 and len(children) == 0:
+                self.__result = testers.ResultType.Passed
+                self.__result = testers.ResultType.Unknown
                 return self.__result
 
             # get results of this runnable
@@ -149,33 +158,33 @@ class Runable(with_metaclass(_test_enity__metaclass__,DelayedEventMapper)):
             for i in self._Testers:
                 if self.__result < i.Result:
                     self.__result = i.Result
-           
+
             # get the results of the children
             for child in children:
                 if self.__result < child._Result:
                     self.__result = child._Result
-                        
+
         return self.__result
 
     @_Result.setter
-    def _Result(self,val):
-        self.__result=val
+    def _Result(self, val):
+        self.__result = val
 
     @property
     def _Reason(self):
         return self.__reason
-    
+
     @_Reason.setter
     def _Reason(self, value):
         self.__reason = value
 
     # for more detailed extention handling
-    def _AddMethod(self,func,name=None):    
-        m=func.__get__(self)
+    def _AddMethod(self, func, name=None):
+        m = func.__get__(self)
         name = name if name is not None else func.__name__
-        setattr(self,name,m)
+        setattr(self, name, m)
 
-    def _AddObject(self,obj,name=None):            
+    def _AddObject(self, obj, name=None):
         name = name if name is not None else obj.__name__
-        setattr(self,name,obj)
+        setattr(self, name, obj)
         obj.Bind(self)

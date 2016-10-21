@@ -5,24 +5,26 @@ import re
 from . import tester
 from autest.exceptions.killonfailure import KillOnFailureError
 
+
 class ContainsExpression(tester.Tester):
-    def __init__(self, regexp, description, killOnFailure = False, description_group = None, reflags=0):
+
+    def __init__(self, regexp, description, killOnFailure=False, description_group=None, reflags=0):
         if isinstance(regexp, str):
             if reflags:
-                regexp = re.compile(regexp,reflags)
+                regexp = re.compile(regexp, reflags)
             else:
-                regexp = re.compile(regexp)            
+                regexp = re.compile(regexp)
         self._multiline = regexp.flags & re.M
         super(ContainsExpression, self).__init__(
-                                    value=regexp,
-                                    test_value=None,
-                                    kill_on_failure=killOnFailure,
-                                    description_group=description_group,
-                                    description=description
-                                    )
+            value=regexp,
+            test_value=None,
+            kill_on_failure=killOnFailure,
+            description_group=description_group,
+            description=description
+        )
 
     def test(self, eventinfo, **kw):
-        filename=self._GetContent(eventinfo)
+        filename = self._GetContent(eventinfo)
         if filename is None:
             filename = self.TestValue.AbsPath
         result = tester.ResultType.Passed
@@ -54,5 +56,7 @@ class ContainsExpression(tester.Tester):
             if self.KillOnFailure:
                 raise KillOnFailureError
         else:
-            self.Reason = 'Contents of {0} contained expression'.format(filename)
-        host.WriteVerbose(["testers.ContainsExpression","ContainsExpression"],"{0} - ".format(tester.ResultType.to_color_string(self.Result)),self.Reason)
+            self.Reason = 'Contents of {0} contained expression'.format(
+                filename)
+        host.WriteVerbose(["testers.ContainsExpression", "ContainsExpression"],
+                          "{0} - ".format(tester.ResultType.to_color_string(self.Result)), self.Reason)

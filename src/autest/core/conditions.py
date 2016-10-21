@@ -13,17 +13,18 @@ from builtins import object
 
 
 class Condition(object):
+
     def __init__(self, testfunc, reason, pass_value, neg_reason=None):
         self.__func = testfunc
         self.__msg = reason
         self.__pass_value = pass_value
         self.__neg_msg = neg_reason
 
-    #python 2
+    # python 2
     def __nonzero__(self):
         return self.Pass()
 
-    #python 3
+    # python 3
     def __bool__(self):
         return self.Pass()
 
@@ -47,6 +48,7 @@ class Condition(object):
 
 
 class ConditionFactory(object):
+
     def __call__(self, function, reason, pass_value=True, neg_reason=None):
         return self.Condition(function, reason, pass_value, neg_reason)
 
@@ -64,13 +66,13 @@ class ConditionFactory(object):
     def HasRegKey(self, root, keys, msg):
         return self.Condition(lambda: reg.has_regkey(root, keys), msg, True)
 
-    #def RegistryKeyEqual(self,key,value):
-    #pass
+    # def RegistryKeyEqual(self,key,value):
+    # pass
 
     def RunCommand(self, command, msg, pass_value=0, env=None, shell=False):
-        return self.Condition(lambda :subprocess.call(command,shell=False),
-                       msg,
-                       pass_value)
+        return self.Condition(lambda: subprocess.call(command, shell=False),
+                              msg,
+                              pass_value)
 
     def HasProgram(self, program, msg, pass_value=True, path=None):
         return self.Condition(lambda: ospath.has_program(program, path), msg,
@@ -78,7 +80,8 @@ class ConditionFactory(object):
 
     def IsPlatform(self, *lst):
         return self.Condition(
-            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
+            lambda: sys.platform.lower() in lst or platform.system(
+            ).lower() in lst or os.name.lower() in lst,
             'Platform must be one of {0}, reported value was "{1}" or "{2}"'.
             format(lst, platform.system().lower(), os.name),
             True,
@@ -87,7 +90,8 @@ class ConditionFactory(object):
 
     def IsNotPlatform(self, *lst):
         return self.Condition(
-            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
+            lambda: sys.platform.lower() in lst or platform.system(
+            ).lower() in lst or os.name.lower() in lst,
             'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.
             format(lst, platform.system().lower(), os.name),
             False,

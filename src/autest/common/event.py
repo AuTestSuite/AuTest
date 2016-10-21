@@ -2,10 +2,12 @@ from __future__ import absolute_import, division, print_function
 from .constructor import call_base, smart_init
 
 # simple event class
-# need to look at extending this or 
+# need to look at extending this or
 # finding a usable existing solution
+
+
 class Event(object):
-    
+
     def __init__(self):
         self.__callbacks = []
 
@@ -26,25 +28,26 @@ class Event(object):
         return self
 
     def __isub__(self, callback):
-        return self.Disconnect(callback)    
+        return self.Disconnect(callback)
 
     def __call__(self, *args, **kargs):
         for callback in self.__callbacks:
-            #print " ",callback.Description
+            # print " ",callback.Description
             callback(*args, **kargs)
-            #print " ",callback.Reason
+            # print " ",callback.Reason
 
     def __len__(self):
         return len(self.__callbacks)
 
     @property
     def Testers(self):
-        return  self.__callbacks
+        return self.__callbacks
 
 
-#util class
+# util class
 @smart_init
 class EventInfo(object):
+
     @call_base()
     def __init__(self):
         pass

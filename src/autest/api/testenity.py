@@ -7,26 +7,28 @@ from autest.core.testrun import TestRun
 
 import types
 
-def AddTestEnityMember( clsobj, name=None, classes=None ):
+
+def AddTestEnityMember(clsobj, name=None, classes=None):
     # imported here to break import cycle
     from autest.testenities.process import Process
-    
-    if not issubclass(clsobj,TestEnity):
-        host.WriteError("Object must be subclass of autest.core.testenity.TestEnity")
-    
+
+    if not issubclass(clsobj, TestEnity):
+        host.WriteError(
+            "Object must be subclass of autest.core.testenity.TestEnity")
+
     # get name of task if user did not provide a value
     if name is None:
         name = clsobj.__name__
 
     if classes is None:
-        classes = [Test,TestRun,Process]
+        classes = [Test, TestRun, Process]
 
     for cls in classes:
         # get any info that might exist, else return empty dictionary
-        cls_info = glb._runable_items.get(cls,{})
+        cls_info = glb._runable_items.get(cls, {})
         if name in cls_info:
-            host.WriteError("Cannot add user object member {1}.{0}\n {0} already exists on {1} object".format(name, cls.__name__), show_stack=False)
+            host.WriteError("Cannot add user object member {1}.{0}\n {0} already exists on {1} object".format(
+                name, cls.__name__), show_stack=False)
         cls_info[name] = clsobj
         # set the information ( as this might have been the empty dictionary )
         glb._runable_items[cls] = cls_info
-

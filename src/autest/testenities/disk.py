@@ -8,26 +8,27 @@ import autest.glb as glb
 
 import os
 
+
 @smart_init
 class Disk(TestEnity):
     '''
     allows use to define what kind of disk based test we want to do
     '''
     @call_base(TestEnity=("runable",))
-    def __init__(self,runable):
-        self.__files={}
-        self.__dirs={}
+    def __init__(self, runable):
+        self.__files = {}
+        self.__dirs = {}
 
     def File(self, name, exists=None, size=None, content=None, execute=None, id=None,
-             runtime=True,typename=None):
+             runtime=True, typename=None):
         if typename is None:
-            ext=os.path.splitext(name)
+            ext = os.path.splitext(name)
             # auto select file based on ext
-            cls=glb.FileExtMap.get(ext,File)
+            cls = glb.FileExtMap.get(ext, File)
         else:
             # select file based on typename
-            cls=glb.FileTypeMap.get(typename,File)
-        
+            cls = glb.FileTypeMap.get(typename, File)
+
         tmp = cls(self._Runable, name, exists, size, content, execute, runtime)
 
         if name in self.__files:

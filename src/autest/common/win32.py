@@ -1,9 +1,9 @@
 # ctypes wrapper to a number of win32 API's
-# this is used to avoid use of win32api which 
-# is not always there. 
-# This allows me to avoid 
+# this is used to avoid use of win32api which
+# is not always there.
+# This allows me to avoid
 # copy and paste of code in different files.
-# this is a continous growing file... 
+# this is a continous growing file...
 # Will probally break up into a module
 from __future__ import absolute_import, division, print_function
 import os
@@ -12,8 +12,8 @@ if os.name == 'nt':
 
     import ctypes
     import collections
-    from ctypes.wintypes import * 
-    
+    from ctypes.wintypes import *
+
     # utils functions
     # this stub function allows try to get the function without breaking
     def _stubFunction(*_):
@@ -25,45 +25,43 @@ if os.name == 'nt':
             or not. This allows us to get at "new" win32 function on newer setups
             while not breaking older setups
         '''
-        
+
         try:
             func = getattr(ctypes.windll.kernel32, name)
         except AttributeError:
             return _stubFunction
-        
-        func.argtypes = argtypes 
+
+        func.argtypes = argtypes
         func.restype = restype
 
         return func
-
-
 
     LPFILETIME = ctypes.POINTER(FILETIME)
     LPLARGE_INTEGER = ctypes.POINTER(LARGE_INTEGER)
 
     # constants taken from MSDN
 
-    #thread flags .. clean up threads
+    # thread flags .. clean up threads
     TH32CS_SNAPPROCESS = 0x2    # snapshot all the processes on the system
     TH32CS_SNAPTHREAD = 0x4     # snapshot all the threads on the system
-    THREAD_SUSPEND_RESUME = 0x2 # suspend or resume a thread
+    THREAD_SUSPEND_RESUME = 0x2  # suspend or resume a thread
 
-    #process rights
-    
-    PROCESS_TERMINATE                  =0x0001  
-    PROCESS_CREATE_THREAD              =0x0002
-    PROCESS_SET_SESSIONID              =0x0004
-    PROCESS_VM_OPERATION               =0x0008
-    PROCESS_VM_READ                    =0x0010
-    PROCESS_VM_WRITE                   =0x0020
-    PROCESS_DUP_HANDLE                 =0x0040
-    PROCESS_CREATE_PROCESS             =0x0080
-    PROCESS_SET_QUOTA                  =0x0100
-    PROCESS_SET_INFORMATION            =0x0200
-    PROCESS_QUERY_INFORMATION          =0x0400
-    PROCESS_SUSPEND_RESUME             =0x0800
-    PROCESS_QUERY_LIMITED_INFORMATION  =0x1000
-    PROCESS_SET_LIMITED_INFORMATION    =0x2000
+    # process rights
+
+    PROCESS_TERMINATE = 0x0001
+    PROCESS_CREATE_THREAD = 0x0002
+    PROCESS_SET_SESSIONID = 0x0004
+    PROCESS_VM_OPERATION = 0x0008
+    PROCESS_VM_READ = 0x0010
+    PROCESS_VM_WRITE = 0x0020
+    PROCESS_DUP_HANDLE = 0x0040
+    PROCESS_CREATE_PROCESS = 0x0080
+    PROCESS_SET_QUOTA = 0x0100
+    PROCESS_SET_INFORMATION = 0x0200
+    PROCESS_QUERY_INFORMATION = 0x0400
+    PROCESS_SUSPEND_RESUME = 0x0800
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    PROCESS_SET_LIMITED_INFORMATION = 0x2000
 
     FILE_SHARE_READ = 1
     FILE_SHARE_WRITE = 2
@@ -80,7 +78,8 @@ if os.name == 'nt':
 
     MAX_PATH = 260
 
-    SmallProcessInfo = collections.namedtuple('SmallProcessInfo', 'name pid ppid')
+    SmallProcessInfo = collections.namedtuple(
+        'SmallProcessInfo', 'name pid ppid')
     SmallThreadInfo = collections.namedtuple('SmallThreadInfo', 'tid pid')
 
     class ProcessEntry32(ctypes.Structure):
@@ -101,7 +100,7 @@ if os.name == 'nt':
 
         def getInfo(self):
             return SmallProcessInfo(self.szExeFile, self.th32ProcessID, self.th32ParentProcessID)
-    
+
     class ThreadEntry32(ctypes.Structure):
         _fields_ = [('dwSize',             DWORD),
                     ('cntUsage',           DWORD),
@@ -118,7 +117,6 @@ if os.name == 'nt':
         def getInfo(self):
             return SmallThreadInfo(self.th32ThreadID, self.th32OwnerProcessID)
 
-
     class ByHandleFileInformation(ctypes.Structure):
         _fields_ = [('dwFileAttributes', DWORD),
                     ('ftCreationTime', FILETIME),
@@ -132,10 +130,10 @@ if os.name == 'nt':
                     ('nFileIndexLow', DWORD)]
 
     class SECURITY_ATTRIBUTES(ctypes.Structure):
-        _fields_ = [('nLength',DWORD),
-                    ('lpSecurityDescriptor',ctypes.POINTER(ctypes.c_void_p)),
-                    ('bInheritHandle',BOOL)]
-    
+        _fields_ = [('nLength', DWORD),
+                    ('lpSecurityDescriptor', ctypes.POINTER(ctypes.c_void_p)),
+                    ('bInheritHandle', BOOL)]
+
     # Job Objects and enums
     # I am probally missing something...
 
@@ -151,11 +149,10 @@ if os.name == 'nt':
     JOB_OBJECT_MSG_NOTIFICATION_LIMIT = 11
     JOB_OBJECT_MSG_JOB_CYCLE_TIME_LIMIT = 12
 
-
     # Define the valid notification filter values.
 
     JOB_OBJECT_MSG_MINIMUM = 1
-    JOB_OBJECT_MSG_MAXIMUM = 12    
+    JOB_OBJECT_MSG_MAXIMUM = 12
 
     # Basic Limits
     JOB_OBJECT_LIMIT_WORKINGSET = 0x00000001
@@ -166,7 +163,6 @@ if os.name == 'nt':
     JOB_OBJECT_LIMIT_PRIORITY_CLASS = 0x00000020
     JOB_OBJECT_LIMIT_PRESERVE_JOB_TIME = 0x00000040
     JOB_OBJECT_LIMIT_SCHEDULING_CLASS = 0x00000080
-
 
     # Extended Limits
 
@@ -189,7 +185,6 @@ if os.name == 'nt':
     JOB_OBJECT_EXTENDED_LIMIT_VALID_FLAGS = 0x00007fff
     JOB_OBJECT_NOTIFICATION_LIMIT_VALID_FLAGS = 0x00070204
     JOB_OBJECT_RESERVED_LIMIT_VALID_FLAGS = 0x0007ffff
-
 
     # UI restrictions for jobs
 
@@ -242,50 +237,46 @@ if os.name == 'nt':
     JobObjectCompletionCounter = 17
 
     class IO_COUNTERS(ctypes.Structure):
-        _fields_ = [("ReadOperationCount",ctypes.c_ulonglong),
-        ("WriteOperationCount",ctypes.c_ulonglong),
-        ("OtherOperationCount",ctypes.c_ulonglong),
-        ("ReadTransferCount",ctypes.c_ulonglong),
-        ("WriteTransferCount",ctypes.c_ulonglong),
-        ("OtherTransferCount",ctypes.c_ulonglong),]
+        _fields_ = [("ReadOperationCount", ctypes.c_ulonglong),
+                    ("WriteOperationCount", ctypes.c_ulonglong),
+                    ("OtherOperationCount", ctypes.c_ulonglong),
+                    ("ReadTransferCount", ctypes.c_ulonglong),
+                    ("WriteTransferCount", ctypes.c_ulonglong),
+                    ("OtherTransferCount", ctypes.c_ulonglong), ]
 
     class JOBOBJECT_BASIC_LIMIT_INFORMATION(ctypes.Structure):
-        _fields_ = [('PerProcessUserTimeLimit',LARGE_INTEGER),
-                      ('PerJobUserTimeLimit',LARGE_INTEGER),
-                      ('LimitFlags',DWORD),
-                      ('MinimumWorkingSetSize',ctypes.c_ssize_t),
-                      ('MaximumWorkingSetSize',ctypes.c_ssize_t),
-                      ('ActiveProcessLimit',DWORD),
-                      ('Affinity',LPVOID),
-                      ('PriorityClass',DWORD),
-                      ('SchedulingClass',DWORD),]
-
+        _fields_ = [('PerProcessUserTimeLimit', LARGE_INTEGER),
+                    ('PerJobUserTimeLimit', LARGE_INTEGER),
+                    ('LimitFlags', DWORD),
+                    ('MinimumWorkingSetSize', ctypes.c_ssize_t),
+                    ('MaximumWorkingSetSize', ctypes.c_ssize_t),
+                    ('ActiveProcessLimit', DWORD),
+                    ('Affinity', LPVOID),
+                    ('PriorityClass', DWORD),
+                    ('SchedulingClass', DWORD), ]
 
     class JOBOBJECT_EXTENDED_LIMIT_INFORMATION(ctypes.Structure):
-        _fields_ = [('BasicLimitInformation',JOBOBJECT_BASIC_LIMIT_INFORMATION),
-                    ('IoInfo',IO_COUNTERS),
-                    ('ProcessMemoryLimit',ctypes.c_ssize_t),
-                    ('JobMemoryLimit',ctypes.c_ssize_t),
-                    ('PeakProcessMemoryUsed',ctypes.c_ssize_t),
-                    ('PeakJobMemoryUsed',ctypes.c_ssize_t),]
-
+        _fields_ = [('BasicLimitInformation', JOBOBJECT_BASIC_LIMIT_INFORMATION),
+                    ('IoInfo', IO_COUNTERS),
+                    ('ProcessMemoryLimit', ctypes.c_ssize_t),
+                    ('JobMemoryLimit', ctypes.c_ssize_t),
+                    ('PeakProcessMemoryUsed', ctypes.c_ssize_t),
+                    ('PeakJobMemoryUsed', ctypes.c_ssize_t), ]
 
     class _min_max_rate(ctypes.Structure):
-        _fields_ = [('MinRate',WORD),
-                   ('MaxRate',WORD)]
-    
+        _fields_ = [('MinRate', WORD),
+                    ('MaxRate', WORD)]
 
-    class _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION(ctypes.Union): 
+    class _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION(ctypes.Union):
         _anonymous_ = ('_MM',)
-        _fields_ = [('CpuRate',DWORD),
-                    ('Weight',DWORD),
-                    ('_MM',_min_max_rate)]
+        _fields_ = [('CpuRate', DWORD),
+                    ('Weight', DWORD),
+                    ('_MM', _min_max_rate)]
 
-    class JOBOBJECT_CPU_RATE_CONTROL_INFORMATION(ctypes.Structure): 
+    class JOBOBJECT_CPU_RATE_CONTROL_INFORMATION(ctypes.Structure):
         _anonymous_ = ('_JOBOBJECT_CPU_RATE_CONTROL_INFORMATION',)
-        _fields_ = [('ControlFlags',DWORD),                    
-                    ('_JOBOBJECT_CPU_RATE_CONTROL_INFORMATION',_JOBOBJECT_CPU_RATE_CONTROL_INFORMATION)]
-
+        _fields_ = [('ControlFlags', DWORD),
+                    ('_JOBOBJECT_CPU_RATE_CONTROL_INFORMATION', _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION)]
 
 
 ##############################################################
@@ -293,44 +284,55 @@ if os.name == 'nt':
 ##############################################################
 
     # basic handle handling
-    CloseHandle = tryKernal32("CloseHandle",BOOL,(HANDLE,))
+    CloseHandle = tryKernal32("CloseHandle", BOOL, (HANDLE,))
 
-    CreateToolhelp32Snapshot = tryKernal32("CreateToolhelp32Snapshot", HANDLE, (DWORD, DWORD))
+    CreateToolhelp32Snapshot = tryKernal32(
+        "CreateToolhelp32Snapshot", HANDLE, (DWORD, DWORD))
 
-
-    
     # Debugging API
-    DebugActiveProcess = tryKernal32("DebugActiveProcess",BOOL,(DWORD,))
-    DebugActiveProcessStop = tryKernal32("DebugActiveProcessStop",BOOL,(DWORD,))
+    DebugActiveProcess = tryKernal32("DebugActiveProcess", BOOL, (DWORD,))
+    DebugActiveProcessStop = tryKernal32(
+        "DebugActiveProcessStop", BOOL, (DWORD,))
 
     # Process/thread handling
-    Process32First = tryKernal32("Process32First",BOOL,(HANDLE, ctypes.POINTER(ProcessEntry32)))    
-    Process32Next = tryKernal32("Process32Next",BOOL,(HANDLE, ctypes.POINTER(ProcessEntry32)))
+    Process32First = tryKernal32(
+        "Process32First", BOOL, (HANDLE, ctypes.POINTER(ProcessEntry32)))
+    Process32Next = tryKernal32(
+        "Process32Next", BOOL, (HANDLE, ctypes.POINTER(ProcessEntry32)))
 
-    Thread32First = tryKernal32("Thread32First",BOOL,(HANDLE, ctypes.POINTER(ThreadEntry32)))
-    Thread32Next = tryKernal32("Thread32Next",BOOL,(HANDLE, ctypes.POINTER(ThreadEntry32)))
-    
+    Thread32First = tryKernal32(
+        "Thread32First", BOOL, (HANDLE, ctypes.POINTER(ThreadEntry32)))
+    Thread32Next = tryKernal32(
+        "Thread32Next", BOOL, (HANDLE, ctypes.POINTER(ThreadEntry32)))
 
-    OpenThread = tryKernal32("OpenThread",HANDLE,(DWORD, BOOL, DWORD))
-    SuspendThread = tryKernal32("SuspendThread",DWORD,(HANDLE,))
+    OpenThread = tryKernal32("OpenThread", HANDLE, (DWORD, BOOL, DWORD))
+    SuspendThread = tryKernal32("SuspendThread", DWORD, (HANDLE,))
 
-    OpenProcess = tryKernal32("OpenProcess",HANDLE,(DWORD, BOOL, DWORD))
-    TerminateProcess = tryKernal32("TerminateProcess",BOOL,(HANDLE, ctypes.c_uint))
-    GetProcessTimes = tryKernal32("GetProcessTimes",BOOL,(HANDLE, LPFILETIME, LPFILETIME, LPFILETIME, LPFILETIME))
+    OpenProcess = tryKernal32("OpenProcess", HANDLE, (DWORD, BOOL, DWORD))
+    TerminateProcess = tryKernal32(
+        "TerminateProcess", BOOL, (HANDLE, ctypes.c_uint))
+    GetProcessTimes = tryKernal32(
+        "GetProcessTimes", BOOL, (HANDLE, LPFILETIME, LPFILETIME, LPFILETIME, LPFILETIME))
 
     # the wait function
-    WaitForSingleObject = tryKernal32("WaitForSingleObject",DWORD,(HANDLE, DWORD))
+    WaitForSingleObject = tryKernal32(
+        "WaitForSingleObject", DWORD, (HANDLE, DWORD))
 
     # Job object
-    CreateJobObject = tryKernal32("CreateJobObjectW",HANDLE,(ctypes.POINTER(SECURITY_ATTRIBUTES),LPWSTR))
-    AssignProcessToJobObject = tryKernal32("AssignProcessToJobObject",BOOL,(HANDLE,HANDLE))
-    TerminateJobObject = tryKernal32("TerminateJobObject",BOOL,(HANDLE,UINT))
-    SetInformationJobObject = tryKernal32("SetInformationJobObject",BOOL,(HANDLE,ctypes.c_uint32,LPVOID,DWORD))
-    QueryInformationJobObject = tryKernal32("QueryInformationJobObject",BOOL,(HANDLE,ctypes.c_uint32,LPVOID,DWORD,LPVOID))
+    CreateJobObject = tryKernal32(
+        "CreateJobObjectW", HANDLE, (ctypes.POINTER(SECURITY_ATTRIBUTES), LPWSTR))
+    AssignProcessToJobObject = tryKernal32(
+        "AssignProcessToJobObject", BOOL, (HANDLE, HANDLE))
+    TerminateJobObject = tryKernal32(
+        "TerminateJobObject", BOOL, (HANDLE, UINT))
+    SetInformationJobObject = tryKernal32(
+        "SetInformationJobObject", BOOL, (HANDLE, ctypes.c_uint32, LPVOID, DWORD))
+    QueryInformationJobObject = tryKernal32(
+        "QueryInformationJobObject", BOOL, (HANDLE, ctypes.c_uint32, LPVOID, DWORD, LPVOID))
 
     # file APIs
-    CreateSymbolicLink = tryKernal32('CreateSymbolicLinkW',BOOLEAN,(LPWSTR, LPWSTR, DWORD))
-    CreateHardLink = tryKernal32('CreateHardLinkW',BOOLEAN,(LPWSTR, LPWSTR, DWORD))
-    CopyFile = tryKernal32('CopyFileW', BOOLEAN,(LPWSTR, LPWSTR, BOOL))
-
-
+    CreateSymbolicLink = tryKernal32(
+        'CreateSymbolicLinkW', BOOLEAN, (LPWSTR, LPWSTR, DWORD))
+    CreateHardLink = tryKernal32(
+        'CreateHardLinkW', BOOLEAN, (LPWSTR, LPWSTR, DWORD))
+    CopyFile = tryKernal32('CopyFileW', BOOLEAN, (LPWSTR, LPWSTR, BOOL))

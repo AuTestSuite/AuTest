@@ -4,11 +4,11 @@ import hosts.output as host
 from autest.core.test import Test
 import types
 
-def ExtendTest(func,name=None):
+
+def ExtendTest(func, name=None):
     if name is None:
-        name=func.__name__
-    method=func
-    setattr(Test,name,method)
-    host.WriteVerbose("api",'Added Test extension function "{0}"'.format(name))
-
-
+        name = func.__name__
+    method = func
+    setattr(Test, name, method)
+    host.WriteVerbose(
+        "api", 'Added Test extension function "{0}"'.format(name))

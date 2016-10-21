@@ -4,8 +4,9 @@ import autest.glb as glb
 
 
 class _test_enity__metaclass__(type):
+
     def __call__(cls, *lst, **kw):
-        #make instance of the class
+        # make instance of the class
         inst = type.__call__(cls, *lst, **kw)
         # given which class this is we look up
         # in a dictionary which items we want to add

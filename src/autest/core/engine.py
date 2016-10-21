@@ -41,17 +41,18 @@ class Engine(object):
         self.__test_dir = test_dir  # this the root directory to look for the tests
         self.__run_dir = os.path.abspath(
             run_dir)  # this is the directory to run the tests in
-        self.__autest_site = autest_site  # any special autest directory to look up.  None uses standard one
+        # any special autest directory to look up.  None uses standard one
+        self.__autest_site = autest_site
         self.__filters = filters  # which set of tests to run
         self.__ENV = env
         self.__variables = variables
         self.__reporters = reporters
 
         # setup the thread poool to run all the tasks
-        #if jobs > 1:
+        # if jobs > 1:
         #self.__pool = ThreadPool(jobs)
 
-        #set the engine to be easy to access
+        # set the engine to be easy to access
         if glb.Engine:
             raise RuntimeError("Only one engine can be created at a time")
         glb.Engine = self
@@ -83,7 +84,7 @@ class Engine(object):
                         oldExceptionArgs = e.args
                         time.sleep(1)
                         continue
-                    host.WriteError(("Unable to remove sandbox directory for clean test run" + \
+                    host.WriteError(("Unable to remove sandbox directory for clean test run" +
                                      "\n Reason: {0}").format(e), show_stack=False)
                     raise
                 else:
@@ -128,13 +129,13 @@ class Engine(object):
                     format(path))
                 path = os.path.join(self.__test_dir, 'gtest-site')
         else:
-            #This is a custom location
+            # This is a custom location
             path = os.path.abspath(self.__autest_site)
 
         # add expected API function so they can be called
         locals = {
             'RegisterFileType': api.RegisterFileType,
-            'AddTestRunSet': api.ExtendTest,  #backward compat
+            'AddTestRunSet': api.ExtendTest,  # backward compat
             'ExtendTest': api.ExtendTest,
             'AddSetupTask': api.AddSetupItem,  # backward compat
             'AddSetupItem': api.AddSetupItem,

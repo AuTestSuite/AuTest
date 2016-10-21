@@ -2,20 +2,22 @@ from __future__ import absolute_import, division, print_function
 import os
 import stat
 
-def has_program(program,path=None):
-    return where_is(program,path)!=None
 
-def where_is(program,path=None):
-    #get the path we need to check
+def has_program(program, path=None):
+    return where_is(program, path) != None
+
+
+def where_is(program, path=None):
+    # get the path we need to check
     if path is None:
         try:
-            path = os.environ['PATH'].split(os.pathsep )
+            path = os.environ['PATH'].split(os.pathsep)
         except KeyError:
             # no path set?
-            #well there is nothing to find.
+            # well there is nothing to find.
             return None
     try:
-        pathext = os.environ['PATHEXT'].split(os.pathsep )
+        pathext = os.environ['PATHEXT'].split(os.pathsep)
     except KeyError:
         pathext = [""]
 

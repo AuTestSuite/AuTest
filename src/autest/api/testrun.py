@@ -4,13 +4,15 @@ import hosts.output as host
 from autest.core.testrun import TestRun
 import types
 
-def ExtendTestRun( func,name=None,setproperty=False ):
+
+def ExtendTestRun(func, name=None, setproperty=False):
     if name is None:
         name = func.__name__
-    
+
     method = func
     if setproperty:
         method = property(fset=method)
 
-    setattr(TestRun,name,method)
-    host.WriteVerbose("api",'Added TestRun extension function "{0}"'.format(name))
+    setattr(TestRun, name, method)
+    host.WriteVerbose(
+        "api", 'Added TestRun extension function "{0}"'.format(name))

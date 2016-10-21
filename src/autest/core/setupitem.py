@@ -31,13 +31,13 @@ class SetupItem(object):
         self.cnt = 0
 
         # description of what we are trying to do
-        self.__description="actions description not defined"
+        self.__description = "actions description not defined"
 
         # assume pass unless an error happens
-        self._Result=testers.ResultType.Passed
-        
+        self._Result = testers.ResultType.Passed
+
         # did we run this item
-        self.__ran=val=False
+        self.__ran = val = False
 
     # basic properties values we need
 
@@ -66,14 +66,14 @@ class SetupItem(object):
         return self.__ran
 
     @RanOnce.setter
-    def RanOnce(self,val):
-        self.__ran=val
+    def RanOnce(self, val):
+        self.__ran = val
 
     @property
     def SandBoxDir(self):
         # directory we run the test in
         return self.__runable._RootRunable.RunDirectory
-    
+
     @property
     def TestRootDir(self):
         # the directory location given to scan for files for all the tests
@@ -91,9 +91,9 @@ class SetupItem(object):
         # create a StreamWriter which will write out the stream data of the run
         # to sorted files
         output = streamwriter.StreamWriter(os.path.join(
-            self.__runable.RunDirectory, 
+            self.__runable.RunDirectory,
             "_setup_tmp_{0}_{1}".format(
-                self.ItemName.replace(" ", "_"), self.cnt)), 
+                self.ItemName.replace(" ", "_"), self.cnt)),
             cmd,
             self.__runable.Env)
         self.cnt += 1
@@ -139,15 +139,17 @@ class SetupItem(object):
         try:
             if os.path.isfile(source):
                 if os.path.exists(target):
-                    host.WriteVerbose("setup", "target already exists! Replacing...")
-            
+                    host.WriteVerbose(
+                        "setup", "target already exists! Replacing...")
+
                 shutil.copy2(source, target)
-            
+
             else:
                 autest.common.disk.copy_tree(source, target)
         except Exception as e:
-            raise SetupError("Cannot copy {0} because {1}".format(source,str(e)))
-    
+            raise SetupError(
+                "Cannot copy {0} because {1}".format(source, str(e)))
+
     def CopyAs(self, source, targetdir, targetname=None):
         '''
         For copying files as a different name in nonexisting directories
@@ -157,19 +159,22 @@ class SetupItem(object):
         '''
         source, targetdir = self._copy_setup(source, targetdir)
         self.MakeDir(targetdir)
-        if targetname is None: target = targetdir
-        else: target = os.path.join(targetdir, targetname)
+        if targetname is None:
+            target = targetdir
+        else:
+            target = os.path.join(targetdir, targetname)
         host.WriteVerbose("setup", "Copying {0} as {1}".format(source, target))
         try:
             shutil.copy2(source, target)
         except Exception as e:
-            raise SetupError("Cannot copy {0} to {1} because {2}".format(source, targetdir,str(e)))
+            raise SetupError("Cannot copy {0} to {1} because {2}".format(
+                source, targetdir, str(e)))
 
     def MakeDir(self, path, mode=None):
         # check if the path given is in the sandbox if abs
         self._in_sandbox(path)
-        # if abs path isn't specified then put it in the sandbox 
-        path = os.path.join(self.SandBoxDir, path) 
+        # if abs path isn't specified then put it in the sandbox
+        path = os.path.join(self.SandBoxDir, path)
         if not os.path.isdir(path):
             if not os.path.isfile(path):
                 if mode is None:
@@ -192,10 +197,11 @@ class SetupItem(object):
         gid = grp.getgrnam(gid).gr_gid
         try:
             os.chown(path, uid, gid)
-            host.WriteVerbose("setup", "Changing ownership of {0} to uid {1} gid {2}".format(path, uid, gid))
+            host.WriteVerbose(
+                "setup", "Changing ownership of {0} to uid {1} gid {2}".format(path, uid, gid))
         except OSError as e:
             # Operation not Permitted will just pass
-            host.WriteVerbose("setup", "Chown-",e) 
+            host.WriteVerbose("setup", "Chown-", e)
             if e.errno != 1:
                 raise
 
@@ -206,27 +212,28 @@ class SetupItem(object):
             # Sandbox directory
             source = os.path.join(self.TestFileDir, source)
         if target:
-            # check if target is permissible 
-            self._in_sandbox(target) 
+            # check if target is permissible
+            self._in_sandbox(target)
             target = os.path.join(self.SandBoxDir, target)
         else:
             # given that target is None we assume that we want to copy it
             # the sandbox directory with the same name as the source
             target = os.path.join(self.SandBoxDir, os.path.basename(source))
         return (source, target)
-    
+
     # check that the path give is within the sandbox
     def _in_sandbox(self, path):
-        # the split should have the first index as empty if the prefix is the same as the SandBoxDir
-        split = path.split(self.SandBoxDir) 
+        # the split should have the first index as empty if the prefix is the
+        # same as the SandBoxDir
+        split = path.split(self.SandBoxDir)
         if os.path.isabs(path) and split[0] != '':
             raise IOError('Target path is not within sandbox')
 
     def SymLink(self, source, target):
-        os.symlink(source,target)
+        os.symlink(source, target)
 
     def HardLink(self, source, target):
-        os.link(source,target)
+        os.link(source, target)
 
     def _smartLink(self, source, target):
         '''
@@ -237,8 +244,9 @@ class SetupItem(object):
         '''
         if os.path.isfile(source):
             try:
-                host.WriteVerbose("setup", "Hardlinking {0} to {1}".format(source, target))
-                self.HardLink(source,target)
+                host.WriteVerbose(
+                    "setup", "Hardlinking {0} to {1}".format(source, target))
+                self.HardLink(source, target)
                 return
             except:
                 host.WriteVerbose("setup", "Hardlinking - Failed! Trying..")
@@ -247,15 +255,15 @@ class SetupItem(object):
             for x in files:
                 fullsrc = os.path.join(source, x)
                 fulldest = os.path.join(target, x)
-                self.Copy(fullsrc,fulldest,try_link=True)
+                self.Copy(fullsrc, fulldest, try_link=True)
         else:
             try:
-                host.WriteVerbose("setup", "Symlinking {0} to {1}".format(source, target))
-                self.SymLink(source,target)
+                host.WriteVerbose(
+                    "setup", "Symlinking {0} to {1}".format(source, target))
+                self.SymLink(source, target)
             except:
                 host.WriteVerbose("setup", "Symlinking - Failed! Trying..")
-                raise            
-            
+                raise
 
     def _bind(self, test):
         '''
@@ -263,7 +271,7 @@ class SetupItem(object):
         This is done before we try to execute the setup logic
         '''
         self.__runable = test
-        self.onBind() # in case the item need to do something once we bind to the setup object
+        self.onBind()  # in case the item need to do something once we bind to the setup object
 
     def onBind(self):
         pass
@@ -271,14 +279,14 @@ class SetupItem(object):
     def cleanup(self):
         pass
 
-    def _AddMethod(self,func,name=None):    
-        m=func.__get__(self)
+    def _AddMethod(self, func, name=None):
+        m = func.__get__(self)
         name = name if name is not None else func.__name__
-        setattr(self,name,m)
+        setattr(self, name, m)
 
-    def _AddObject(self,obj,name=None):            
+    def _AddObject(self, obj, name=None):
         name = name if name is not None else obj.__name__
-        setattr(self,name,obj)
+        setattr(self, name, obj)
         obj.Bind(self)
 
     @property
@@ -286,11 +294,11 @@ class SetupItem(object):
         return self.__runable.Env
 
     @property
-    def Variables(self):        
+    def Variables(self):
         return self.__runable.Variables
-    
+
     def ComposeEnv(self):
         return self.__runable.ComposeEnv()
 
-    def ComposeVariables(self):        
+    def ComposeVariables(self):
         return self.__runable.ComposeVariables()

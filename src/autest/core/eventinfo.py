@@ -4,21 +4,25 @@ from autest.common.constructor import call_base, smart_init
 
 
 class SetupInfo(EventInfo):
+
     def __init__(self):
         pass
 
 
 class StartingInfo(EventInfo):
+
     def __init__(self):
         pass
 
 
 class StartedInfo(EventInfo):
+
     def __init__(self):
         pass
 
 
 class RunningInfo(EventInfo):
+
     def __init__(self, start, current):
         self.startTime = start
         self.currentTime = current
@@ -31,6 +35,7 @@ class RunningInfo(EventInfo):
 
 @smart_init
 class FinishedInfo(EventInfo):
+
     @call_base(EventInfo=())
     def __init__(self, runtime):
         self.__runtime = runtime
@@ -42,6 +47,7 @@ class FinishedInfo(EventInfo):
 
 @smart_init
 class ProcessFinishedInfo(FinishedInfo):
+
     @call_base(FinishedInfo=('runtime', ))
     def __init__(self, runtime, returncode, streamwriter):
         self.__returncode = returncode
@@ -49,7 +55,7 @@ class ProcessFinishedInfo(FinishedInfo):
         self.__all_file = streamwriter.FullFile
         self.__stdout_file = streamwriter.StdOutFile
         self.__stderr_file = streamwriter.StdErrFile
-        #self.__message_file=streamwriter.MessageFile
+        # self.__message_file=streamwriter.MessageFile
         self.__warning_file = streamwriter.WarningFile
         self.__error_file = streamwriter.ErrorFile
         self.__verbose_file = streamwriter.VerboseFile
@@ -93,5 +99,6 @@ class ProcessFinishedInfo(FinishedInfo):
 
 
 class CleanupInfo(EventInfo):
+
     def __init__(self):
         pass

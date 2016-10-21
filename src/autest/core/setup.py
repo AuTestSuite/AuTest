@@ -6,55 +6,59 @@ from autest.testers import tester
 import traceback
 from future.utils import with_metaclass
 
+
 class _setup__metaclass__(type):
-        def __call__(cls,*lst,**kw):
-            inst=type.__call__(cls,*lst,**kw)
-            for k,v in glb._setup_items.items():
-                setattr(inst,k,v(inst))
-            return inst
+
+    def __call__(cls, *lst, **kw):
+        inst = type.__call__(cls, *lst, **kw)
+        for k, v in glb._setup_items.items():
+            setattr(inst, k, v(inst))
+        return inst
+
 
 def mapsetup(item):
     def dosetup(ev):
         try:
-            item.RanOnce=True
+            item.RanOnce = True
             item.setup()
         except SetupError as e:
             # this is a known failure
-            item._Result=tester.ResultType.Failed
-            item._Reason=str(e)
+            item._Result = tester.ResultType.Failed
+            item._Reason = str(e)
         except Exception as e:
             # this is some random expection
             item._Result = tester.ResultType.Exception
             item._Reason = traceback.format_exc()
-            
-            
+
     return dosetup
+
 
 def mapcleanup(item):
     def docleanup(ev):
         item.cleanup()
     return docleanup
 
-class Setup(with_metaclass(_setup__metaclass__,object)):
-    
-    def __init__(self,test):
-        self.__setup_items=[]
-        self.__test=test
-        self.__reason=None
-        self.__result=None
+
+class Setup(with_metaclass(_setup__metaclass__, object)):
+
+    def __init__(self, test):
+        self.__setup_items = []
+        self.__test = test
+        self.__reason = None
+        self.__result = None
 
     def _BindEvents(self):
 
         for item in self.__setup_items:
-            if hasattr(item,'setup'):
+            if hasattr(item, 'setup'):
                 self.__test.SetupEvent.Connect(mapsetup(item))
-    
+
         for item in self.__setup_items:
-            if hasattr(item,'cleanup'):
+            if hasattr(item, 'cleanup'):
                 self.__test.CleanupEvent.Connect(mapcleanup(item))
 
-    def _add_item(self,task):
-        # bind the setup task with the test object so it 
+    def _add_item(self, task):
+        # bind the setup task with the test object so it
         # can get information about certain locations
         task._bind(self.__test)
         self.__setup_items.append(task)
@@ -75,15 +79,15 @@ class Setup(with_metaclass(_setup__metaclass__,object)):
                 for i in self.__setup_items:
                     if self.__result < i._Result:
                         self.__result = i._Result
-            
+
         return self.__result
 
     @property
     def _Reason(self):
-        #if not self.__reason:
-            #return "Setup has no issues"
+        # if not self.__reason:
+            # return "Setup has no issues"
         return self.__reason
-    
+
     @_Reason.setter
     def _Reason(self, value):
         self.__reason = value
@@ -93,4 +97,4 @@ class Setup(with_metaclass(_setup__metaclass__,object)):
         return self.__reason is not None
 
 #import autest.api
-#autest.api.AddTestEnityMember(Setup)
+# autest.api.AddTestEnityMember(Setup)

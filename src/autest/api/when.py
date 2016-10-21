@@ -3,18 +3,18 @@ import autest.glb as glb
 import hosts.output as host
 
 
-def AddWhenFunction( func,name=None ):
+def AddWhenFunction(func, name=None):
     if name is None:
         name = func.__name__
 
-    def wrapper( self,*lst,**kw ):
+    def wrapper(self, *lst, **kw):
         if lst != () or kw != {}:
             # we have arguments, bind them to call with lambda
-            return lambda: func(*lst,**kw)
+            return lambda: func(*lst, **kw)
         else:
             # just pass back function
             return func
     wrapper.when_wrapper = True
     method = wrapper
-    setattr(glb.When,name,method)
-    host.WriteVerbose("api",'Added extension function "{0}"'.format(name))
+    setattr(glb.When, name, method)
+    host.WriteVerbose("api", 'Added extension function "{0}"'.format(name))

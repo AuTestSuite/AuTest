@@ -1,33 +1,34 @@
 from __future__ import absolute_import, division, print_function
 import abc
 
+
 class UIHost(object):
     """description of class"""
 
-#class C io streams
+# class C io streams
     @abc.abstractmethod
-    def writeStdOut(self,msg):
+    def writeStdOut(self, msg):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeStdErr(self,msg):
+    def writeStdErr(self, msg):
         raise NotImplementedError
 
 # our virtual streams
     @abc.abstractmethod
-    def writeMessage(self,msg):
+    def writeMessage(self, msg):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeWarning(self,msg,stack=None,show_stack=False):
+    def writeWarning(self, msg, stack=None, show_stack=False):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeError(self,msg,stack=None,show_stack=True):
+    def writeError(self, msg, stack=None, show_stack=True):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeDebug(self,catagory,msg):
+    def writeDebug(self, catagory, msg):
         '''
         prints a debug message
         catagorty - is the type of verbose message
@@ -40,7 +41,7 @@ class UIHost(object):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeVerbose(self,catagory,msg):
+    def writeVerbose(self, catagory, msg):
         '''
         prints a verbose message
         catagorty - is the type of verbose message
@@ -53,7 +54,7 @@ class UIHost(object):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeProgress(self,task,msg=None,progress=None,completed=False):
+    def writeProgress(self, task, msg=None, progress=None, completed=False):
         '''
         task - string telling the current activity we are doing
         status - string telling the current state of the task
@@ -77,28 +78,27 @@ class UIHost(object):
         return []
 
     # Format our virtual streams
-    # these are not required but allow custom formating 
+    # these are not required but allow custom formating
     # from the default formatting which can be useful
     # for output hosts that write to certain file formats
 
-    
-    def formatMessage(self,msg_list,sep=' ',end='\n',**kw):
+    def formatMessage(self, msg_list, sep=' ', end='\n', **kw):
         return None
 
-    def formatWarning(self,msg_list,sep=' ',end='\n',stack=None,show_stack=False,**kw):
+    def formatWarning(self, msg_list, sep=' ', end='\n', stack=None, show_stack=False, **kw):
         return None
 
-    def formatError(self,msg_list,sep=' ',end='\n',stack=None,show_stack=True,**kw):
+    def formatError(self, msg_list, sep=' ', end='\n', stack=None, show_stack=True, **kw):
         return None
 
-    def formatDebug(self,catagory,msg_list,sep=' ',end='\n',**kw):
+    def formatDebug(self, catagory, msg_list, sep=' ', end='\n', **kw):
         return None
 
-    def formatVerbose(self,catagory,msg_list,sep=' ',end='\n',**kw):
+    def formatVerbose(self, catagory, msg_list, sep=' ', end='\n', **kw):
         return None
 
-    def formatProgress(self,task,msg=None,progress=None,completed=False):
+    def formatProgress(self, task, msg=None, progress=None, completed=False):
         return None
 
-    def formatStack(self,stack):
+    def formatStack(self, stack):
         return None

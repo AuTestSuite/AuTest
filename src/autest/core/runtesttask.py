@@ -17,38 +17,42 @@ import shutil
 
 @smart_init
 class RunTestTask(Task):
+
     @call_base(Task=("self",))
-    def __init__( self, test, startlogic ):
-        self.__test = test # this is the test object
-        self.__logic = startlogic # this the logic start the task with
+    def __init__(self, test, startlogic):
+        self.__test = test  # this is the test object
+        self.__logic = startlogic  # this the logic start the task with
 
     # needed by higher level tasking system.
     def isSerial(self):
         return self.__test.RunSerial
 
-    def __call__( self ):
-        tl=None
+    def __call__(self):
+        tl = None
         try:
-            tl=self.__logic.Run(self.__test)
+            tl = self.__logic.Run(self.__test)
         except KillOnFailureError:
-        # validate the we did not have a setup error        
-            self.__test._Result=testers.ResultType.Failed
-            host.WriteVerbose("test_logic", "Test {0} failed with KillOnFailureError\n {1}".format(self.__test.Name,self.__test.Setup._Reason))
+            # validate the we did not have a setup error
+            self.__test._Result = testers.ResultType.Failed
+            host.WriteVerbose("test_logic", "Test {0} failed with KillOnFailureError\n {1}".format(
+                self.__test.Name, self.__test.Setup._Reason))
             return
         except Exception as e:
-            self.__test._Result=testers.ResultType.Exception
+            self.__test._Result = testers.ResultType.Exception
             self.__test._Reason = traceback.format_exc()
-            host.WriteVerbose("test_logic", "Test {0} failed with Exception\n {1}".format(self.__test.Name,self.__test._Reason))
-            if tl: 
+            host.WriteVerbose("test_logic", "Test {0} failed with Exception\n {1}".format(
+                self.__test.Name, self.__test._Reason))
+            if tl:
                 tl.Stop()
             return
 
-        try:    
+        try:
             while tl.Poll():
                 time.sleep(.1)
 
             if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
-                shutil.rmtree(self.__test.RunDirectory, onerror=disk.remove_read_only)
+                shutil.rmtree(self.__test.RunDirectory,
+                              onerror=disk.remove_read_only)
         except KeyboardInterrupt:
             # ctrl-c was pushed ( or soft term)
             tl.Stop()
@@ -57,4 +61,3 @@ class RunTestTask(Task):
             # something bad happen try not to hang
             tl.Stop()
             raise
- 

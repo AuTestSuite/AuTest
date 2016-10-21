@@ -1,7 +1,9 @@
 import autest.core.setupitem as setupitem
 import autest.api as api
 
+
 class Chown(setupitem.SetupItem):
+
     def __init__(self, path, uid, gid, ignore=False):
         super(Chown, self).__init__(
             itemname="Chown"
@@ -9,8 +11,9 @@ class Chown(setupitem.SetupItem):
         self.path = path
         self.uid = uid
         self.gid = gid
-        self.Description="On {0} with uid: {1} gid: {2}".format(self.path, self.uid, self.gid)
-        self.ignore=ignore
+        self.Description = "On {0} with uid: {1} gid: {2}".format(
+            self.path, self.uid, self.gid)
+        self.ignore = ignore
 
     def setup(self):
         try:
@@ -20,4 +23,4 @@ class Chown(setupitem.SetupItem):
                 raise
 
 
-api.AddSetupItem(Chown,"__call__",ns='Chown')
+api.AddSetupItem(Chown, "__call__", ns='Chown')

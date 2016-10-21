@@ -14,32 +14,36 @@ from . import setup
 
 
 @smart_init
-class TestRun(Order,Item,Runable):
+class TestRun(Order, Item, Runable):
 
-    @call_base(Runable=("testobj",),Order=(),Item=("displaystr","name"))
-    def __init__( self, testobj, name, displaystr ):
+    @call_base(Runable=("testobj",), Order=(), Item=("displaystr", "name"))
+    def __init__(self, testobj, name, displaystr):
 
-        self.__test = testobj # this is the parent test object
-        self.__exceptionMessage = '' # this is a error message given an unknown exeception
+        self.__test = testobj  # this is the parent test object
+        self.__exceptionMessage = ''  # this is a error message given an unknown exeception
 
         # will want to refactor setup later
         self.__setup = setup.Setup(self)
 
         # this is the result type of the test run
-        self.__result = None 
+        self.__result = None
 
-        #controls is we should continue on a failure
-        self.__continueonfail=False
+        # controls is we should continue on a failure
+        self.__continueonfail = False
 
         # setup testables
-         ## util object
+        # util object
         class LamdaEq(object):
+
             def __init__(self, func):
-                self.__func=func
-            def __eq__(self,rhs):
+                self.__func = func
+
+            def __eq__(self, rhs):
                 return self.__func() == rhs
-            def __ne__(self,rhs):
+
+            def __ne__(self, rhs):
                 return self.__func() != rhs
+
             def __str__(self):
                 return self.__func.__name__
 
@@ -47,43 +51,42 @@ class TestRun(Order,Item,Runable):
         self._Register(
             "Test.Process.StillRunningBefore",
             TesterSet(
-                    testers.Equal,
-                    True,
-                    self.SetupEvent,
-                    converter=lambda val: LamdaEq(val._isRunningBefore),
-                ),"StillRunningBefore"
-            )
+                testers.Equal,
+                True,
+                self.SetupEvent,
+                converter=lambda val: LamdaEq(val._isRunningBefore),
+            ), "StillRunningBefore"
+        )
         # StillRunningAfter
         self._Register(
             "Test.Process.StillRunningAfter",
             TesterSet(
-                    testers.Equal,
-                    True,
-                    self.FinishedEvent,
-                    converter=lambda val: LamdaEq(val._isRunningAfter),
-                ),"StillRunningAfter"
-            )
+                testers.Equal,
+                True,
+                self.FinishedEvent,
+                converter=lambda val: LamdaEq(val._isRunningAfter),
+            ), "StillRunningAfter"
+        )
         # NotRunningBefore
         self._Register(
             "Test.Process.NotRunningBefore",
             TesterSet(
-                    testers.Equal,
-                    False,
-                    self.SetupEvent,
-                    converter=lambda val: LamdaEq(val._isRunningBefore),
-                ),"NotRunningBefore"
-            )
+                testers.Equal,
+                False,
+                self.SetupEvent,
+                converter=lambda val: LamdaEq(val._isRunningBefore),
+            ), "NotRunningBefore"
+        )
         # NotRunningAfter
         self._Register(
             "Test.Process.NotRunningAfter",
             TesterSet(
-                    testers.Equal,
-                    False,
-                    self.FinishedEvent,
-                    converter=lambda val: LamdaEq(val._isRunningAfter),
-                ),"NotRunningAfter"
-            )
-        
+                testers.Equal,
+                False,
+                self.FinishedEvent,
+                converter=lambda val: LamdaEq(val._isRunningAfter),
+            ), "NotRunningAfter"
+        )
 
     @property
     def Setup(self):
@@ -91,17 +94,17 @@ class TestRun(Order,Item,Runable):
 
     # attributes of this given test run
     @property
-    def Name( self ):
+    def Name(self):
         return self._ID
 
     @property
-    def DisplayString( self ):
+    def DisplayString(self):
         if self._Description:
             return self._Description
         return self.Name
 
     @property
-    def _ExceptionMessage( self ):
+    def _ExceptionMessage(self):
         if self._Result == testers.ResultType.Exception and self.__exceptionMessage == "":
             for i in self._Testers:
                 if i.Result == testers.ResultType.Exception:
@@ -109,7 +112,7 @@ class TestRun(Order,Item,Runable):
         return self.__exceptionMessage
 
     @_ExceptionMessage.setter
-    def _ExceptionMessage( self,val ):
+    def _ExceptionMessage(self, val):
         self.__exceptionMessage = val
 
     @property
@@ -121,6 +124,5 @@ class TestRun(Order,Item,Runable):
         return self.__continueonfail
 
     @ContinueOnFail.setter
-    def ContinueOnFail(self,val):
-        self.__continueonfail=val
-        
+    def ContinueOnFail(self, val):
+        self.__continueonfail = val

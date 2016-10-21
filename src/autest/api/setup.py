@@ -15,31 +15,34 @@ from autest.core.setup import Setup
 # add Copy as a special function __call__ to the "namespace" Copy
 
 
-def AddSetupItem(item,name=None,ns=None):
+def AddSetupItem(item, name=None, ns=None):
     # helper function
-    def wrapper(self,*lst,**kw):
-            self._add_item(item(*lst,**kw))
+    def wrapper(self, *lst, **kw):
+        self._add_item(item(*lst, **kw))
     # check to make sure this is a SetupItem type
-    if not issubclass(item,SetupItem):
-        host.WriteError("Object must be subclass of autest.core.setupitem.SetupItem")    
+    if not issubclass(item, SetupItem):
+        host.WriteError(
+            "Object must be subclass of autest.core.setupitem.SetupItem")
 
-    #get name of task if user did not provide a value
+    # get name of task if user did not provide a value
     if name is None:
-        name=item.__name__
+        name = item.__name__
 
     if ns is None:
-        host.WriteVerbose("setupext","Adding setup extension named: {0}".format(name))
-        method=wrapper#types.MethodType(wrapper,None,Setup)
-        setattr(Setup,name,method)
+        host.WriteVerbose(
+            "setupext", "Adding setup extension named: {0}".format(name))
+        method = wrapper  # types.MethodType(wrapper,None,Setup)
+        setattr(Setup, name, method)
     else:
         # see if we have this namespace defined already
-        nsobj=glb._setup_items.get(ns)
+        nsobj = glb._setup_items.get(ns)
         if nsobj is None:
-            #create the ns object
-            nsobj=type(ns,(namespace.NameSpace,),{})
-            #copy on class type as defined for given name
-            glb._setup_items[ns]=nsobj
-        #add new method to namespace object
-        x=wrapper #types.MethodType(wrapper,None,nsobj)
-        setattr(nsobj,name,x)
-        host.WriteVerbose("setupext","Adding setup extension named: {0} to namespace: {1}".format(name,ns))
+            # create the ns object
+            nsobj = type(ns, (namespace.NameSpace,), {})
+            # copy on class type as defined for given name
+            glb._setup_items[ns] = nsobj
+        # add new method to namespace object
+        x = wrapper  # types.MethodType(wrapper,None,nsobj)
+        setattr(nsobj, name, x)
+        host.WriteVerbose(
+            "setupext", "Adding setup extension named: {0} to namespace: {1}".format(name, ns))

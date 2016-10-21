@@ -1,4 +1,4 @@
-from .tester import Tester,ResultType
+from .tester import Tester, ResultType
 from .equal import Equal
 from .not_equal import NotEqual
 from .less_equal import LessEqual
@@ -12,7 +12,8 @@ from .zip_content import ZipContent
 from .regexp_content import RegexpContent
 from .file_callback import FileContentCallback
 from .contains_expression import ContainsExpression
-from .contains_expression import ContainsExpression as IncludesExpression # map for easy of use
+# map for easy of use
+from .contains_expression import ContainsExpression as IncludesExpression
 from .excludes_expression import ExcludesExpression
 from .file_callback import FileContentCallback
 from .lambda_tester import Lambda

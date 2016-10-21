@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function
 Engine = None
 
 # Object that hold tests functions used
+
+
 class When(object):
     pass
 
@@ -17,10 +19,10 @@ _runable_items = {}
 _setup_items = {}
 
 # set of reporters that we can use to generate reports with
-reporters={}
+reporters = {}
 
-##### extention for File creation
+# extention for File creation
 # mapping of file class names to the class
-FileTypeMap={}
+FileTypeMap = {}
 # mapping of file extension to class
-FileExtMap={}
+FileExtMap = {}
