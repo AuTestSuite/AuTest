@@ -1,27 +1,41 @@
 from __future__ import absolute_import, division, print_function
+import difflib
+import json
+
 from . import tester
 import hosts.output as host
 from autest.exceptions.killonfailure import KillOnFailureError
 
-import difflib
-import json
+g_escape = ['{}', '``']
+
+
+def equalToEscape(val):
+    if val in g_escape:
+        return val
+    return None
 
 
 class GoldFile(tester.Tester):
-
-    def __init__(self, goldfile, test_value=None, kill_on_failure=False, normalize_eol=True, description_group=None, description=None):
+    def __init__(self,
+                 goldfile,
+                 test_value=None,
+                 kill_on_failure=False,
+                 normalize_eol=True,
+                 description_group=None,
+                 description=None):
         if description is None:
-            description = "Checking that {0} matches {1}".format(
-                test_value, goldfile)
-        super(GoldFile, self).__init__(value=goldfile,
-                                       test_value=test_value,
-                                       kill_on_failure=kill_on_failure,
-                                       description_group=description_group,
-                                       description=description
-                                       )
+            description = "Checking that {0} matches {1}".format(test_value,
+                                                                 goldfile)
+        super(GoldFile, self).__init__(
+            value=goldfile,
+            test_value=test_value,
+            kill_on_failure=kill_on_failure,
+            description_group=description_group,
+            description=description)
 
         self._goldfile = self.Value
         self._normalize_eol = normalize_eol
+        self.__test_value = None
 
     def test(self, eventinfo, **kw):
 
@@ -80,9 +94,10 @@ class GoldFile(tester.Tester):
             # helping to make the
             # finial diff string more readable
             data = gf_content[j1:j2].strip()
-            if data.strip() == '{}' or (data == '' and sub == True):
+            tmp = equalToEscape(data.strip())
+            if tmp or (data == '' and sub is True):
                 sub = True
-                data = '{}'
+                data = tmp if tmp else '``'
                 if tag != 'insert':
                     tag = "replace"
             else:
@@ -114,15 +129,16 @@ class GoldFile(tester.Tester):
         diff = difflib.Differ()
         self.Result = tester.ResultType.Failed
 
-        tmp_result = "\n".join(diff.compare(newtext.splitlines(),
-                                            val_content.splitlines()))
+        tmp_result = "\n".join(
+            diff.compare(newtext.splitlines(), val_content.splitlines()))
 
-        self.Reason = "File differences\nGold File : {0}\nData File : {1}\n{2}".format(self._GetContent(eventinfo, self._goldfile),
-                                                                                       self._GetContent(
-                                                                                           eventinfo),
-                                                                                       tmp_result)
-        host.WriteVerbose(["testers.GoldFile", "testers"], "{0} - ".format(
-            tester.ResultType.to_color_string(self.Result)), self.Reason)
+        self.Reason = "File differences\nGold File : {0}\nData File : {1}\n{2}".format(
+            self._GetContent(eventinfo, self._goldfile),
+            self._GetContent(eventinfo), tmp_result)
+        host.WriteVerbose(
+            ["testers.GoldFile", "testers"],
+            "{0} - ".format(tester.ResultType.to_color_string(self.Result)),
+            self.Reason)
         if self.KillOnFailure:
             raise KillOnFailureError
 
@@ -135,11 +151,11 @@ class GoldFile(tester.Tester):
         # or added to a text file normally
     def _do_action_replace(self, data, text):
         try:
-            if data == "{}":
+            if equalToEscape(data):
                 return text
             # more options when we need them
             # elif data == "range":
-               # pass
+            # pass
         except KeyError:
             # key are not found, so we assume we should default actions
             pass
@@ -147,7 +163,7 @@ class GoldFile(tester.Tester):
 
     def _do_action_add(self, data, text):
         try:
-            if data.strip() == "{}":
+            if equalToEscape(data.strip()):
                 return ''
         except KeyError:
             pass
@@ -155,19 +171,28 @@ class GoldFile(tester.Tester):
 
 
 class GoldFileList(tester.Tester):
-
-    def __init__(self, goldfilesList, test_value=None, kill_on_failure=False, normalize_eol=True, description_group=None, description=None):
-        super(GoldFileList, self).__init__(test_value=test_value,
-                                           kill_on_failure=kill_on_failure,
-                                           description_group=description_group,
-                                           description=description)
-        self.Description = "Checking that {0} matches one of {1}".format(test_value,
-                                                                         ', '.join([str(gold) for gold in goldfilesList]))
+    def __init__(self,
+                 goldfilesList,
+                 test_value=None,
+                 kill_on_failure=False,
+                 normalize_eol=True,
+                 description_group=None,
+                 description=None):
+        super(GoldFileList, self).__init__(
+            test_value=test_value,
+            kill_on_failure=kill_on_failure,
+            description_group=description_group,
+            description=description)
+        self.Description = "Checking that {0} matches one of {1}".format(
+            test_value, ', '.join([str(gold) for gold in goldfilesList]))
         golds = []
         for goldfile in goldfilesList:
-            golds.append(GoldFile(goldfile, test_value=test_value,
-                                  kill_on_failure=kill_on_failure,
-                                  normalize_eol=normalize_eol))
+            golds.append(
+                GoldFile(
+                    goldfile,
+                    test_value=test_value,
+                    kill_on_failure=kill_on_failure,
+                    normalize_eol=normalize_eol))
         self._golds = golds
 
     def test(self, eventinfo, **kw):
