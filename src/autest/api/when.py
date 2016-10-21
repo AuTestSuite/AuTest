@@ -14,6 +14,7 @@ def AddWhenFunction(func, name=None):
         else:
             # just pass back function
             return func
+
     wrapper.when_wrapper = True
     method = wrapper
     setattr(glb.When, name, method)

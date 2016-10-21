@@ -4,7 +4,8 @@ from . import is_a
 
 
 def flatten(iterable):
-    if isinstance(iterable, collections.Iterable) and not isinstance(iterable, str):
+    if isinstance(iterable, collections.Iterable) and not isinstance(iterable,
+                                                                     str):
         return [a for i in iterable for a in flatten(i)]
     else:
         return [iterable]

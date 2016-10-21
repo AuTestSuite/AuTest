@@ -1,8 +1,7 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
+
 import hosts.output as host
 from autest.core.testrun import TestRun
-import types
 
 
 def ExtendTestRun(func, name=None, setproperty=False):
@@ -14,5 +13,5 @@ def ExtendTestRun(func, name=None, setproperty=False):
         method = property(fset=method)
 
     setattr(TestRun, name, method)
-    host.WriteVerbose(
-        "api", 'Added TestRun extension function "{0}"'.format(name))
+    host.WriteVerbose("api",
+                      'Added TestRun extension function "{0}"'.format(name))

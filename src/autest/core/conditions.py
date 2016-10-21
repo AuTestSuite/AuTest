@@ -1,7 +1,4 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
-import autest.common.ospath as ospath
-import autest.common.reg as reg
 
 import subprocess
 import os
@@ -11,9 +8,12 @@ import stat
 
 from builtins import object
 
+import autest.common.ospath as ospath
+import autest.common.reg as reg
+
+
 
 class Condition(object):
-
     def __init__(self, testfunc, reason, pass_value, neg_reason=None):
         self.__func = testfunc
         self.__msg = reason
@@ -48,7 +48,6 @@ class Condition(object):
 
 
 class ConditionFactory(object):
-
     def __call__(self, function, reason, pass_value=True, neg_reason=None):
         return self.Condition(function, reason, pass_value, neg_reason)
 
@@ -80,8 +79,7 @@ class ConditionFactory(object):
 
     def IsPlatform(self, *lst):
         return self.Condition(
-            lambda: sys.platform.lower() in lst or platform.system(
-            ).lower() in lst or os.name.lower() in lst,
+            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
             'Platform must be one of {0}, reported value was "{1}" or "{2}"'.
             format(lst, platform.system().lower(), os.name),
             True,
@@ -90,8 +88,7 @@ class ConditionFactory(object):
 
     def IsNotPlatform(self, *lst):
         return self.Condition(
-            lambda: sys.platform.lower() in lst or platform.system(
-            ).lower() in lst or os.name.lower() in lst,
+            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
             'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.
             format(lst, platform.system().lower(), os.name),
             False,

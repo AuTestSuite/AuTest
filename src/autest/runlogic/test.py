@@ -1,9 +1,13 @@
+# pylint: disable=locally-disabled, protected-access, redefined-builtin
 from __future__ import absolute_import, division, print_function
+
+import os
+import copy
+import time
+
+import hosts.output as host
 import autest.glb as glb
 from autest.common.constructor import call_base, smart_init
-import hosts.output as host
-
-import autest.common.disk as disk
 import autest.common.is_a as is_a
 from autest.common.execfile import execFile
 import autest.testers as testers
@@ -16,15 +20,11 @@ from .runlogic import RunLogic
 from .process import Process_RunLogic
 from .testrun import TestRun_RunLogic
 
-import os
-import traceback
-import copy
-import time
+
 
 
 @smart_init
 class Test_RunLogic(RunLogic):
-
     @call_base()
     def __init__(self):
         self.__running = False  # Are we running
@@ -32,7 +32,8 @@ class Test_RunLogic(RunLogic):
         self.__task_stack = []  # a list of objects
         # current running process if any (started by test)
         self.__running_processes = []
-        self.__tr_running_processes = []  # running processes start by a test run
+        self.__tr_running_processes = [
+        ]  # running processes start by a test run
         self.__running_default = None  # the default running process object
         self.__test = None  # The test object
         self._default = None  # the default process object (info)
@@ -61,8 +62,9 @@ class Test_RunLogic(RunLogic):
         tmp = self.StartOrderedItemsAync(proc_list, Process_RunLogic)
         if len(tmp) and is_a.String(tmp[0]):
             # we had a startup failure
-            host.WriteVerbosef(
-                "test_logic", "Test {0}: Starting of processes Failed!", self.__test.Name)
+            host.WriteVerbosef("test_logic",
+                               "Test {0}: Starting of processes Failed!",
+                               self.__test.Name)
             return (True, tmp[0], tmp[1])
         self.__running_processes = tmp
         host.WriteVerbosef("test_logic", "Test {0} Started!", self.__test.Name)
@@ -75,11 +77,12 @@ class Test_RunLogic(RunLogic):
         self.__running = True
         self.__test = test
         host.WriteMessagef("Running Test {0}:", self.__test.Name, end="")
-        host.WriteVerbosef(
-            "test_logic", "Starting Test \"{0}\"", self.__test.Name)
+        host.WriteVerbosef("test_logic", "Starting Test \"{0}\"",
+                           self.__test.Name)
         # Make sandbox directory for the given test
-        host.WriteVerbosef(
-            "test_logic", "Creating sandbox directory for Test {0}", self.__test.Name)
+        host.WriteVerbosef("test_logic",
+                           "Creating sandbox directory for Test {0}",
+                           self.__test.Name)
         os.makedirs(self.__test.RunDirectory)
         # read the test
         try:
@@ -91,11 +94,13 @@ class Test_RunLogic(RunLogic):
         # validate conditions
         if self.canRunTest():
             # map some events
-            self.__test._RegisterEvent("starting_logic",
-                                       self.__test.StartingEvent,
-                                       testers.Lambda(self.doStart,
-                                                      description_group="Starting Test {0}".format(self.__test.Name))
-                                       )
+            self.__test._RegisterEvent(
+                "starting_logic",
+                self.__test.StartingEvent,
+                testers.Lambda(
+                    self.doStart,
+                    description_group="Starting Test {0}".format(
+                        self.__test.Name)))
 
             # bind events
             self.__test.Setup._BindEvents()
@@ -104,8 +109,8 @@ class Test_RunLogic(RunLogic):
             self.__test.SetupEvent(SetupInfo())
             # test that everything setup correctly so we can continue
             if self.__test.Setup._Result != testers.ResultType.Passed and self.__test.Setup._Result != testers.ResultType.Warning:
-                host.WriteVerbosef(
-                    "test_logic", "Setup failed for Test {0}", self.__test.Name)
+                host.WriteVerbosef("test_logic", "Setup failed for Test {0}",
+                                   self.__test.Name)
                 return False
 
             # starting event
@@ -114,15 +119,18 @@ class Test_RunLogic(RunLogic):
             # started event
             self.__test.StartedEvent(StartedInfo())
         else:
-             # cannot run test..  report as needed that this being skipped
+            # cannot run test..  report as needed that this being skipped
             reason = self.__test._Conditions._Reason
             self.__test._Result = testers.ResultType.Skipped
             self.__running = False
 
             host.WriteMessagef(
-                " {0}", testers.ResultType.to_color_string(self.__test._Result))
-            host.WriteWarning("Skipping test {0} because:\n {1}".format(self.__test.Name, reason),
-                              show_stack=False)
+                " {0}",
+                testers.ResultType.to_color_string(self.__test._Result))
+            host.WriteWarning(
+                "Skipping test {0} because:\n {1}".format(self.__test.Name,
+                                                          reason),
+                show_stack=False)
             # clean up any mess
             # such as remove the sandbox if had no issues
             # self.cleanupTest()
@@ -161,28 +169,32 @@ class Test_RunLogic(RunLogic):
         stack_len = len(self.__task_stack)
 
         if self.__delay_time:
-            if time.time() - self.__delay_time > self.__task_stack[0].DelayStart:
+            if time.time() - self.__delay_time > self.__task_stack[
+                    0].DelayStart:
                 self.startTestRun()
             ret = True
         elif self.__current_run is None and stack_len:
             # we don't have a anything running start up first item on list
             # check for DelayStart
             if self.__task_stack[0].DelayStart and self.__delay_time is None:
-                host.WriteVerbosef(["test_logic"], "Delaying start of test run {0} by {1} sec", self.__task_stack[
-                                   0].Name, self.__task_stack[0].DelayStart)
+                host.WriteVerbosef(["test_logic"],
+                                   "Delaying start of test run {0} by {1} sec",
+                                   self.__task_stack[0].Name,
+                                   self.__task_stack[0].DelayStart)
                 self.__delay_time = time.time()
             else:
                 self.startTestRun()
             ret = True
-        elif self.__current_run and self.__current_run.Poll():  # are we still running
+        elif self.__current_run and self.__current_run.Poll(
+        ):  # are we still running
             # poll running processes
             try:
                 # we don't care is the processes are running or not
                 # we just need to trigger the run event on these objects
                 self.PollItems(self.__running_processes)
                 # call running event on this test object
-                self.__test.RunningEvent(RunningInfo(
-                    self.__start_time, time.time()))
+                self.__test.RunningEvent(
+                    RunningInfo(self.__start_time, time.time()))
             except KillOnFailureError:
                 # if we catch this here .. whole test has to stop
                 # stop current run
@@ -197,17 +209,19 @@ class Test_RunLogic(RunLogic):
             # remove and processes started by a test run and are not running
             # anymore
             stopped_processes = [
-                x for x in self.__tr_running_processes if not x.isRunning()]
+                x for x in self.__tr_running_processes if not x.isRunning()
+            ]
             self.__tr_running_processes = [
-                x for x in self.__tr_running_processes if x.isRunning()]
+                x for x in self.__tr_running_processes if x.isRunning()
+            ]
             # for the stopped processes we need make sure they finish
             for p in stopped_processes:
                 # simple poll call will make sure it calls any events and cleanup code
                 # if it has not happened yet
                 p.Poll()
 
-            host.WriteVerbosef(
-                ["test_logic"], "Finished test run: {0}", self.__current_run.TestRun.Name)
+            host.WriteVerbosef(["test_logic"], "Finished test run: {0}",
+                               self.__current_run.TestRun.Name)
             # start up next item if we have any
             curr_result = self.__current_run.TestRun._Result
             if curr_result == testers.ResultType.Failed:
@@ -229,10 +243,11 @@ class Test_RunLogic(RunLogic):
             if stack_len:
                 # are we skipping tests if we have a failure
                 if skip:
-                    host.WriteVerbosef(
-                        ["test_logic"], "Skipping rest of the test: {0}", self.__test.Name)
+                    host.WriteVerbosef(["test_logic"],
+                                       "Skipping rest of the test: {0}",
+                                       self.__test.Name)
                     # skip test
-                    while(len(self.__task_stack) != 0):
+                    while len(self.__task_stack) != 0:
                         tmp = self.__task_stack[0]
                         tmp._Result = testers.ResultType.Skipped
                         tmp._Reason = "Test run {0} failed".format(
@@ -241,29 +256,34 @@ class Test_RunLogic(RunLogic):
                     ret = False
                 else:
                     # start next test
-                    if self.__task_stack[0].DelayStart and self.__delay_time is None:
-                        host.WriteVerbosef(["test_logic"], "Delaying start of test run {0} by {1} sec", self.__task_stack[
-                                           0].Name, self.__task_stack[0].DelayStart)
+                    if self.__task_stack[
+                            0].DelayStart and self.__delay_time is None:
+                        host.WriteVerbosef(
+                            ["test_logic"],
+                            "Delaying start of test run {0} by {1} sec",
+                            self.__task_stack[0].Name,
+                            self.__task_stack[0].DelayStart)
                         self.__delay_time = time.time()
                     else:
                         self.startTestRun()
                     ret = True
 
-        if ret == False:
+        if ret is False:
             # all the test runs are done
             # Stop processes
-            host.WriteVerbosef(
-                ['test_logic'], "Stopping processes owned by Test")
+            host.WriteVerbosef(['test_logic'],
+                               "Stopping processes owned by Test")
             if hard_stop:
                 self.StopItems(self.__running_processes +
                                self.__tr_running_processes)
             else:
-                self.StopItems(self.__running_processes +
-                               self.__tr_running_processes, 15, 2)
+                self.StopItems(
+                    self.__running_processes + self.__tr_running_processes, 15,
+                    2)
             # call finished event
             if self.__start_time:
-                self.__test.FinishedEvent(FinishedInfo(
-                    time.time() - self.__start_time))
+                self.__test.FinishedEvent(
+                    FinishedInfo(time.time() - self.__start_time))
             else:
                 self.__test.FinishedEvent(FinishedInfo(0))
 
@@ -272,11 +292,13 @@ class Test_RunLogic(RunLogic):
 
             # output some info
             host.WriteMessagef(
-                " {0}", testers.ResultType.to_color_string(self.__test._Result))
+                " {0}",
+                testers.ResultType.to_color_string(self.__test._Result))
             if self.__current_run and self.__current_run.TestRun._Result == testers.ResultType.Exception:
-                host.WriteWarning('Stopping test run for test "{0}" because test run "{1}" had an Exception:\n {2}'.format(self.__test.Name,
-                                                                                                                           self.__current_run.TestRun.Name,
-                                                                                                                           self.__current_run.TestRun._ExceptionMessage))
+                host.WriteWarning(
+                    'Stopping test run for test "{0}" because test run "{1}" had an Exception:\n {2}'.
+                    format(self.__test.Name, self.__current_run.TestRun.Name,
+                           self.__current_run.TestRun._ExceptionMessage))
 
             self.__running = False
         return ret
@@ -301,8 +323,8 @@ class Test_RunLogic(RunLogic):
         })
 
         # get full path
-        fileName = os.path.join(
-            self.__test.TestDirectory, self.__test.TestFile)
+        fileName = os.path.join(self.__test.TestDirectory,
+                                self.__test.TestFile)
         host.WriteVerbose(["test_logic", "reading"],
                           'reading test "{0}"'.format(self.__test.Name))
         execFile(fileName, locals, locals)

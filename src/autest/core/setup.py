@@ -1,17 +1,16 @@
 from __future__ import absolute_import, division, print_function
+import traceback
+from future.utils import with_metaclass
+
 import autest.glb as glb
 from autest.exceptions.setuperror import SetupError
 from autest.testers import tester
 
-import traceback
-from future.utils import with_metaclass
-
 
 class _setup__metaclass__(type):
-
     def __call__(cls, *lst, **kw):
         inst = type.__call__(cls, *lst, **kw)
-        for k, v in glb._setup_items.items():
+        for k, v in glb.setup_items.items():
             setattr(inst, k, v(inst))
         return inst
 
@@ -36,11 +35,11 @@ def mapsetup(item):
 def mapcleanup(item):
     def docleanup(ev):
         item.cleanup()
+
     return docleanup
 
 
 class Setup(with_metaclass(_setup__metaclass__, object)):
-
     def __init__(self, test):
         self.__setup_items = []
         self.__test = test
@@ -85,7 +84,7 @@ class Setup(with_metaclass(_setup__metaclass__, object)):
     @property
     def _Reason(self):
         # if not self.__reason:
-            # return "Setup has no issues"
+        # return "Setup has no issues"
         return self.__reason
 
     @_Reason.setter
@@ -95,6 +94,7 @@ class Setup(with_metaclass(_setup__metaclass__, object)):
     @property
     def _Failed(self):
         return self.__reason is not None
+
 
 #import autest.api
 # autest.api.AddTestEnityMember(Setup)

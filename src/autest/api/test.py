@@ -1,8 +1,6 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
 import hosts.output as host
 from autest.core.test import Test
-import types
 
 
 def ExtendTest(func, name=None):
@@ -10,5 +8,5 @@ def ExtendTest(func, name=None):
         name = func.__name__
     method = func
     setattr(Test, name, method)
-    host.WriteVerbose(
-        "api", 'Added Test extension function "{0}"'.format(name))
+    host.WriteVerbose("api",
+                      'Added Test extension function "{0}"'.format(name))

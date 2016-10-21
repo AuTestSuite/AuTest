@@ -1,7 +1,8 @@
 from __future__ import absolute_import, division, print_function
-from . import is_a
 from functools import *
 import inspect
+
+from . import is_a
 
 
 def map_kw(cls, func_info, args, kw):
@@ -26,9 +27,9 @@ def map_kw(cls, func_info, args, kw):
 
 
 def user_map(func_info, argmap, kw):
-    ''' 
+    '''
     based on function info map the arguments needed
-    to call the function based on what we have in KW        
+    to call the function based on what we have in KW
     '''
     ret = {}
     if func_info.keywords:
@@ -39,8 +40,9 @@ def user_map(func_info, argmap, kw):
 
     for cnt, a in enumerate(argmap):
         if cnt + 2 > len(func_info.args):
-            raise RuntimeError("Invalid mapping of arguments, function takes {0} arguments got {1}".format(
-                len(func_info.args), cnt + 2))
+            raise RuntimeError(
+                "Invalid mapping of arguments, function takes {0} arguments got {1}".
+                format(len(func_info.args), cnt + 2))
         if not inspect.isfunction(a):
             ret[func_info.args[cnt + 1]] = kw[a] if a in kw else a
         else:  # assume it is a function
@@ -49,9 +51,9 @@ def user_map(func_info, argmap, kw):
 
 
 def map_kw_init(clsname, func_info, kw):
-    ''' 
+    '''
     based on function info map the arguments needed
-    to call the function based on what we have in KW        
+    to call the function based on what we have in KW
     '''
     rkw = {}
     arg_map = kw.get("__arg_map__", {}).get(clsname)
@@ -62,7 +64,7 @@ def map_kw_init(clsname, func_info, kw):
     if func_info.keywords:
         # we have a kw to pass
         for k, v in kw.items():
-            if k != __arg_map__:
+            if k != arg_map:
                 rkw[k] = v
     else:
         # normal mapping
@@ -84,12 +86,8 @@ def map_kw_init(clsname, func_info, kw):
                         default_indx += 1
                     else:
                         print(
-                            "argument mapping error for class {0}:\n Trying to map arguments {1}\n Has arguments {2}".format(
-                                clsname,
-                                func_info.args,
-                                kw.keys()
-                            )
-                        )
+                            "argument mapping error for class {0}:\n Trying to map arguments {1}\n Has arguments {2}".
+                            format(clsname, func_info.args, kw.keys()))
                         raise
     return rkw
 
@@ -133,7 +131,8 @@ def call_base(**kw):
                 for k, v in arg_map.items():
                     if k in kw["__arg_map__"]:
                         raise RuntimeError(
-                            "class {0} is already been defined for mapping, in valid class mapping".format(k))
+                            "class {0} is already been defined for mapping, in valid class mapping".
+                            format(k))
                     kw["__arg_map__"][k] = v
             except KeyError:
                 # we have not set it yet
@@ -144,10 +143,13 @@ def call_base(**kw):
             # get next init function to make sure we can pass **kw to it
             # the python object does not allow for this
             tmp = _next_class(type(lst[0]), cls)
-            if call_super and (inspect.isfunction(tmp.__init__) or inspect.ismethod(tmp.__init__)):
+            if call_super and (inspect.isfunction(tmp.__init__) or
+                               inspect.ismethod(tmp.__init__)):
                 super(cls, lst[0]).__init__(**kw)
             func(lst[0], **init_kw)
+
         return init_wrapper
+
     return constructor_mapper
 
 

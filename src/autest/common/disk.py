@@ -8,7 +8,7 @@ def remove_read_only(func, path, exc_info):
     """
     common helper function for shutil functions.
     This will try to see if the file we failed to remove
-    was due to lack of write access ( 
+    was due to lack of write access (
 
     Usage : ``shutil.rmtree(path, onerror=remove_read_only)``
     """
@@ -46,8 +46,10 @@ def copy_tree(src, dest):
     This is different from shutil.copytree that errors out if the dest directory
     already exists
     '''
+
     def copyfunc(src, dest):
         if not os.path.exists(dest):
             os.makedirs(dest)
         shutil.copy2(src, dest)
+
     gen_tree_action(src, dest, copyfunc)

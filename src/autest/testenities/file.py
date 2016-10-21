@@ -1,12 +1,13 @@
 from __future__ import absolute_import, division, print_function
-from autest.common.constructor import call_base, smart_init
+import os
 
+from autest.common.constructor import call_base, smart_init
 import autest.common.is_a as is_a
 from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
 import autest.testers as testers
 
-import os
+
 
 
 @smart_init
@@ -14,8 +15,16 @@ class File(TestEnity):
     '''
     Allows us to test for a file. We can test for size, existance and content
     '''
-    @call_base(TestEnity=("runable",))
-    def __init__(self, runable, name, exists=None, size=None, content_tester=None, execute=False, runtime=True):
+
+    @call_base(TestEnity=("runable", ))
+    def __init__(self,
+                 runable,
+                 name,
+                 exists=None,
+                 size=None,
+                 content_tester=None,
+                 execute=False,
+                 runtime=True):
         self.__name = name
         self.__runtime = runtime
         self._count = 0
@@ -29,9 +38,8 @@ class File(TestEnity):
                 self,
                 self._Runable.FinishedEvent,
                 converter=bool,
-                description_group=des_grp
-            ), "Exists"
-        )
+                description_group=des_grp),
+            "Exists")
         # size
         self._Register(
             "File.{0}.Size".format(self.__name),
@@ -41,9 +49,8 @@ class File(TestEnity):
                 self._Runable.FinishedEvent,
                 converter=int,
                 description_group=des_grp,
-                description="File size is {0.Value} bytes"
-            ), "Size"
-        )
+                description="File size is {0.Value} bytes"),
+            "Size")
         # content
         self._Register(
             "File.{0}.Content".format(self.__name),
@@ -98,14 +105,16 @@ class File(TestEnity):
         '''
         The absolute path of the file, based on Runtime sandbox location
         '''
-        return os.path.normpath(os.path.join(self._RootRunable.RunDirectory, self.Name))
+        return os.path.normpath(
+            os.path.join(self._RootRunable.RunDirectory, self.Name))
 
     @property
     def AbsTestPath(self):
         '''
         The absolute path of the file, based on directory relative from the test file location
         '''
-        return os.path.normpath(os.path.join(self._RootRunable.TestDirectory, self.Name))
+        return os.path.normpath(
+            os.path.join(self._RootRunable.TestDirectory, self.Name))
 
     @property
     def Name(self):
@@ -138,11 +147,12 @@ class File(TestEnity):
         if event is None:
             event = self._Runable.StartingEvent
 
-        self._Runable._RegisterEvent("File.{0}.WriteOn.{1}".format(self.__name, self._count),
-                                     event,
-                                     testers.Lambda(action,
-                                                    description_group="Writing File {0}".format(self.__name))
-                                     )
+        self._Runable._RegisterEvent(
+            "File.{0}.WriteOn.{1}".format(self.__name, self._count),
+            event,
+            testers.Lambda(
+                action,
+                description_group="Writing File {0}".format(self.__name)))
 
     def WriteAppendOn(self, content, event=None):
         # content is a string or function taking a file handle
@@ -162,11 +172,12 @@ class File(TestEnity):
 
         # content is a string or function taking a file handle
         self._count += 1
-        self._Runable._RegisterEvent("File.{0}.WriteAppendOn.{1}".format(self.__name, self._count),
-                                     event,
-                                     testers.Lambda(action,
-                                                    description_group="Appending File {0}".format(self.__name))
-                                     )
+        self._Runable._RegisterEvent(
+            "File.{0}.WriteAppendOn.{1}".format(self.__name, self._count),
+            event,
+            testers.Lambda(
+                action,
+                description_group="Appending File {0}".format(self.__name)))
 
     def WriteCustomOn(self, func, event=None):
         # content is a string or function taking a file handle
@@ -178,8 +189,9 @@ class File(TestEnity):
 
         # content is a string or function taking a file handle
         self._count += 1
-        self._Runable._RegisterEvent("File.{0}.WriteCustomOn.{1}".format(self.__name, self._count),
-                                     event,
-                                     testers.Lambda(action,
-                                                    description_group="Appending File {0}".format(self.__name))
-                                     )
+        self._Runable._RegisterEvent(
+            "File.{0}.WriteCustomOn.{1}".format(self.__name, self._count),
+            event,
+            testers.Lambda(
+                action,
+                description_group="Appending File {0}".format(self.__name)))

@@ -1,4 +1,3 @@
-
 from .file import RegisterFileType
 from .instance import AddMethodToInstance
 from .reporter import RegisterReporter

@@ -7,7 +7,6 @@ import autest.common.is_a as is_a
 
 @smart_init
 class Variables(dict, object):
-
     @call_base(dict=(), object=())
     def __init__(self, val=None, parent=None):
         self.__parent = parent

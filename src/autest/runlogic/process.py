@@ -1,8 +1,15 @@
+# pylint: disable=locally-disabled, protected-access
 from __future__ import absolute_import, division, print_function
-from autest.common.constructor import call_base, smart_init
-import hosts.output as host
-import autest.glb as glb
+import os
+import string
+import subprocess
+import time
+import shlex
+import traceback
 
+import hosts.output as host
+
+from autest.common.constructor import call_base, smart_init
 import autest.common.is_a as is_a
 import autest.common.process
 from .runlogic import RunLogic
@@ -11,16 +18,9 @@ import autest.core.eventinfo as eventinfo
 import autest.testers as testers
 from autest.exceptions.killonfailure import KillOnFailureError
 
-import os
-import string
-import subprocess
-import time
-import shlex
-
 
 @smart_init
 class Process_RunLogic(RunLogic):
-
     @call_base()
     def __init__(self):
         self._process = None
@@ -44,7 +44,9 @@ class Process_RunLogic(RunLogic):
         # Test to see if we have run so long
         runtime = time.time() - self.__start_time
         host.WriteDebugf(
-            ["process"], "Checking if time passed has been {0} seconds: ran for {1} sec", t, runtime)
+            ["process"],
+            "Checking if time passed has been {0} seconds: ran for {1} sec", t,
+            runtime)
         return runtime >= t
 
     def ListCmd(self, cmdstr):
@@ -60,12 +62,24 @@ class Process_RunLogic(RunLogic):
 
         # some command characters that suggest we wanted to run in a shell
         core_operators = ';&><|'
-        shell_args = [';', '&&', '&', '>', '>>',
-                      '<', '|', '||', 'cd', 'set', 'export', ]
+        shell_args = [
+            ';',
+            '&&',
+            '&',
+            '>',
+            '>>',
+            '<',
+            '|',
+            '||',
+            'cd',
+            'set',
+            'export',
+        ]
         if os.name == 'nt':
             # extra stuff for windows.. not complete, but common stuff
-            shell_args = ['echo', 'dir', 'del', 'rmdir',
-                          'rd', 'move', 'rename', 'mkdir']
+            shell_args = [
+                'echo', 'dir', 'del', 'rmdir', 'rd', 'move', 'rename', 'mkdir'
+            ]
         for arg in self.ListCmd(cmdstr):
             if arg.lower() in shell_args:
                 return True
@@ -79,8 +93,8 @@ class Process_RunLogic(RunLogic):
         return False
 
     def doSetup(self, ev):
-        host.WriteVerbosef(
-            "testrun_logic", "Setup Test {0}", self._process.Name)
+        host.WriteVerbosef("testrun_logic", "Setup Test {0}",
+                           self._process.Name)
         try:
             self._process.Setup._do_setup()
         except:
@@ -91,8 +105,8 @@ class Process_RunLogic(RunLogic):
         if self.isRunning():
             # in case we are already running
             return
-        host.WriteVerbosef(
-            ['process'], 'Start process {0}', self._process.Name)
+        host.WriteVerbosef(['process'], 'Start process {0}',
+                           self._process.Name)
         # so we know we can call clean up once to get the end events testers
         self.__call_cleanup = True
 
@@ -101,7 +115,8 @@ class Process_RunLogic(RunLogic):
 
         # substitute the value of the string via the template engine
         # as this provide a safe cross platform $subst model.
-        env = self._process.ComposeEnv()  # get the correct shell env for the process
+        env = self._process.ComposeEnv(
+        )  # get the correct shell env for the process
         template = string.Template(command_line)
         command_line = template.substitute(env)
         # test to see that this might need a shell
@@ -113,66 +128,69 @@ class Process_RunLogic(RunLogic):
 
         except ValueError as e:
             self.__output = streamwriter.StreamWriter(
-                self._process.StreamOutputDirectory,
-                command_line,
-                env)
+                self._process.StreamOutputDirectory, command_line, env)
             self.Cleanup()
-            raise KillOnFailureError(
-                'Bad command line - {0}\n Details: {1}'.format(command_line, e))
-        args = self.ListCmd(command_line) if shell == False else command_line
+            raise KillOnFailureError('Bad command line - {0}\n Details: {1}'.
+                                     format(command_line, e))
+        args = self.ListCmd(command_line) if not shell else command_line
 
         # call event that we are starting to run the process
-        host.WriteDebugf(["process"], "Calling StartingRun event with {0} callbacks mapped to it", len(
-            self._process.StartingEvent))
+        host.WriteDebugf(
+            ["process"],
+            "Calling StartingRun event with {0} callbacks mapped to it",
+            len(self._process.StartingEvent))
         self._process.StartingEvent(eventinfo.StartingInfo())
 
-        host.WriteVerbosef(["process"], "Running command:\n '{0}'\n in directory='{1}'\n Path={2}",
-                           command_line, self._process._RootRunable.RunDirectory, env['PATH'])
-        host.WriteDebugf(
-            ["process"], "Passing arguments to subprocess as: {0}", args)
+        host.WriteVerbosef(
+            ["process"],
+            "Running command:\n '{0}'\n in directory='{1}'\n Path={2}",
+            command_line, self._process._RootRunable.RunDirectory, env['PATH'])
+        host.WriteDebugf(["process"],
+                         "Passing arguments to subprocess as: {0}", args)
         if is_a.List(args):
             finalcmd = subprocess.list2cmdline(args)
-            host.WriteDebugf(
-                ["process"], "subprocess list2cmdline = {0}", finalcmd)
+            host.WriteDebugf(["process"], "subprocess list2cmdline = {0}",
+                             finalcmd)
         else:
             finalcmd = args
         # create a StreamWriter which will write out the stream data of the run
         # to sorted files, as well as make script files of the command ( might
         # break this up later)
         self.__output = streamwriter.StreamWriter(
-            self._process.StreamOutputDirectory,
-            finalcmd,
-            env)
+            self._process.StreamOutputDirectory, finalcmd, env)
 
         try:
-            self.__proc = autest.common.process.Popen(args,
-                                                      shell=shell,
-                                                      stdout=subprocess.PIPE,
-                                                      stderr=subprocess.PIPE,
-                                                      cwd=self._process._RootRunable.RunDirectory,
-                                                      env=env)
+            self.__proc = autest.common.process.Popen(
+                args,
+                shell=shell,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=self._process._RootRunable.RunDirectory,
+                env=env)
         except IOError as err:
             self.Cleanup()
-            raise KillOnFailureError(
-                'Bad command line - {0}\n Details: {1}'.format(command_line, err))
+            raise KillOnFailureError('Bad command line - {0}\n Details: {1}'.
+                                     format(command_line, err))
         except OSError as err:
             self.Cleanup()
-            raise KillOnFailureError(
-                'Bad command line - {0}\n Details: {1}'.format(command_line, err))
+            raise KillOnFailureError('Bad command line - {0}\n Details: {1}'.
+                                     format(command_line, err))
 
         # map pipes for output
-        self.__stdout = streamwriter.PipeRedirector(
-            self.__proc.stdout, self.__output.WriteStdOut)
-        self.__stderr = streamwriter.PipeRedirector(
-            self.__proc.stderr, self.__output.WriteStdErr)
+        self.__stdout = streamwriter.PipeRedirector(self.__proc.stdout,
+                                                    self.__output.WriteStdOut)
+        self.__stderr = streamwriter.PipeRedirector(self.__proc.stderr,
+                                                    self.__output.WriteStdErr)
 
         # Get times
         self.__start_time = time.time()
         self.__last_event_time = self.__start_time
 
         # set event that process was started
-        host.WriteDebugf(["process"], "Calling RunStarted event with {0} callbacks mapped to it", len(
-            self._process.StartedEvent))
+        host.WriteDebugf(
+            ["process"],
+            "Calling RunStarted event with {0} callbacks mapped to it",
+            len(self._process.StartedEvent))
         self._process.StartedEvent(eventinfo.StartedInfo)
         self._process._isRunning(True)
 
@@ -184,14 +202,14 @@ class Process_RunLogic(RunLogic):
                 if self.__output is None:
                     self.__output = streamwriter.StreamWriter(
                         self._process.StreamOutputDirectory,
-                        self._process.RawCommand,
-                        self._process.ComposeEnv())
+                        self._process.RawCommand, self._process.ComposeEnv())
 
-                event_info = eventinfo.ProcessFinishedInfo(
-                    0, None, self.__output)
+                event_info = eventinfo.ProcessFinishedInfo(0, None,
+                                                           self.__output)
             else:
                 event_info = eventinfo.ProcessFinishedInfo(
-                    time.time() - self.__start_time, self.__proc.returncode, self.__output)
+                    time.time() - self.__start_time, self.__proc.returncode,
+                    self.__output)
                 self.__proc = None
 
             if self.__output:
@@ -205,8 +223,10 @@ class Process_RunLogic(RunLogic):
                 self.__stderr = None
 
             # call event
-            host.WriteDebug(["process"], "Calling FinishedEvent event with {0} callbacks mapped to it".format(
-                len(self._process.FinishedEvent)))
+            host.WriteDebug(
+                ["process"],
+                "Calling FinishedEvent event with {0} callbacks mapped to it".
+                format(len(self._process.FinishedEvent)))
             self._process.FinishedEvent(event_info)
 
     def Start(self, process):
@@ -219,8 +239,8 @@ class Process_RunLogic(RunLogic):
         self._process.SetupEvent(eventinfo.SetupInfo())
         # test that everything setup correctly so we can continue
         if self._process.Setup._Result != testers.ResultType.Passed and self._process.Setup._Result != testers.ResultType.Warning:
-            host.WriteVerbosef(
-                "test_logic", "Setup failed for Test {0}", self._process.Name)
+            host.WriteVerbosef("test_logic", "Setup failed for Test {0}",
+                               self._process.Name)
             return False
         # For process this will call the rest of the events as needed
         try:
@@ -237,8 +257,8 @@ class Process_RunLogic(RunLogic):
             curr_time = time.time()
             if curr_time - self.__last_event_time > .5:
                 # make event info object
-                event_info = eventinfo.RunningInfo(
-                    self.__start_time, curr_time)
+                event_info = eventinfo.RunningInfo(self.__start_time,
+                                                   curr_time)
                 # call event
                 #host.WriteDebugf(["process"],"Process: {0} - Calling Running event with {1} callbacks mapped to it", self.Name ,len(self.Running))
                 try:
@@ -257,8 +277,8 @@ class Process_RunLogic(RunLogic):
         return self.__proc is not None and self.__proc.poll() is None
 
     def Stop(self):
-        host.WriteVerbosef(
-            ['process'], 'Stopping process {0}', self._process.Name)
+        host.WriteVerbosef(['process'], 'Stopping process {0}',
+                           self._process.Name)
         if self.isRunning():
 
             self.__proc.killtree()

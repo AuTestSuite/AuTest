@@ -4,15 +4,20 @@ from autest.exceptions.killonfailure import KillOnFailureError
 
 
 class NotEqual(tester.Tester):
-
-    def __init__(self, value, test_value=None, kill_on_failure=False, description_group=None, description=None):
+    def __init__(self,
+                 value,
+                 test_value=None,
+                 kill_on_failure=False,
+                 description_group=None,
+                 description=None):
         if description is None:
             description = "Checking that {0} != {1}"
-        super(NotEqual, self).__init__(value=value,
-                                       test_value=test_value,
-                                       kill_on_failure=kill_on_failure,
-                                       description_group=description_group,
-                                       description=description)
+        super(NotEqual, self).__init__(
+            value=value,
+            test_value=test_value,
+            kill_on_failure=kill_on_failure,
+            description_group=description_group,
+            description=description)
 
     def test(self, eventinfo, **kw):
         # Get value to test against
@@ -31,5 +36,7 @@ class NotEqual(tester.Tester):
         else:
             self.Result = tester.ResultType.Passed
             self.Reason = "Returned value: {0} != {1}".format(val, self.Value)
-        host.WriteVerbose(["testers.NotEqual", "testers"], "{0} - ".format(
-            tester.ResultType.to_color_string(self.Result)), self.Reason)
+        host.WriteVerbose(
+            ["testers.NotEqual", "testers"],
+            "{0} - ".format(tester.ResultType.to_color_string(self.Result)),
+            self.Reason)

@@ -1,8 +1,6 @@
+import socket
 from autest.api import AddWhenFunction
 import hosts.output as host
-
-import socket
-
 
 def PortOpen(port, address=None):
 
@@ -25,5 +23,6 @@ def PortOpen(port, address=None):
                     "checking port {0} = {1}".format(port, ret))
 
     return ret
+
 
 AddWhenFunction(PortOpen)

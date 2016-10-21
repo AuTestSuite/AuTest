@@ -1,15 +1,14 @@
 from __future__ import absolute_import, division, print_function
+import hosts.output as host
 from autest.common.constructor import call_base, smart_init
 from autest.core.testenity import TestEnity
-import hosts.output as host
 import autest.testers as testers
 from .process import Process
 
 
 @smart_init
-class Processes (TestEnity):
-
-    @call_base(TestEnity=("runable",))
+class Processes(TestEnity):
+    @call_base(TestEnity=("runable", ))
     def __init__(self, runable):
 
         self.__processes = {}
@@ -26,11 +25,13 @@ class Processes (TestEnity):
     def _Items(self):
         return self.__processes.values()
 
-    def Process(self, id,
-                cmdstr=None,
-                returncode=None,
-                startup_timeout=10,  # default to 10 second as most things should be ready by this time
-                ):
+    def Process(
+            self,
+            id,
+            cmdstr=None,
+            returncode=None,
+            startup_timeout=10,  # default to 10 second as most things should be ready by this time
+    ):
         # todo ... add check to make sure id a varaible safe
 
         tmp = Process(self._Runable, id, cmdstr)
@@ -46,12 +47,12 @@ class Processes (TestEnity):
         self.__dict__[id] = tmp
         return tmp
 
-    def Add(self, process):
-        if self.process.Name in self.__processes:
-            host.WriteWarning(
-                "Overriding process object {0}".format(self.process.Name))
-        self.__processes[self.process.Name] = self.process
-        self.__dict__[self.process.Name] = self.process
+    # def Add(self, process):
+    #     if self.process.Name in self.__processes:
+    #         host.WriteWarning("Overriding process object {0}".format(
+    #             self.process.Name))
+    #     self.__processes[self.process.Name] = self.process
+    #     self.__dict__[self.process.Name] = self.process
 
     @property
     def Default(self):

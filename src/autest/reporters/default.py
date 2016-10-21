@@ -1,3 +1,4 @@
+# pylint: disable=locally-disabled, protected-access
 from __future__ import absolute_import, division, print_function
 from autest.testers.tester import ResultType, Tester
 import hosts.output as host
@@ -20,28 +21,32 @@ def indentStr(str, indent, preindent=None):
         return tmp
     return str
 
+
 ###########################################
 # header information for a Test
 
 
 def TestInfo(test, indent=0):
     ret = 'Test: {0}: {3}\n   File: {1}\n   Directory: {2}\n'.format(
-        test.Name, test.TestFile, test.TestDirectory, ResultType.to_color_string(test._Result))
+        test.Name, test.TestFile, test.TestDirectory,
+        ResultType.to_color_string(test._Result))
     if test._Reason:
         ret += "    Reason: {0}\n".format(indentStr(test._Reason, 4, 0))
 
     return indentStr(ret, indent)
+
 
 ###########################################
 # header info about a testrun
 
 
 def TestRunInfo(tr, indent=0):
-    ret = "Run: {0}: {1}\n".format(
-        tr.DisplayString, ResultType.to_color_string(tr._Result))
+    ret = "Run: {0}: {1}\n".format(tr.DisplayString,
+                                   ResultType.to_color_string(tr._Result))
     if tr._Reason:
         ret += "   Reason: {0}\n".format(indentStr(tr._Reason, 4, 0))
     return indentStr(ret, indent)
+
 
 ###########################################
 # header information for a Process
@@ -59,6 +64,7 @@ def ProcessInfo(ps, indent=0):
         ret += "   Reason: {0}\n".format(indentStr(ps._Reason, 4, 0))
     return indentStr(ret, indent)
 
+
 ###########################################
 # Body data for a SetupItem
 
@@ -73,6 +79,7 @@ def SetupItemData(check, indent=0):
 
     return indentStr(ret, indent)
 
+
 ###########################################
 # Body data for a some check tester
 
@@ -84,8 +91,12 @@ def CheckerData(item, indent=0):
     else:
         reason = item.Reason
     result = ResultType.to_color_string(item.Result)
-    ret = '{0} : {1} - {2}\n'.format("{0}".format(item.DescriptionGroup)
-                                     if item.DescriptionGroup is not None else "Test", item.Description, result, indent=" " * indent)
+    ret = '{0} : {1} - {2}\n'.format(
+        "{0}".format(item.DescriptionGroup)
+        if item.DescriptionGroup is not None else "Test",
+        item.Description,
+        result,
+        indent=" " * indent)
     ret += '   Reason: {0}'.format(indentStr(item.Reason, 4, 0))
     if item.isContainer:
         for tester in item._testers:
@@ -93,6 +104,7 @@ def CheckerData(item, indent=0):
             ret += CheckerData(item, 2)
     ret += "\n"
     return indentStr(ret, indent)
+
 
 ###########################################
 # Body data for a Process
@@ -108,6 +120,7 @@ def ProcessData(obj, indent=0):
         ret += ReportCheckers(obj, 2)
     ret += "\n"
     return indentStr(ret, indent)
+
 
 ###########################################
 # Body data for a TestRun
@@ -136,6 +149,7 @@ def TestRunData(obj, indent=0):
     ret += "\n"
     return indentStr(ret, indent)
 
+
 ###########################################
 # Body data for a Test
 
@@ -162,7 +176,7 @@ def ReportSetup(obj, indent=0):
         if item.RanOnce:
             ret += SetupItemData(item)
     # if not ret:
-        #ret="Nothing to setup\n"
+    #ret="Nothing to setup\n"
     return indentStr(ret, indent)
 
 
@@ -171,7 +185,7 @@ def ReportProcesses(obj, indent=0):
     for p in obj.Processes._Items:
         ret += ProcessData(p)
     # if not ret:
-        #ret="No Processes defined\n"
+    #ret="No Processes defined\n"
     return indentStr(ret, indent)
 
 
@@ -190,7 +204,7 @@ def ReportCheckers(obj, indent=0):
         if check.RanOnce:
             ret += CheckerData(check)
     # if not ret:
-        #ret="Nothing was checked\n"
+    #ret="Nothing was checked\n"
 
     return indentStr(ret, indent)
 
@@ -207,8 +221,9 @@ def GenerateReport(info, ):  # args):
         host.WriteMessage("{0} Tests were skipped:".format(len(skipped)))
         host.WriteMessage("-" * 80)
         for test in skipped:
-            host.WriteMessage(' Test "{0}" Skipped\n    File: {1}\n    Directory: {2}'.format(
-                test.Name, test.TestFile, test.TestDirectory))
+            host.WriteMessage(
+                ' Test "{0}" Skipped\n    File: {1}\n    Directory: {2}'.
+                format(test.Name, test.TestFile, test.TestDirectory))
             host.WriteMessage("  Reason: {0}".format(test._Conditions._Reason))
             host.WriteMessage()
 
@@ -231,11 +246,12 @@ def GenerateReport(info, ):  # args):
     # print stats for all tests
     host.WriteMessage('Total of {0} test'.format(info.TotalTestCount))
     for resType in (ResultType.Unknown, ResultType.Exception,
-                    ResultType.Failed, ResultType.Warning,
-                    ResultType.Skipped, ResultType.Passed):
+                    ResultType.Failed, ResultType.Warning, ResultType.Skipped,
+                    ResultType.Passed):
         amount = info.stats[resType]
         host.WriteMessage('  {0}: {1}'.format(
             ResultType.to_string(resType), amount))
+
 
 import autest.api as api
 

@@ -1,12 +1,12 @@
 from __future__ import absolute_import, division, print_function
+import os
+
+import autest.glb as glb
 from autest.common.constructor import call_base, smart_init
 from autest.core.testenity import TestEnity
 from .directory import Directory
 from .file import File
 import hosts.output as host
-import autest.glb as glb
-
-import os
 
 
 @smart_init
@@ -14,13 +14,21 @@ class Disk(TestEnity):
     '''
     allows use to define what kind of disk based test we want to do
     '''
-    @call_base(TestEnity=("runable",))
+
+    @call_base(TestEnity=("runable", ))
     def __init__(self, runable):
         self.__files = {}
         self.__dirs = {}
 
-    def File(self, name, exists=None, size=None, content=None, execute=None, id=None,
-             runtime=True, typename=None):
+    def File(self,
+             name,
+             exists=None,
+             size=None,
+             content=None,
+             execute=None,
+             id=None,
+             runtime=True,
+             typename=None):
         if typename is None:
             ext = os.path.splitext(name)
             # auto select file based on ext

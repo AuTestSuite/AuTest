@@ -42,8 +42,8 @@ class ConsoleHost(interfaces.UIHost):
         stream_color = colorama.Style.BRIGHT
         stream_reset = colorama.Style.RESET_ALL + stream_color
         reset = colorama.Style.RESET_ALL
-        self.__stdout__.write(
-            stream_color + msg.replace(reset_stream, stream_reset) + reset)
+        self.__stdout__.write(stream_color + msg.replace(reset_stream,
+                                                         stream_reset) + reset)
         self.__stdout__.flush()
 
     def get_contents(self, filename, lineno):
@@ -62,16 +62,16 @@ class ConsoleHost(interfaces.UIHost):
         stream_color = colorama.Fore.LIGHTYELLOW_EX
         stream_reset = colorama.Style.RESET_ALL + stream_color
         reset = colorama.Style.RESET_ALL
-        self.__stdout__.write(
-            stream_color + msg.replace(reset_stream, stream_reset) + reset)
+        self.__stdout__.write(stream_color + msg.replace(reset_stream,
+                                                         stream_reset) + reset)
         self.__stdout__.flush()
 
     def writeError(self, msg, stack=None, show_stack=True):
         stream_color = colorama.Fore.LIGHTRED_EX
         stream_reset = colorama.Style.RESET_ALL + stream_color
         reset = colorama.Style.RESET_ALL
-        self.__stderr__.write(
-            stream_color + msg.replace(reset_stream, stream_reset) + reset)
+        self.__stderr__.write(stream_color + msg.replace(reset_stream,
+                                                         stream_reset) + reset)
         self.__stderr__.flush()
 
     def writeDebug(self, catagory, msg):
@@ -87,8 +87,8 @@ class ConsoleHost(interfaces.UIHost):
         stream_color = colorama.Fore.GREEN
         stream_reset = colorama.Style.RESET_ALL + stream_color
         reset = colorama.Style.RESET_ALL
-        self.__stdout__.write(
-            stream_color + msg.replace(reset_stream, stream_reset) + reset)
+        self.__stdout__.write(stream_color + msg.replace(reset_stream,
+                                                         stream_reset) + reset)
         self.__stdout__.flush()
 
     def writeVerbose(self, catagory, msg):
@@ -99,13 +99,13 @@ class ConsoleHost(interfaces.UIHost):
         The host may or may not be given all verbose messages
         by the engine. The catagory is not added to the message.
         The host can use this value help orginize messages, it is suggested
-        that a given message is clearly formatted with the catagory type. 
+        that a given message is clearly formatted with the catagory type.
         '''
         stream_color = colorama.Fore.CYAN
         stream_reset = colorama.Style.RESET_ALL + stream_color
         reset = colorama.Style.RESET_ALL
-        self.__stdout__.write(
-            stream_color + msg.replace(reset_stream, stream_reset) + reset)
+        self.__stdout__.write(stream_color + msg.replace(reset_stream,
+                                                         stream_reset) + reset)
         self.__stdout__.flush()
 
     def writeProgress(self, task, msg=None, progress=None, completed=False):
@@ -125,16 +125,16 @@ class ConsoleHost(interfaces.UIHost):
 
     @property
     def debugCatagories(self):
-        ''' 
-        returns list of string defining the catagories of debug messages we want to have 
+        '''
+        returns list of string defining the catagories of debug messages we want to have
         processed by the engine
         '''
         return self.__debug
 
     @property
     def verboseCatagories(self):
-        ''' 
-        returns list of string defining the catagories of verbose messages we want to have 
+        '''
+        returns list of string defining the catagories of verbose messages we want to have
         processed by the engine
         '''
         return self.__verbose

@@ -1,7 +1,9 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
-from autest.common.constructor import call_base, smart_init
+import time
+
 import hosts.output as host
+
+from autest.common.constructor import call_base, smart_init
 import autest.common.is_a as is_a
 from .runlogic import RunLogic
 from .process import Process_RunLogic
@@ -10,8 +12,6 @@ from autest.core.order import GenerateStartOrderedList, GenerateEndOrderedList
 from autest.core.eventinfo import *
 from autest.exceptions.killonfailure import KillOnFailureError
 
-import time
-import traceback
 
 
 @smart_init
@@ -37,7 +37,10 @@ class TestRun_RunLogic(RunLogic):
         # order processes
         proc_list = GenerateStartOrderedList(self._default)
         if len(proc_list) == 0:
-            return (True, "Generating Process list of processes to start", 'List came back empty.\n Did you define a process for test run "{0}"'.format(self.__tr.DisplayString))
+            return (
+                True, "Generating Process list of processes to start",
+                'List came back empty.\n Did you define a process for test run "{0}"'.
+                format(self.__tr.DisplayString))
         idx = 0
         for i in proc_list:
             if i.object == self._default:
@@ -48,13 +51,15 @@ class TestRun_RunLogic(RunLogic):
 
         if is_a.String(tmp[0]):
             # we had a startup failure
-            host.WriteVerbosef(
-                "testrun_logic", "TestRun {0}: Starting of processes Failed!", self.__tr.Name)
+            host.WriteVerbosef("testrun_logic",
+                               "TestRun {0}: Starting of processes Failed!",
+                               self.__tr.Name)
             return (True, tmp[0], tmp[1])
         # get processes that are own by test object and add them to its list of
         # running processes
         self.__test_processes = [
-            x for x in tmp if x._process._ParentRunable != self.__tr]
+            x for x in tmp if x._process._ParentRunable != self.__tr
+        ]
         self.__running_processes = tmp
         self.__running_default = self.__running_processes[idx]
         return (False, "No Issues found", "Started!")
@@ -66,13 +71,14 @@ class TestRun_RunLogic(RunLogic):
         self.__tr = testrun
 
         # map some events
-        self.__tr._RegisterEvent("starting_logic", self.__tr.StartingEvent,
-                                 testers.Lambda(self.doStart,
-                                                kill_on_failure=True,
-                                                description_group="Starting TestRun {0}".format(
-                                                    self.__tr.Name)
-                                                )
-                                 )
+        self.__tr._RegisterEvent(
+            "starting_logic",
+            self.__tr.StartingEvent,
+            testers.Lambda(
+                self.doStart,
+                kill_on_failure=True,
+                description_group="Starting TestRun {0}".format(
+                    self.__tr.Name)))
 
         # bind events
         self.__tr.Setup._BindEvents()
@@ -82,8 +88,8 @@ class TestRun_RunLogic(RunLogic):
             self.__tr.SetupEvent(SetupInfo())
             # test that everything setup correctly so we can continue
             if self.__tr.Setup._Result != testers.ResultType.Passed and self.__tr.Setup._Result != testers.ResultType.Warning:
-                host.WriteVerbosef(
-                    "test_logic", "Setup failed for Test {0}", self.__tr.Name)
+                host.WriteVerbosef("test_logic", "Setup failed for Test {0}",
+                                   self.__tr.Name)
                 return False
             # starting event
             self.__start_time = time.time()
@@ -132,8 +138,8 @@ class TestRun_RunLogic(RunLogic):
 
         # call finished event
         if self.__start_time:
-            self.__tr.FinishedEvent(FinishedInfo(
-                time.time() - self.__start_time))
+            self.__tr.FinishedEvent(
+                FinishedInfo(time.time() - self.__start_time))
         else:
             self.__tr.FinishedEvent(FinishedInfo(0))
 

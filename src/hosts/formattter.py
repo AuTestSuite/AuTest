@@ -1,10 +1,9 @@
 from __future__ import absolute_import, division, print_function
-from .interfaces import uihost
-from .console import ConsoleHost
-from .common import is_a
-
 import sys
 import linecache
+
+from .interfaces import uihost
+from .common import is_a
 
 # this class does two functions
 # 1) formats the message
@@ -12,7 +11,6 @@ import linecache
 
 
 class Formatter(uihost.UIHost):
-
     def __init__(self, defaultHost):
         self.__default_host = defaultHost
         self.__hosts = [self.__default_host]
@@ -38,9 +36,11 @@ class Formatter(uihost.UIHost):
         if lineno > 3:
             content += "   {0}".format(linecache.getline(filename, lineno - 3))
         if lineno > 2:
-            content += "    {0}".format(linecache.getline(filename, lineno - 2))
+            content += "    {0}".format(
+                linecache.getline(filename, lineno - 2))
         if lineno > 1:
-            content += "    {0}".format(linecache.getline(filename, lineno - 1))
+            content += "    {0}".format(
+                linecache.getline(filename, lineno - 1))
         content += "->  {0}".format(linecache.getline(filename, lineno))
         content += "    {0}".format(linecache.getline(filename, lineno + 1))
         return content
@@ -54,7 +54,8 @@ class Formatter(uihost.UIHost):
             if c.lower() in self.__verbose:
                 return catagory[0]
 
-   # Get the global value setup by --debug
+# Get the global value setup by --debug
+
     def _get_debug_catagory(self, catagory):
         for c in catagory:
             if c.lower() in self.__verbose:
@@ -90,8 +91,8 @@ class Formatter(uihost.UIHost):
                 lineno = frame.f_lineno
                 routine = frame.f_code.co_name
                 content = self.get_contents(filename, lineno)
-            msg = ' File: "%s", line: %s, in "%s"\n %s\n' % (
-                filename, lineno, routine, content)
+            msg = ' File: "%s", line: %s, in "%s"\n %s\n' % (filename, lineno,
+                                                             routine, content)
         return msg
 
     def _formatStdOut(self, msglst, **kw):
@@ -258,6 +259,10 @@ class Formatter(uihost.UIHost):
                     msg = fmsg
                 h.writeVerbose(cat, msg)
 
-    def writeProgress(self, task, msg_list=None, progress=None, completed=False):
+    def writeProgress(self,
+                      task,
+                      msg_list=None,
+                      progress=None,
+                      completed=False):
         for h in self.__hosts:
             h.writeProgress(catagory, task, msg_list, progress, completed)

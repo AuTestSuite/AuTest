@@ -3,11 +3,8 @@ import autest.api as api
 
 
 class Chown(setupitem.SetupItem):
-
     def __init__(self, path, uid, gid, ignore=False):
-        super(Chown, self).__init__(
-            itemname="Chown"
-        )
+        super(Chown, self).__init__(itemname="Chown")
         self.path = path
         self.uid = uid
         self.gid = gid

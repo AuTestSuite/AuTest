@@ -5,7 +5,7 @@ import abc
 class UIHost(object):
     """description of class"""
 
-# class C io streams
+    # class C io streams
     @abc.abstractmethod
     def writeStdOut(self, msg):
         raise NotImplementedError
@@ -15,6 +15,7 @@ class UIHost(object):
         raise NotImplementedError
 
 # our virtual streams
+
     @abc.abstractmethod
     def writeMessage(self, msg):
         raise NotImplementedError
@@ -49,7 +50,7 @@ class UIHost(object):
         The host may or may not be given all verbose messages
         by the engine. The catagory is not added to the message.
         The host can use this value help orginize messages, it is suggested
-        that a given message is clearly formatted with the catagory type. 
+        that a given message is clearly formatted with the catagory type.
         '''
         raise NotImplementedError
 
@@ -85,10 +86,22 @@ class UIHost(object):
     def formatMessage(self, msg_list, sep=' ', end='\n', **kw):
         return None
 
-    def formatWarning(self, msg_list, sep=' ', end='\n', stack=None, show_stack=False, **kw):
+    def formatWarning(self,
+                      msg_list,
+                      sep=' ',
+                      end='\n',
+                      stack=None,
+                      show_stack=False,
+                      **kw):
         return None
 
-    def formatError(self, msg_list, sep=' ', end='\n', stack=None, show_stack=True, **kw):
+    def formatError(self,
+                    msg_list,
+                    sep=' ',
+                    end='\n',
+                    stack=None,
+                    show_stack=True,
+                    **kw):
         return None
 
     def formatDebug(self, catagory, msg_list, sep=' ', end='\n', **kw):

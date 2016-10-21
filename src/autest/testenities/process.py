@@ -1,17 +1,10 @@
 from __future__ import absolute_import, division, print_function
-import hosts.output as host
+
 from autest.common.constructor import call_base, smart_init
 from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
 import autest.testers as testers
 import autest.core.process as process
-
-from .file import File
-import os
-import string
-import subprocess
-import time
-import shlex
 
 # deal with subprocess throwing different exceptions on different systems
 try:
@@ -22,7 +15,6 @@ except NameError:
 
 @smart_init
 class Process(process.Process, TestEnity):
-
     @call_base(TestEnity=(), Process=("runable", "name", "cmdstr"))
     def __init__(self, runable, name, cmdstr=None):
         self.__streams = object()
@@ -35,9 +27,8 @@ class Process(process.Process, TestEnity):
                 testers.Equal,
                 "ReturnCode",
                 self.FinishedEvent,
-                converter=lambda x: int(x) if x is not None else None
-            ), "ReturnCode"
-        )
+                converter=lambda x: int(x) if x is not None else None),
+            "ReturnCode")
         # TimeOut
         self._Register(
             "Process.{0}.TimeOut".format(self.Name),
@@ -46,9 +37,8 @@ class Process(process.Process, TestEnity):
                 "TotalRunTime",
                 self.RunningEvent,
                 converter=float,
-                kill_on_failure=True
-            ), "TimeOut"
-        )
+                kill_on_failure=True),
+            "TimeOut")
         # Time
         self._Register(
             "Process.{0}.Time".format(self.Name),
@@ -57,14 +47,14 @@ class Process(process.Process, TestEnity):
                 "TotalTime",
                 self.FinishedEvent,
                 converter=float,
-                kill_on_failure=True
-            ), "Time"
-        )
+                kill_on_failure=True),
+            "Time")
 
     def _isRunning(self, value=None):
         if value is not None:
             self.__is_running = value
         return self.__is_running
+
     # these are to help with discription
 
     def _isRunningBefore(self):
@@ -95,11 +85,11 @@ def Time(self, val):
 def TimeOut(self, val):
     self.Processes.Default.TimeOut = val
 
+
 # for backward compatiblity
 
 
 class Streams(TestEnity):
-
     def __init__(self, testrun):
         super(Streams, self).__init__(testrun)
 
@@ -137,7 +127,7 @@ class Streams(TestEnity):
 
     @property
     def Error(self):
-        return self._TestRun.Processes.Default.Streams.Error
+        return self._Runable.Processes.Default.Streams.Error
 
     @Error.setter
     def Error(self, val):
@@ -145,7 +135,7 @@ class Streams(TestEnity):
 
     @property
     def Debug(self):
-        return self._TestRun.Processes.Default.Streams.Debug
+        return self._Runable.Processes.Default.Streams.Debug
 
     @Debug.setter
     def Debug(self, val):

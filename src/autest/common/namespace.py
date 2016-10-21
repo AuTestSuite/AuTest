@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 
 
 class NameSpace(object):
-
     def __init__(self, obj):
         self._parent = obj
 

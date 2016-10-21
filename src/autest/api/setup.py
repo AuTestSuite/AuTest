@@ -19,6 +19,7 @@ def AddSetupItem(item, name=None, ns=None):
     # helper function
     def wrapper(self, *lst, **kw):
         self._add_item(item(*lst, **kw))
+
     # check to make sure this is a SetupItem type
     if not issubclass(item, SetupItem):
         host.WriteError(
@@ -29,20 +30,22 @@ def AddSetupItem(item, name=None, ns=None):
         name = item.__name__
 
     if ns is None:
-        host.WriteVerbose(
-            "setupext", "Adding setup extension named: {0}".format(name))
-        method = wrapper  # types.MethodType(wrapper,None,Setup)
+        host.WriteVerbose("setupext",
+                          "Adding setup extension named: {0}".format(name))
+        method = wrapper
         setattr(Setup, name, method)
     else:
         # see if we have this namespace defined already
-        nsobj = glb._setup_items.get(ns)
+        nsobj = glb.setup_items.get(ns)
         if nsobj is None:
             # create the ns object
-            nsobj = type(ns, (namespace.NameSpace,), {})
+            nsobj = type(ns, (namespace.NameSpace, ), {})
             # copy on class type as defined for given name
-            glb._setup_items[ns] = nsobj
+            glb.setup_items[ns] = nsobj
         # add new method to namespace object
-        x = wrapper  # types.MethodType(wrapper,None,nsobj)
+        x = wrapper
         setattr(nsobj, name, x)
         host.WriteVerbose(
-            "setupext", "Adding setup extension named: {0} to namespace: {1}".format(name, ns))
+            "setupext",
+            "Adding setup extension named: {0} to namespace: {1}".format(name,
+                                                                         ns))

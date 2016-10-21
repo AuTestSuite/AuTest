@@ -7,7 +7,6 @@ from .constructor import call_base, smart_init
 
 
 class Event(object):
-
     def __init__(self):
         self.__callbacks = []
 
@@ -47,7 +46,6 @@ class Event(object):
 # util class
 @smart_init
 class EventInfo(object):
-
     @call_base()
     def __init__(self):
         pass

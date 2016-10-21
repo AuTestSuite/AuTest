@@ -1,20 +1,17 @@
 from __future__ import absolute_import, division, print_function
-import autest.common.process
+import time
+from collections import namedtuple
+
 from autest.common.constructor import call_base, smart_init
-from autest.common import make_list
 import autest.common.sort as sort
 import autest.common.is_a as is_a
 import hosts.output as host
-from collections import namedtuple
-
-import time
 
 # need better name...  to do later
 
 
 @smart_init
 class Order(object):
-
     @call_base()
     def __init__(self):
 
@@ -75,7 +72,9 @@ class Order(object):
         for obj in lst:
             readyfunc, args = self._setupReadyStart(obj, *lst, **kw)
             host.WriteDebugf(
-                ["startbefore"], "Setting ready logic to wait for object {0} with readyfunc {1}", obj, readyfunc)
+                ["startbefore"],
+                "Setting ready logic to wait for object {0} with readyfunc {1}",
+                obj, readyfunc)
             self.__startbefore[obj] = (readyfunc, args)
 
     def StartAfter(self, *lst, **kw):
@@ -86,7 +85,9 @@ class Order(object):
         for obj in lst:
             readyfunc, args = self._setupReadyStart(obj, *lst, **kw)
             host.WriteDebugf(
-                ["startafter"], "Setting ready logic to wait for object {0} with readyfunc {1}", obj, readyfunc)
+                ["startafter"],
+                "Setting ready logic to wait for object {0} with readyfunc {1}",
+                obj, readyfunc)
             self.__startafter[obj] = (readyfunc, args)
 
     def EndBefore(self, *lst, **kw):
@@ -97,7 +98,9 @@ class Order(object):
         for obj in lst:
             readyfunc, args = self._setupReady(obj, *lst, **kw)
             host.WriteDebugf(
-                ["endbefore"], "Setting ready logic to wait for object {0} with readyfunc {1}", obj, readyfunc)
+                ["endbefore"],
+                "Setting ready logic to wait for object {0} with readyfunc {1}",
+                obj, readyfunc)
             self.__endbefore[obj] = (readyfunc, args)
 
     def EndAfter(self, *lst, **kw):
@@ -108,7 +111,9 @@ class Order(object):
         for obj in lst:
             readyfunc, args = self._setupReady(obj, *lst, **kw)
             host.WriteDebugf(
-                ["endafter"], "Setting ready logic to wait for object {0} with readyfunc {1}", obj, readyfunc)
+                ["endafter"],
+                "Setting ready logic to wait for object {0} with readyfunc {1}",
+                obj, readyfunc)
             self.__endafter[obj] = (readyfunc, args)
 
     @property
@@ -127,21 +132,26 @@ class Order(object):
     def Ready(self, test):
         if is_a.Number(test):
             host.WriteDebugf(
-                ["order"], "Setting ready logic to wait for {0} second for item {1}", test, self._ID)
+                ["order"],
+                "Setting ready logic to wait for {0} second for item {1}",
+                test, self._ID)
             self.__ready = lambda hasRunFor: hasRunFor(test)
         elif hasattr(test, "when_wrapper"):
-            host.WriteDebugf(
-                ["order"], "Setting ready logic to {0} second for item {1}", test, self._ID)
+            host.WriteDebugf(["order"],
+                             "Setting ready logic to {0} second for item {1}",
+                             test, self._ID)
             self.__ready = test()
         else:
-            host.WriteDebugf(
-                ["order"], "Setting ready logic to {0} second for item {1}", test, self._ID)
+            host.WriteDebugf(["order"],
+                             "Setting ready logic to {0} second for item {1}",
+                             test, self._ID)
             self.__ready = test
 
     def _isReady(self, *lst, **kw):
         if self.__ready is None:
-            host.WriteDebugf(["order", 'when', 'process'],
-                             "Calling Default isReady() function",)
+            host.WriteDebugf(
+                ["order", 'when', 'process'],
+                "Calling Default isReady() function", )
             return True
         try:
             return self.__ready(*lst, **kw)
@@ -166,7 +176,7 @@ class Order(object):
 ordered_item_t = namedtuple("ordered_item_t", "object readyfunc args")
 
 
-def SortStartOrderedList(self, lst, startidx=0):
+def SortStartOrderedList(lst, startidx=0):
     '''
         make a flatten list of ordered items, ignores Ready logic
         lst -- list of items to sort based on any extra startXXX() relationships
@@ -217,6 +227,7 @@ def SortEndOrderedList(lst, startidx=0):
     # Sort the items in the list based on depends mapping
     return sort.depends_back_sort(lst, d)
 
+
 # these funtions generate a list with visted information in it
 # The list that are returned are Fat in that they can contain an item
 # more than once. This is because the "ready" requirements for a given process
@@ -252,7 +263,8 @@ def GenerateStartOrderedList(item):
             # break any loops
             if info in stack:
                 host.WriteMessagef(
-                    "Ignoring adding {0} to start order as it is already exist, breaking loop.", info)
+                    "Ignoring adding {0} to start order as it is already exist, breaking loop.",
+                    info)
                 continue
             stack.append(info)
             ret.extend(getlst(obj.StartBefore(), stack, default_proc))
@@ -289,7 +301,8 @@ def GenerateEndOrderedList(item):
             # break any loops
             if info in stack:
                 host.WriteMessagef(
-                    "Ignoring adding {0} to start order as it is already exist, breaking loop.", info)
+                    "Ignoring adding {0} to start order as it is already exist, breaking loop.",
+                    info)
                 continue
             stack.append(info)
             ret.extend(getlst(obj.EndBefore(), stack, default_proc))

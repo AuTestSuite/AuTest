@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function
-import hosts.output as host
-from autest.exceptions.killonfailure import KillOnFailureError
-import colorama
 import abc
 import traceback
+import colorama
+
+from autest.exceptions.killonfailure import KillOnFailureError
 
 
 def get_name(obj):
@@ -44,7 +44,8 @@ class ResultType(object):
             c = colorama.Fore.RED
 
         ResultType.to_string(v)
-        return colorama.Style.RESET_ALL + c + ResultType.to_string(v) + "{{host.reset-stream}}"
+        return colorama.Style.RESET_ALL + c + ResultType.to_string(
+            v) + "{{host.reset-stream}}"
 
 
 class Tester(object):
@@ -52,13 +53,18 @@ class Tester(object):
     The base tester object contains the basic properties all testers should fill in
     Description - this is what we are testing such as "Tesing return code is 5" or "Checking file file X exists"
     Result - this returns a ResultType object telling us how to process the result of the test
-    Reason - this is a string (possibly multiline) with information about why the result happened. This maybe as 
+    Reason - this is a string (possibly multiline) with information about why the result happened. This maybe as
     simple as "Return code equal to 5" or it might be more complex with diffs of what was different in a text file
-    DescriptionGroup - this is extra information about the file, process, etc that might be useful to give the 
+    DescriptionGroup - this is extra information about the file, process, etc that might be useful to give the
     test more context, sould be in form of Type: name, ie Process: proc1
     '''
 
-    def __init__(self, value, test_value, kill_on_failure=False, description_group=None, description=None):
+    def __init__(self,
+                 value,
+                 test_value,
+                 kill_on_failure=False,
+                 description_group=None,
+                 description=None):
         self._description_group = description_group
         self._description = description
         self.__result = ResultType.Unknown
@@ -141,14 +147,14 @@ class Tester(object):
     @property
     def Result(self):
         '''
-        Should return True or False based on if the test passed                                                       
+        Should return True or False based on if the test passed
         '''
         return self.__result
 
     @Result.setter
     def Result(self, val):
         '''
-        Sets the result of a test                                                       
+        Sets the result of a test
         '''
         self.__result = val
 
@@ -168,7 +174,7 @@ class Tester(object):
     def test(self, eventinfo, **kw):
         '''
         This is called to test a given event
-        it should store the result of the test in the Result property 
+        it should store the result of the test in the Result property
         and set the message of why the test failed to the ResultData property
         The return value is ignored
         '''
@@ -191,7 +197,7 @@ class Tester(object):
                 self.Reason = msg
                 return None
             return ret
-        except AttributeError as e:
+        except AttributeError:
             pass
         # if that did not work because GetContent() does not exist
         # try to call object as a function (ie callable) that takes
@@ -210,8 +216,8 @@ class Tester(object):
         if isinstance(test_value, str):
             if not hasattr(eventinfo, test_value):
                 self.Result = ResultType.Failed
-                self.Reason = "{0} does not have attibute {1}".format(type(eventinfo),
-                                                                      test_value)
+                self.Reason = "{0} does not have attibute {1}".format(
+                    type(eventinfo), test_value)
                 return None
             return getattr(eventinfo, test_value)
         # if that failed, we see if this has a __call__ attribute

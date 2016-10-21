@@ -4,7 +4,7 @@ import sys
 import autest.glb as glb
 
 if sys.platform == 'win32':
-    if sys.version_info >= (3,):
+    if sys.version_info >= (3, ):
         from winreg import *
     else:
         from _winreg import *
@@ -42,7 +42,6 @@ if sys.platform == 'win32':
         return False
 
     def reg_key_equal(key, value):
-
         pass
 
 else:

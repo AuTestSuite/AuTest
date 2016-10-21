@@ -24,7 +24,8 @@ def Int(obj):
 
 
 def Number(obj):
-    return not isinstance(obj, bool) and (isinstance(obj, int) or isinstance(obj, float))
+    return not isinstance(obj, bool) and (isinstance(obj, int) or isinstance(
+        obj, float))
 
 
 def Dictionary(obj):

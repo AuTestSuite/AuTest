@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function
+from builtins import map
+
 from . import common
 import hosts.glb as glb
-
-from builtins import map
 
 # these function are the "main" function the user will ideally use in a normal application
 # They map the logic to the formatter which will format the message as requested

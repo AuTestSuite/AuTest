@@ -1,16 +1,16 @@
 from __future__ import absolute_import, division, print_function
+
+import autest.testers as testers
 from autest.common.constructor import call_base, smart_init
 from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
-import hosts.output as host
-import autest.testers as testers
+
 from .file import File
 
 
 @smart_init
 class Streams(TestEnity):
-
-    @call_base(TestEnity=("runable",))
+    @call_base(TestEnity=("runable", ))
     def __init__(self, runable):
         # setup testers
         STREAMS = (  # std streams
@@ -23,7 +23,7 @@ class Streams(TestEnity):
             ('Warning', 'Streams.{0}.Warning', 'WarningFile'),
             ('Error', 'Streams.{0}.Error', 'ErrorFile'),
             ('Debug', 'Streams.{0}.Debug', 'DebugFile'),
-            ('Verbose', 'Streams.{0}.Verbose', 'VerboseFile'),)
+            ('Verbose', 'Streams.{0}.Verbose', 'VerboseFile'), )
 
         for name, eventname, testValue in STREAMS:
             # tweak to add property for all testable events
@@ -38,6 +38,7 @@ class Streams(TestEnity):
                 ),
                 name
             )
+
 
 import autest.api
 from .process import Process

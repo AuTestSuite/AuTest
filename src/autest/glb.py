@@ -8,15 +8,16 @@ Engine = None
 class When(object):
     pass
 
+
 Locals = {}
 
 # this hold meta information for any items we will add to
 # any runable object
-_runable_items = {}
+runable_items = {}
 
 # this hold meta information for any items we will add to
 # the Setup object
-_setup_items = {}
+setup_items = {}
 
 # set of reporters that we can use to generate reports with
 reporters = {}

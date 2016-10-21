@@ -1,7 +1,14 @@
 from __future__ import absolute_import, division, print_function
+
+import os
+import sys
+from fnmatch import fnmatch
+import time
+import shutil
+
+import hosts.output as host
 import autest.glb as glb
 import autest.common.execfile as execfile
-import hosts.output as host
 import autest.api as api
 from . import setupitem
 from . import runtesttask
@@ -14,11 +21,7 @@ from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
 
-import os
-import sys
-from fnmatch import fnmatch
-import time
-import shutil
+
 
 
 class Engine(object):
@@ -84,8 +87,10 @@ class Engine(object):
                         oldExceptionArgs = e.args
                         time.sleep(1)
                         continue
-                    host.WriteError(("Unable to remove sandbox directory for clean test run" +
-                                     "\n Reason: {0}").format(e), show_stack=False)
+                    host.WriteError(
+                        ("Unable to remove sandbox directory for clean test run"
+                         + "\n Reason: {0}").format(e),
+                        show_stack=False)
                     raise
                 else:
                     # no exceptions, the directory was wiped
@@ -125,8 +130,7 @@ class Engine(object):
             old_path = os.path.join(self.__test_dir, 'gtest-site')
             if not os.path.exists(path) and os.path.exists(old_path):
                 host.WriteWarning(
-                    "Depracated gest-site found!\n Please rename to autest-site".
-                    format(path))
+                    "Depracated gest-site found!\n Please rename to autest-site")
                 path = os.path.join(self.__test_dir, 'gtest-site')
         else:
             # This is a custom location
@@ -196,7 +200,7 @@ class Engine(object):
                         name = f[:-len('.test.py')]
                     else:
                         name = f[:-len('.test')]
-                    match = False
+
                     for filter in self.__filters:
                         if not filter.startswith("*"):
                             filter = "*" + filter
@@ -218,9 +222,10 @@ class Engine(object):
 
     def _run_tests(self):
         if self.__jobs > 1:
-            for t in self.__tests.values():
-                self.__pool.addTask(self.__run_test_task, t)
-            self.__pool.waitCompletion()
+            #for t in self.__tests.values():
+                #self.__pool.addTask(self.__run_test_task, t)
+            #self.__pool.waitCompletion()
+            pass
         else:
             tmp = list(self.__tests.keys())
             tmp.sort()

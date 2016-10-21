@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
+import time
 import hosts.output as host
+import autest.glb as glb
 from autest.common.constructor import call_base, smart_init
 from autest.exceptions.killonfailure import KillOnFailureError
-import time
+
 
 
 @smart_init
 class RunLogic(object):
-
     @call_base()
     def __init__(self):
         pass
@@ -60,7 +60,7 @@ class RunLogic(object):
     def isReady(self, item, hasrunfor):
         '''
             Test the item mapped ready function as well as the
-            the object own ready function (given it has one) 
+            the object own ready function (given it has one)
         '''
         obj = item.object
         isReady = True
@@ -113,8 +113,8 @@ class RunLogic(object):
                 # * have more than one process
                 # * are not at the end of the list
                 # * need to start and want to wait on being ready
-                host.WriteDebugf(
-                    ["runlogic"], "Starting object {0}", ready_item.object.Name)
+                host.WriteDebugf(["runlogic"], "Starting object {0}",
+                                 ready_item.object.Name)
                 starting_obj = logic_cls.Run(ready_item.object)
                 started_items.append(starting_obj)
 
@@ -133,6 +133,7 @@ class RunLogic(object):
                 # reason
                 if ready_item.object.DelayStart:
                     delay_start = time.time()
+                    delay_time = 0
                     while delay_time < ready_item.object.DelayStart:
                         # poll other items
                         for f in started_items:
@@ -143,27 +144,36 @@ class RunLogic(object):
                                     f.Poll()
                                 except KillOnFailureError:
                                     self.StopItems(started_items)
-                                    return 'Delaying start of {0}'.format(ready_item.object.Name), "Test run stopped because Kill On Failure from {0}".format(f.Name)
-                        delay_time = time - time() - delay_start
+                                    return 'Delaying start of {0}'.format(
+                                        ready_item.object.Name
+                                    ), "Test run stopped because Kill On Failure from {0}".format(
+                                        f.Name)
+                        delay_time = time - time.time() - delay_start
 
                 while not isReady:
                     isReady = self.isReady(ready_item, hasRunFor)
                     # if it is ready set state on process
                     if isReady:
                         ready_item.object._stopReadyTimer()
-                        host.WriteDebugf(
-                            ["runlogic"], "Object {0} is ready!", ready_item.object.Name)
+                        host.WriteDebugf(["runlogic"], "Object {0} is ready!",
+                                         ready_item.object.Name)
                         continue
                     # verify we are running...
                     if not started_items[-1].isRunning():
                         # If we are not running we need to stop
                         self.StopItems(started_items)
-                        return 'Waiting for {0} "{1}" to become ready'.format(typename, ready_item.object.Name), 'Process finished before it was ready'
+                        return 'Waiting for {0} "{1}" to become ready'.format(
+                            typename, ready_item.object.
+                            Name), 'Process finished before it was ready'
                     # test that the process started in the time needed
-                    if ready_item.object.StartupTimeout < ready_item.object._readyTime(time.time()):
+                    if ready_item.object.StartupTimeout < ready_item.object._readyTime(
+                            time.time()):
                         self.StopItems(started_items)
-                        return ("Checking that {0} is ready within {1} seconds so we can start process: {2}".format(typename, ready_item.object.StartupTimeout, next_item.Name),
-                                "Process failed to become ready in time")
+                        return (
+                            "Checking that {0} is ready within {1} seconds so we can start process: {2}".
+                            format(typename, ready_item.object.StartupTimeout,
+                                   next_item.Name),
+                            "Process failed to become ready in time")
                     # poll other items
                     for f in started_items:
                         if f.isRunning():
@@ -173,10 +183,13 @@ class RunLogic(object):
                                 f.Poll()
                             except KillOnFailureError:
                                 self.StopItems(started_items)
-                                return 'Waiting for {0} "{1}" to become ready'.format(typename, ready_item.object.Name), "Test run stopped because Kill On Failure"
+                                return 'Waiting for {0} "{1}" to become ready'.format(
+                                    typename, ready_item.object.Name
+                                ), "Test run stopped because Kill On Failure"
         except KillOnFailureError as e:
             self.StopItems(started_items)
-            return 'KillOnFailure while starting {0} {1}'.format(typename, ready_item.object.Name), e.info
+            return 'KillOnFailure while starting {0} {1}'.format(
+                typename, ready_item.object.Name), e.info
         except:
             self.StopItems(started_items)
             raise
