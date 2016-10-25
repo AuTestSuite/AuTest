@@ -44,6 +44,7 @@ In the directory containing the tests run:
 ~~~~
 autest
 ~~~~
+[Quick start for creating a test](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/quick-start)
 
 Read [documentation](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/Home) to learn how to use write and use AuTest in more detail
 [here.](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/Home)
