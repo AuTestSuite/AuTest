@@ -95,7 +95,8 @@ else:
             os.killpg(pgid, signal.SIGKILL)
         except OSError as e:
             # If this a 3 (no such process) error we ignore it
-            if e.errno != 3:
+            # mac os will throw permission errors ie value 1
+            if e.errno != 3 and e.errno != 1:
                 raise
 
     def waitTimeOut(process, timeout):
