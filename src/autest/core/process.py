@@ -76,3 +76,19 @@ class Process(Runable, Order, Item):
     @property
     def _ChildRunables(self):
         return self.Setup._Items
+
+    @property
+    def TestDirectory(self):
+        return self._RootRunable.TestDirectory
+
+    @property
+    def TestFile(self):
+        return self._RootRunable.TestFile
+
+    @property
+    def TestRoot(self):
+        return self._RootRunable.TestRoot
+
+    @property
+    def RunDirectory(self):
+        return self._RootRunable.RunDirectory
