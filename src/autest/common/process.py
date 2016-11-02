@@ -14,13 +14,13 @@ import time
 if os.name == 'nt':
     from . import win32
 
-    def killtree(self):
+    def killtree(self, kill_delay = 1):
         '''
         Kills a process with all its children
         '''
 
         os.kill(self.pid, signal.CTRL_C_EVENT)
-        time.sleep(1)
+        time.sleep(kill_delay)
         # pylint: disable=locally-disabled, protected-access
         win32.TerminateJobObject(self._job, -1)
 
@@ -82,7 +82,7 @@ if os.name == 'nt':
         return process
 else:
 
-    def killtree(self):
+    def killtree(self, kill_delay = 1):
         '''
         Terminates a process and all its children
         '''
@@ -90,7 +90,7 @@ else:
         # try to kill group with a ctrl-C
         pgid = os.getpgid(self.pid)
         os.killpg(pgid, signal.SIGINT)
-        time.sleep(1)
+        time.sleep(kill_delay)
         try:
             os.killpg(pgid, signal.SIGKILL)
         except OSError as e:

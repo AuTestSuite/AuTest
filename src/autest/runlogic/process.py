@@ -280,8 +280,7 @@ class Process_RunLogic(RunLogic):
         host.WriteVerbosef(['process'], 'Stopping process {0}',
                            self._process.Name)
         if self.isRunning():
-
-            self.__proc.killtree()
+            self.__proc.killtree(self._process.ComposeVariables().Autest.KillDelaySecond)
         self.Cleanup()
 
     def Wait(self, timeout):

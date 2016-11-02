@@ -241,7 +241,16 @@ def main():
         "init", "Before extension load: args = {0}\n unknown = {1}", setup.arguments, setup.unknowns)
     # -------------------------------------------
     # setup vars
-    variables = Variables()
+    variables = Variables({'Autest':Variables({
+        # Long delay before process trees are shut down
+        'KillProcessLongDelaySeconds':10,  
+        #  Short delay after first process kill before next will be kill 
+        'KillProcessShortDelaySeconds':1,
+        #  delay after control-c before kill  
+        'KillDelaySecond':1,  
+        })
+    })
+
     # setup shell environment
     env = os.environ.copy()
     if setup.arguments.env:

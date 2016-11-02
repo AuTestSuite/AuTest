@@ -278,8 +278,9 @@ class Test_RunLogic(RunLogic):
                                self.__tr_running_processes)
             else:
                 self.StopItems(
-                    self.__running_processes + self.__tr_running_processes, 15,
-                    2)
+                    self.__running_processes + self.__tr_running_processes, 
+                    self.__test.ComposeVariables().Autest.KillProcessLongDelaySeconds,
+                    self.__test.ComposeVariables().Autest.KillProcessShortDelaySeconds)
             # call finished event
             if self.__start_time:
                 self.__test.FinishedEvent(
