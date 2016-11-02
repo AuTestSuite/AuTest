@@ -243,9 +243,9 @@ def main():
     # setup vars
     variables = Variables({'Autest':Variables({
         # Long delay before process trees are shut down
-        'KillProcessLongDelaySeconds':10,  
+        'StopProcessLongDelaySeconds':10,  
         #  Short delay after first process kill before next will be kill 
-        'KillProcessShortDelaySeconds':1,
+        'StopProcessShortDelaySeconds':1,
         #  delay after control-c before kill  
         'KillDelaySecond':1,  
         })

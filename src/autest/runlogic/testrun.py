@@ -135,8 +135,8 @@ class TestRun_RunLogic(RunLogic):
             host.WriteVerbosef(['testrun_logic'],
                                "Stoping processes owned by TestRun")
             self.StopItems(tr_processes, 
-            self.__tr.ComposeVariables().Autest.KillProcessLongDelaySeconds,
-            self.__tr.ComposeVariables().Autest.KillProcessShortDelaySeconds)
+            self.__tr.ComposeVariables().Autest.StopProcessLongDelaySeconds,
+            self.__tr.ComposeVariables().Autest.StopProcessShortDelaySeconds)
 
         # call finished event
         if self.__start_time:
