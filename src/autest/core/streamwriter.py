@@ -6,6 +6,7 @@ import threading
 import re
 import os
 import sys
+import traceback
 
 
 class PipeRedirector(object):
