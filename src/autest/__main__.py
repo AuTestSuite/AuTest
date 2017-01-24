@@ -104,7 +104,8 @@ def main():
     if os.path.exists(options_file):
         locals = {
             'Settings': setup,
-            'AutestSitePath': path
+            'AutestSitePath': path,
+            "host": hosts.output,
         }
         execfile.execFile(options_file, locals, locals)
     # parse the options and error if we have unknown options
