@@ -68,5 +68,5 @@ class ExcludesExpression(tester.Tester):
         else:
             self.Reason = 'Contents of {0} excludes expression'.format(
                 filename)
-        host.WriteVerbose(["testers.Equal", "FileContentCallback"], "{0} - ".format(
+        host.WriteVerbose(["testers.ExcludesExpression", "testers"], "{0} - ".format(
             tester.ResultType.to_color_string(self.Result)), self.Reason)
