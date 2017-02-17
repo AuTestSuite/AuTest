@@ -83,7 +83,7 @@ class Runable(with_metaclass(_test_enity__metaclass__, DelayedEventMapper)):
         raise NotImplementedError
 
     def _do_run(self):
-        self._run()
+        self._Run()
 
     def ComposeEnv(self):
         ret = {}

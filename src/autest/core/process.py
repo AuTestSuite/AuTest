@@ -46,7 +46,7 @@ class Process(Runable, Order, Item):
         value = value.replace('/', os.sep)
         self.__cmdstr = value
 
-    # need to remeber if this case is needed
+    # need to remember if this case is needed
     # ///////////////////////
     @property
     def RawCommand(self):

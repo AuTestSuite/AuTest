@@ -8,6 +8,7 @@ from .process import Process
 
 @smart_init
 class Processes(TestEnity):
+
     @call_base(TestEnity=("runable", ))
     def __init__(self, runable):
 
@@ -27,24 +28,29 @@ class Processes(TestEnity):
 
     def Process(
             self,
-            id,
+            name,
             cmdstr=None,
             returncode=None,
             startup_timeout=10,  # default to 10 second as most things should be ready by this time
     ):
         # todo ... add check to make sure id a varaible safe
 
-        tmp = Process(self._Runable, id, cmdstr)
+        # create Process object
+        tmp = Process(self._Runable, name, cmdstr)
 
+        # set some global settings before the user might override these locally
+        tmp.ForceUseShell = self._Runable.ComposeVariables().Autest.ForceUseShell
+
+        # update setting based on values passed in
         if returncode is not None:
             tmp.ReturnCode = returncode
 
         tmp.StartupTimeout = startup_timeout
 
-        if id in self.__processes:
-            host.WriteWarning("Overriding process object {0}".format(id))
-        self.__processes[id] = tmp
-        self.__dict__[id] = tmp
+        if name in self.__processes:
+            host.WriteWarning("Overriding process object {0}".format(name))
+        self.__processes[name] = tmp
+        self.__dict__[name] = tmp
         return tmp
 
     # def Add(self, process):
@@ -57,7 +63,7 @@ class Processes(TestEnity):
     @property
     def Default(self):
         if self.__default is None:
-            self.__default = Process(self._Runable, name="Default")
+            self.__default = self.Process("Default")
             self.__processes["default"] = self.__default
         return self.__default
 

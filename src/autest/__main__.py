@@ -68,12 +68,22 @@ def main():
     # -------------------------------------------
     # setup vars
     variables = Variables({'Autest':Variables({
+        ########################
+        # Process Control
         # Long delay before process trees are shut down
         'StopProcessLongDelaySeconds':10,  
         #  Short delay after first process kill before next will be kill 
         'StopProcessShortDelaySeconds':1,
         #  delay after control-c before kill  
         'KillDelaySecond':1,  
+
+        ########################
+        # Process Spawning
+
+        # False -> autoselect logic used
+        # True -> Use shell, risk losing some information bad commands
+        'ForceUseShell':False
+
         })
     })
 
