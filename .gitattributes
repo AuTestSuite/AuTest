@@ -2,7 +2,7 @@
 * text=auto
 
 # Configure line endings by file type
-*.py text
+*.py eol=lf # make it easy to create unix friendly packages on windows
 *.txt text
 *.test text
 *.gold text
