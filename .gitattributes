@@ -2,7 +2,7 @@
 * text=auto
 
 # Configure line endings by file type
-*.py text
+*.py text eol=lf 
 *.txt text
 *.test text
 *.gold text
