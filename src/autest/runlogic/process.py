@@ -21,6 +21,7 @@ from autest.exceptions.killonfailure import KillOnFailureError
 
 @smart_init
 class Process_RunLogic(RunLogic):
+
     @call_base()
     def __init__(self):
         self._process = None
@@ -121,8 +122,8 @@ class Process_RunLogic(RunLogic):
         command_line = template.substitute(env)
         # test to see that this might need a shell
         try:
-            if self._process.ForceUseShell is not None:
-                shell = self._process.ForceUseShell
+            if self._process.ForceUseShell:
+                shell = True
             else:
                 shell = self.isShellCommand(command_line)
 
@@ -280,7 +281,8 @@ class Process_RunLogic(RunLogic):
         host.WriteVerbosef(['process'], 'Stopping process {0}',
                            self._process.Name)
         if self.isRunning():
-            self.__proc.killtree(self._process.ComposeVariables().Autest.KillDelaySecond)
+            self.__proc.killtree(
+                self._process.ComposeVariables().Autest.KillDelaySecond)
         self.Cleanup()
 
     def Wait(self, timeout):
