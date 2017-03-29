@@ -227,7 +227,7 @@ class SetupItem(object):
         # same as the SandBoxDir
         split = path.split(self.SandBoxDir)
         if os.path.isabs(path) and split[0] != '':
-            raise IOError('Target path is not within sandbox')
+            raise IOError('Target path is not within sandbox:\n {0}'.format(path))
 
     def SymLink(self, source, target):
         os.symlink(source, target)
