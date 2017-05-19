@@ -55,7 +55,7 @@ class RunLogic(object):
         for i in items:
             tmp = i.Poll()
             ret |= tmp
-        yield ret
+        return ret
 
     def isReady(self, item, hasrunfor):
         '''

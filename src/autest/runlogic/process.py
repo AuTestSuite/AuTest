@@ -261,12 +261,10 @@ class Process_RunLogic(RunLogic):
                 event_info = eventinfo.RunningInfo(self.__start_time,
                                                    curr_time)
                 # call event
-                #host.WriteDebugf(["process"],"Process: {0} - Calling Running event with {1} callbacks mapped to it", self.Name ,len(self.Running))
                 try:
                     self._process.RunningEvent(event_info)
                 except KillOnFailureError:
                     self.Stop()
-                    raise
                 self.__last_event_time = curr_time
             return True
         # We are not running
