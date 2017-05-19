@@ -67,24 +67,24 @@ def main():
         "init", "Before extension load: args = {0}\n unknown = {1}", setup.arguments, setup.unknowns)
     # -------------------------------------------
     # setup vars
-    variables = Variables({'Autest': Variables({
-        ########################
-        # Process Control
-        # Long delay before process trees are shut down
-        'StopProcessLongDelaySeconds': 10,
-        #  Short delay after first process kill before next will be kill
-        'StopProcessShortDelaySeconds': 1,
-        #  delay after control-c before kill
-        'KillDelaySecond': 1,
+    variables = Variables({
+        'Autest': Variables({
+            ########################
+            # Process Control
+            # Long delay before process trees are shut down
+            'StopProcessLongDelaySeconds': 10,
+            #  Short delay after first process kill before next will be kill
+            'StopProcessShortDelaySeconds': 1,
+            #  delay after control-c before kill
+            'KillDelaySecond': 1,
 
-        ########################
-        # Process Spawning
+            ########################
+            # Process Spawning
 
-        # None -> autoselect logic used
-        # True -> Use shell, risk losing some information bad commands
-        # False -> Don't use shell, risk command not being split correctly
-        'ForceUseShell': None
-    })
+            # False -> autoselect logic used
+            # True -> Use shell, Bad commands don't report clearly
+            'ForceUseShell': None
+        })
     })
 
     # setup shell environment

@@ -1,4 +1,4 @@
-Copyright (c) 2015-2016 
+Copyright (c) 2015-2016
 Jason Kenny
 
 All rights reserved.

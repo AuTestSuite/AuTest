@@ -19,12 +19,13 @@ def main( name, wait_time, port ):
     SocketServer.TCPServer.allow_reuse_address=True
     Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     httpd = SocketServer.TCPServer(("", port), Handler)
-    print("serving at port", port)
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("exiting")
-        return
+    if port:
+        print("serving at port", port)
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("exiting")
+            return
 
 if __name__ == '__main__':
 
@@ -36,6 +37,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--port",
                     type=int,
+                    default=0,
                     help="port to run server on.")
 
     parser.add_argument('-V','--version', action='version', version='%(prog)s 1.0')
