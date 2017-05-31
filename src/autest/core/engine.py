@@ -70,6 +70,8 @@ class Engine(object):
         import autest.whenitem
         # load built in reporter object
         import autest.reporters
+        # load condition tests
+        import autest.conditions
 
         if os.path.exists(self.__run_dir):
 

@@ -37,6 +37,14 @@ class RunTestTask(Task):
             host.WriteVerbose("test_logic", "Test {0} failed with KillOnFailureError\n {1}".format(
                 self.__test.Name, self.__test.Setup._Reason))
             return
+        except SystemExit as e:
+            self.__test._Result = testers.ResultType.Exception
+            self.__test._Reason = str(e)
+            host.WriteVerbose("test_logic", "Test {0} failed with Exception\n {1}".format(
+                self.__test.Name, self.__test._Reason))
+            if tl:
+                tl.Stop()
+            return
         except Exception as e:
             self.__test._Result = testers.ResultType.Exception
             self.__test._Reason = traceback.format_exc()

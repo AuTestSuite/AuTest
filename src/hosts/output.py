@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 from builtins import map
+import sys
 
 from . import common
 import hosts.glb as glb
@@ -70,3 +71,19 @@ def WriteVerbosef(catagory, sfmt, *lst, **kw):
 
 def WriteProgress(task, msg=None, progress=None, completed=False):
     glb.formatter.writeProgress(task, msg, progress, completed)
+
+
+# some utility functions
+
+def getCurrentStack(start_depth=0):
+    '''
+    start_depth tell us where on the stack to
+    start getting data, this way we can pass information
+    up the stack where the issue is to the user and hide
+    where the error is reported
+    '''
+    frame = sys._getframe(1+start_depth)
+    filename = frame.f_code.co_filename
+    lineno = frame.f_lineno
+    routine = frame.f_code.co_name
+    return (filename, lineno, routine)

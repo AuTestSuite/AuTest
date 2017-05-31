@@ -12,7 +12,6 @@ import autest.common.ospath as ospath
 import autest.common.reg as reg
 
 
-
 class Condition(object):
     def __init__(self, testfunc, reason, pass_value, neg_reason=None):
         self.__func = testfunc
@@ -61,39 +60,6 @@ class ConditionFactory(object):
 
         ret = Condition(function, reason, pass_value, neg_reason)
         return ret
-
-    def HasRegKey(self, root, keys, msg):
-        return self.Condition(lambda: reg.has_regkey(root, keys), msg, True)
-
-    # def RegistryKeyEqual(self,key,value):
-    # pass
-
-    def RunCommand(self, command, msg, pass_value=0, env=None, shell=False):
-        return self.Condition(lambda: subprocess.call(command, shell=False),
-                              msg,
-                              pass_value)
-
-    def HasProgram(self, program, msg, pass_value=True, path=None):
-        return self.Condition(lambda: ospath.has_program(program, path), msg,
-                              pass_value)
-
-    def IsPlatform(self, *lst):
-        return self.Condition(
-            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
-            'Platform must be one of {0}, reported value was "{1}" or "{2}"'.
-            format(lst, platform.system().lower(), os.name),
-            True,
-            'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.
-            format(lst, platform.system().lower(), os.name), )
-
-    def IsNotPlatform(self, *lst):
-        return self.Condition(
-            lambda: sys.platform.lower() in lst or platform.system().lower() in lst or os.name.lower() in lst,
-            'Platform must not be one of {0}, reported value was "{1}" or "{2}"'.
-            format(lst, platform.system().lower(), os.name),
-            False,
-            'Platform must be one of {0}, reported value was "{1}" or "{2}"'.
-            format(lst, platform.system().lower(), os.name), )
 
     def true(self, msg):
         return self.Condition(lambda: True, msg, True)
