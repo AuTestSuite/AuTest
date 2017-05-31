@@ -60,7 +60,7 @@ def setDefaultArgs(argparser):
     defaults.add_argument("--disable-color",
                           dest='show_color',
                           action='store_false',
-                          help="Disable and colored output")
+                          help="Disable colored output")
 
     defaults.add_argument("--verbose", "-v",
                           action=extendAction,

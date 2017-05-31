@@ -28,6 +28,70 @@ class ConsoleHost(interfaces.UIHost):
             self.__stdout__ = sys.__stdout__
             self.__stderr__ = sys.__stderr__
 
+    # our overrides
+    def formatStack(self, stack):
+
+        if stack is not None:
+            filename, lineno, routine = stack
+        else:
+            frame = sys._getframe(5)
+            filename = frame.f_code.co_filename
+            lineno = frame.f_lineno
+            routine = frame.f_code.co_name
+        content = self.get_contents(filename, lineno)
+        msg = ' File: "{filename}", line: {lineno}, in "{routine}"\n{content}\n'.format(
+            filename=filename,
+            lineno=lineno,
+            routine=routine,
+            content=content
+            )
+        return msg
+
+
+    def get_contents(self, filename, lineno):
+        content = ''
+        lineno_color = colorama.Fore.MAGENTA + colorama.Style.NORMAL
+        arrow_color = colorama.Fore.LIGHTGREEN_EX
+        code_color = colorama.Fore.WHITE + colorama.Style.DIM
+        error_code_color = colorama.Fore.LIGHTRED_EX
+
+        if lineno > 3:
+            content += " {lineno_color}{lineno}:     {code_color}{line}".format(
+                    lineno_color=lineno_color,
+                    code_color=code_color,
+                    line=linecache.getline(filename, lineno - 3),
+                    lineno=lineno - 3
+                )
+        if lineno > 2:
+            content += " {lineno_color}{lineno}:     {code_color}{line}".format(
+                lineno_color=lineno_color,
+                code_color=code_color,
+                line=linecache.getline(filename, lineno - 2),
+                lineno=lineno - 2
+            )
+        if lineno > 1:
+            content += " {lineno_color}{lineno}:     {code_color}{line}".format(
+                lineno_color=lineno_color,
+                code_color=code_color,
+                line=linecache.getline(filename, lineno - 1),
+                lineno=lineno - 1
+            )
+        content += " {lineno_color}{lineno}:{arrow_color}==>  {error_code_color}{line}".format(
+            lineno_color=lineno_color,
+            error_code_color=error_code_color,
+            arrow_color=arrow_color,
+            lineno=lineno,
+            line=linecache.getline(filename, lineno)
+        )
+        content += " {lineno_color}{lineno}:     {code_color}{line}".format(
+            lineno_color=lineno_color,
+            code_color=code_color,
+            line=linecache.getline(filename, lineno + 1),
+            lineno=lineno + 1
+        ) + reset_stream
+        return content
+
+
 # class C io streams
 
     def writeStdOut(self, msg):
@@ -45,18 +109,6 @@ class ConsoleHost(interfaces.UIHost):
         self.__stdout__.write(stream_color + msg.replace(reset_stream,
                                                          stream_reset) + reset)
         self.__stdout__.flush()
-
-    def get_contents(self, filename, lineno):
-        content = ''
-        if lineno > 3:
-            content += "  {0}".format(linecache.getline(filename, lineno - 3))
-        if lineno > 2:
-            content += "  {0}".format(linecache.getline(filename, lineno - 2))
-        if lineno > 1:
-            content += "  {0}".format(linecache.getline(filename, lineno - 1))
-        content += "-> {0}".format(linecache.getline(filename, lineno))
-        content += "  {0}".format(linecache.getline(filename, lineno + 1))
-        return content
 
     def writeWarning(self, msg, stack=None, show_stack=True):
         stream_color = colorama.Fore.LIGHTYELLOW_EX

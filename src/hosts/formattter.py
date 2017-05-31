@@ -84,13 +84,13 @@ class Formatter(uihost.UIHost):
         # If this is None, we will do the formating
         if not msg:
             if stack is not None:
-                filename, lineno, routine, content = stack
+                filename, lineno, routine = stack
             else:
                 frame = sys._getframe(4)
                 filename = frame.f_code.co_filename
                 lineno = frame.f_lineno
                 routine = frame.f_code.co_name
-                content = self.get_contents(filename, lineno)
+            content = self.get_contents(filename, lineno)
             msg = ' File: "%s", line: %s, in "%s"\n %s\n' % (filename, lineno,
                                                              routine, content)
         return msg
@@ -195,7 +195,7 @@ class Formatter(uihost.UIHost):
             h.writeError(msg, **kw)
 
         if kw.get("exit", True):
-            sys.exit(exit)
+            sys.exit(msg)
 
     def writeDebug(self, catagory, msg_list, **kw):
         fmsg = None
