@@ -154,7 +154,7 @@ class Engine(object):
             'AUTEST_SITE_PATH': path,
             'SetupError': SetupError,
             # make it easy to define extension
-            'Condition': conditions.ConditionFactory(),
+            'Condition': conditions.ConditionFactory(self.__variables, self.__ENV),
             'Testers': testers,
             # break these out of tester space
             # to make it easier to right a test

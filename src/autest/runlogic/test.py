@@ -313,7 +313,7 @@ class Test_RunLogic(RunLogic):
             'test': self.__test,  # backwards compat
             'Test': self.__test,
             'Setup': self.__test.Setup,
-            'Condition': conditions.ConditionFactory(),
+            'Condition': conditions.ConditionFactory(self.__test.ComposeVariables(), self.__test.ComposeEnv()),
             'Testers': testers,
             # break these out of tester space
             # to make it easier to right a test
