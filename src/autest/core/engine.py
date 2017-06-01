@@ -22,8 +22,6 @@ import autest.testers as testers
 from autest.core import conditions
 
 
-
-
 class Engine(object):
     """description of class"""
 
@@ -139,7 +137,7 @@ class Engine(object):
             path = os.path.abspath(self.__autest_site)
 
         # add expected API function so they can be called
-        locals = {
+        _locals = {
             'RegisterFileType': api.RegisterFileType,
             'AddTestRunSet': api.ExtendTest,  # backward compat
             'ExtendTest': api.ExtendTest,
@@ -149,8 +147,10 @@ class Engine(object):
             'SetupItem': setupitem.SetupItem,
             'AddTestRunMember': api.AddTestEnityMember,  # backward compat
             'AddTestEnityMember': api.AddTestEnityMember,
+            'ExtendCondition': api.ExtendCondition,
             'AddWhenFunction': api.AddWhenFunction,
             'AddMethodToInstance': api.AddMethodToInstance,
+            'AuTestVersion':api.AuTestVersion,
             'AUTEST_SITE_PATH': path,
             'SetupError': SetupError,
             # make it easy to define extension
@@ -176,7 +176,7 @@ class Engine(object):
             for f in os.listdir(path):
                 f = os.path.join(path, f)
                 if os.path.isfile(f) and f.endswith("test.ext"):
-                    execfile.execFile(f, locals, locals)
+                    execfile.execFile(f, _locals, _locals)
         elif self.__autest_site is not None:
             host.WriteError(
                 "Custom autest-site path note found. Looking for:\n {0}".
@@ -224,9 +224,9 @@ class Engine(object):
 
     def _run_tests(self):
         if self.__jobs > 1:
-            #for t in self.__tests.values():
+            # for t in self.__tests.values():
                 #self.__pool.addTask(self.__run_test_task, t)
-            #self.__pool.waitCompletion()
+            # self.__pool.waitCompletion()
             pass
         else:
             tmp = list(self.__tests.keys())

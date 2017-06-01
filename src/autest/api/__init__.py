@@ -6,4 +6,5 @@ from .setup import AddSetupItem
 from .test import ExtendTest
 from .testenity import AddTestEnityMember
 from .testrun import ExtendTestRun
+from .version import AuTestVersion
 from .when import AddWhenFunction
