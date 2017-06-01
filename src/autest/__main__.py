@@ -1,20 +1,20 @@
 
 from __future__ import absolute_import, division, print_function
-import autest.core.testrun
+
 import sys
 import os
-import argparse
-from autest.core.engine import Engine
-import autest.common.execfile as execfile
+
 import hosts
 import hosts.output
-from hosts.console import ConsoleHost
+
 import autest
-import autest.common.is_a as is_a
+import autest.core.testrun
+from autest.core.engine import Engine
+import autest.common.execfile as execfile
+
 from autest.common.settings import Settings, JobValues
 from autest.core.variables import Variables
-
-import inspect
+import autest.api as api
 
 
 def main():
@@ -112,12 +112,13 @@ def main():
     # see if we have a file to load to get new options
     options_file = os.path.join(path, "init.cli.ext")
     if os.path.exists(options_file):
-        locals = {
+        _locals = {
             'Settings': setup,
             'AutestSitePath': path,
             "host": hosts.output,
+            'AuTestVersion': api.AuTestVersion,
         }
-        execfile.execFile(options_file, locals, locals)
+        execfile.execFile(options_file, _locals, _locals)
     # parse the options and error if we have unknown options
     setup.final_parse()
     hosts.output.WriteDebugf(
@@ -126,15 +127,16 @@ def main():
     # see if we have any custom setup we want to do globally.
     options_file = os.path.join(path, "setup.cli.ext")
     if os.path.exists(options_file):
-        locals = {
+        _locals = {
             'os': os,
             'ENV': env,
             'Variables': variables,
             'Arguments': setup.arguments,
             "host": hosts.output,
-            'AutestSitePath': path
+            'AutestSitePath': path,
+            'AuTestVersion': api.AuTestVersion,
         }
-        execfile.execFile(options_file, locals, locals)
+        execfile.execFile(options_file, _locals, _locals)
     sys.path = old_path
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options,
