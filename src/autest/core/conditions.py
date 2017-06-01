@@ -1,16 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
-import subprocess
-import os
-import sys
-import platform
-import stat
-
 from builtins import object
-
-import autest.common.ospath as ospath
-import autest.common.reg as reg
-
 
 class Condition(object):
     def __init__(self, testfunc, reason, pass_value, neg_reason=None):
@@ -47,6 +37,19 @@ class Condition(object):
 
 
 class ConditionFactory(object):
+
+    def __init__(self, variables, env):
+        self.__variables = variables
+        self.__env = env
+
+    @property
+    def Variables(self):
+        return self.__variables
+
+    @property
+    def Env(self):
+        return self.__env
+
     def __call__(self, function, reason, pass_value=True, neg_reason=None):
         return self.Condition(function, reason, pass_value, neg_reason)
 
