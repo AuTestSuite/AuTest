@@ -21,38 +21,46 @@ def main():
     # create primary commandline parser
     setup = Settings()
 
-    setup.path_argument(["-D", "--directory"],
-                        default=os.path.abspath('.'),
-                        help="The directory with all the tests in them")
+    setup.path_argument(
+        ["-D", "--directory"],
+        default=os.path.abspath('.'),
+        help="The directory with all the tests in them")
 
-    setup.path_argument(["--autest-site"],
-                        help="A user provided autest-site directory to use instead of the default")
+    setup.path_argument(
+        ["--autest-site"],
+        help="A user provided autest-site directory to use instead of the default")
 
-    setup.path_argument(["--sandbox"],
-                        default=os.path.abspath('./_sandbox'),
-                        exists=False,
-                        help="The root directory in which the tests will run")
+    setup.path_argument(
+        ["--sandbox"],
+        default=os.path.abspath('./_sandbox'),
+        exists=False,
+        help="The root directory in which the tests will run")
 
-    setup.add_argument(["-j", "--jobs"],
-                       default=1,
-                       type=JobValues,
-                       help="The number of test to try to run at the same time")
+    setup.add_argument(
+        ["-j", "--jobs"],
+        default=1,
+        type=JobValues,
+        help="The number of test to try to run at the same time")
 
-    setup.list_argument(["--env"],
-                        metavar="Key=Value",
-                        help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")
+    setup.list_argument(
+        ["--env"],
+        metavar="Key=Value",
+        help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")
 
-    setup.list_argument(["-f", "--filters"],
-                        dest='filters',
-                        default=['*'],
-                        help="Filter the tests run by their names")
+    setup.list_argument(
+        ["-f", "--filters"],
+        dest='filters',
+        default=['*'],
+        help="Filter the tests run by their names")
 
-    setup.list_argument(["-R", "--reporters"],
-                        default=['default'],
-                        help="Names of Reporters to use for report generation")
+    setup.list_argument(
+        ["-R", "--reporters"],
+        default=['default'],
+        help="Names of Reporters to use for report generation")
 
-    setup.add_argument(['-V', '--version'], action='version',
-                       version='%(prog)s {0}'.format(autest.__version__))
+    setup.add_argument(
+        ['-V', '--version'], action='version',
+        version='%(prog)s {0}'.format(autest.__version__))
 
     # this is a commandline tool so make the cli host
     hosts.setDefaultArgs(setup.parser)
