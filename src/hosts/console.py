@@ -118,7 +118,7 @@ class ConsoleHost(interfaces.UIHost):
                                                          stream_reset) + reset)
         self.__stdout__.flush()
 
-    def writeError(self, msg, stack=None, show_stack=True):
+    def writeError(self, msg, stack=None, show_stack=True, exit=True):
         stream_color = colorama.Fore.LIGHTRED_EX
         stream_reset = colorama.Style.RESET_ALL + stream_color
         reset = colorama.Style.RESET_ALL

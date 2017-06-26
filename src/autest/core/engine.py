@@ -143,6 +143,7 @@ class Engine(object):
             'ExtendTest': api.ExtendTest,
             'AddSetupTask': api.AddSetupItem,  # backward compat
             'AddSetupItem': api.AddSetupItem,
+            'AddTester':api.AddTester,
             'SetupTask': setupitem.SetupItem,  # backward compat
             'SetupItem': setupitem.SetupItem,
             'AddTestRunMember': api.AddTestEnityMember,  # backward compat
@@ -156,6 +157,7 @@ class Engine(object):
             # make it easy to define extension
             'Condition': conditions.ConditionFactory(self.__variables, self.__ENV),
             'Testers': testers,
+            'Tester': testers.Tester,
             # break these out of tester space
             # to make it easier to right a test
             'Any': testers.Any,
