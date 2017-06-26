@@ -158,7 +158,11 @@ def main():
                       env=env,
                       variables=variables)
 
-    ret = myEngine.Start()
+    try:
+        ret = myEngine.Start()
+    except SystemExit:
+        hosts.output.WriteError("Autest shutdown because of critical error!",exit=False,show_stack=False)
+        ret = 1
     exit(ret)
 
 

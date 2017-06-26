@@ -1,31 +1,16 @@
 from __future__ import absolute_import, division, print_function
 import autest.glb as glb
-import autest.common.namespace as namespace
-import types
 import hosts.output as host
-from autest.core.setupitem import SetupItem
-from autest.core.setup import Setup
 
-# this api allow users to add new items to Setup
-# the user can add a namespace as well to allow for
-# logic such as Setup.Copy(...) or Setup.Copy.FromDirectory(...)
-# like logic to happen. In this example Copy was added in as:
-# autest.api.AddSetupTask(Copy,"__call__",ns='Copy')
-# which uses a python trick with overloaded operators to
-# add Copy as a special function __call__ to the "namespace" Copy
-
-
-def AddSetupItem(item, name=None, ns=None):
+def AddTester(item, name=None, ns=None):
     # helper function
     def wrapper(self, *lst, **kw):
         self._add_item(item(*lst, **kw))
 
     # check to make sure this is a SetupItem type
-    if not issubclass(item, SetupItem):
+    if not issubclass(item, Tester):
         host.WriteError(
-            "Object must be subclass of autest.core.setupitem.SetupItem",
-            stack=host.getCurrentStack(1)
-            )
+            "Object must be subclass of autest.testers.Tester")
 
     # get name of task if user did not provide a value
     if name is None:
@@ -33,9 +18,9 @@ def AddSetupItem(item, name=None, ns=None):
 
     if ns is None:
         host.WriteVerbose("setupext",
-                          "Adding setup extension named: {0}".format(name))
+                          "Adding Tester extension named: {0}".format(name))
         method = wrapper
-        setattr(Setup, name, method)
+        setattr(testers, name, method)
     else:
         # see if we have this namespace defined already
         nsobj = glb.setup_items.get(ns)
@@ -49,5 +34,5 @@ def AddSetupItem(item, name=None, ns=None):
         setattr(nsobj, name, x)
         host.WriteVerbose(
             "setupext",
-            "Adding setup extension named: {0} to namespace: {1}".format(name,
+            "Adding Tester extension named: {0} to namespace: {1}".format(name,
                                                                          ns))
