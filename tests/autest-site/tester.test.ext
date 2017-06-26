@@ -37,3 +37,6 @@ class mytester(Tester):
                 tester.ResultType.to_color_string(self.Result)),
             self.Reason
         )
+
+
+AddTester(mytester)
