@@ -4,7 +4,7 @@ import autest.api as api
 
 class RunCommand(setupitem.SetupItem):
     def __init__(self, command, pass_value=0):
-        super().__init__(itemname="RunCommand")
+        super(RunCommand, self).__init__(itemname="RunCommand")
         self.command = command
         self.pass_value = pass_value
         self.Description = "Run command '{0}' expecting exit code '{1}'".\
