@@ -336,3 +336,38 @@ if os.name == 'nt':
     CreateHardLink = tryKernal32(
         'CreateHardLinkW', BOOLEAN, (LPWSTR, LPWSTR, DWORD))
     CopyFile = tryKernal32('CopyFileW', BOOLEAN, (LPWSTR, LPWSTR, BOOL))
+    DeleteFile = tryKernal32('DeleteFileW', BOOLEAN, (LPWSTR,))
+
+    def _long_path(path):
+        if len(path) >= 200 and not path.startswith("\\\\?\\"):
+            path = "\\\\?\\" + os.path.abspath(path)        
+        return path#.encode('utf-16')
+
+    # some overides.. might want to do this differently later
+    def win32_rm(path):
+        path = _long_path(path)
+        if not DeleteFile(path):
+            raise WindowsError(ctypes.GetLastError(),
+                               ctypes.FormatError(ctypes.GetLastError()), path)
+
+    os.remove = win32_rm
+    os.unlink = win32_rm
+
+    def win32_link(source, link_name):
+        source = _long_path(source)
+        link_name = _long_path(link_name)
+        if not CreateHardLink(link_name, source, 0):
+            raise WindowsError(ctypes.GetLastError(), ctypes.FormatError(
+                ctypes.GetLastError()), link_name)
+
+    os.link = win32_link
+
+    def win32_symlink(source, link_name):
+        source = _long_path(source)
+        link_name = _long_path(link_name)
+        if not CreateSymbolicLink(link_name, source, 0):
+            raise WindowsError(ctypes.GetLastError(), ctypes.FormatError(
+                ctypes.GetLastError()), link_name)
+
+    os.symlink = win32_symlink
+

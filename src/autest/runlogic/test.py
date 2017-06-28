@@ -12,6 +12,7 @@ import autest.common.is_a as is_a
 from autest.common.execfile import execFile
 import autest.testers as testers
 from autest.core import conditions
+from autest.core import CopyLogic
 from autest.core.eventinfo import *
 from autest.core.order import GenerateStartOrderedList, GenerateEndOrderedList
 from autest.exceptions.killonfailure import KillOnFailureError
@@ -321,6 +322,7 @@ class Test_RunLogic(RunLogic):
             'All': testers.All,
             'Not': testers.Not,
             'When': glb.When(),
+            'CopyLogic':CopyLogic,
         })
 
         # get full path
