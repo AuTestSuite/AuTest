@@ -341,7 +341,7 @@ if os.name == 'nt':
     def _long_path(path):
         if len(path) >= 200 and not path.startswith("\\\\?\\"):
             path = "\\\\?\\" + os.path.abspath(path)        
-        return path#.encode('utf-16')
+        return path
 
     # some overides.. might want to do this differently later
     def win32_rm(path):
