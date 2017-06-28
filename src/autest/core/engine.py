@@ -20,6 +20,7 @@ from autest.runlogic.test import Test_RunLogic
 from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
+from autest.core import CopyLogic
 
 
 class Engine(object):
@@ -143,6 +144,7 @@ class Engine(object):
             'ExtendTest': api.ExtendTest,
             'AddSetupTask': api.AddSetupItem,  # backward compat
             'AddSetupItem': api.AddSetupItem,
+            'AddTester':api.AddTester,
             'SetupTask': setupitem.SetupItem,  # backward compat
             'SetupItem': setupitem.SetupItem,
             'AddTestRunMember': api.AddTestEnityMember,  # backward compat
@@ -156,6 +158,7 @@ class Engine(object):
             # make it easy to define extension
             'Condition': conditions.ConditionFactory(self.__variables, self.__ENV),
             'Testers': testers,
+            'Tester': testers.Tester,
             # break these out of tester space
             # to make it easier to right a test
             'Any': testers.Any,
@@ -164,6 +167,7 @@ class Engine(object):
             'When': glb.When(),
             'File': File,
             "host": host,
+            "CopyLogic":CopyLogic,
         }
 
         old_path = sys.path[:]

@@ -25,7 +25,7 @@ class UIHost(object):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def writeError(self, msg, stack=None, show_stack=True):
+    def writeError(self, msg, stack=None, show_stack=True,exit=True):
         raise NotImplementedError
 
     @abc.abstractmethod

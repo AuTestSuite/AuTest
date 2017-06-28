@@ -23,7 +23,9 @@ def AddSetupItem(item, name=None, ns=None):
     # check to make sure this is a SetupItem type
     if not issubclass(item, SetupItem):
         host.WriteError(
-            "Object must be subclass of autest.core.setupitem.SetupItem")
+            "Object must be subclass of autest.core.setupitem.SetupItem",
+            stack=host.getCurrentStack(1)
+            )
 
     # get name of task if user did not provide a value
     if name is None:

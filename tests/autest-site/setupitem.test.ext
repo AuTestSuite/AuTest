@@ -1,0 +1,13 @@
+
+class MySetupItem(SetupItem):
+    def __init__(self, value):
+        super(MySetupItem, self).__init__(itemname="MySetupItem")
+        self.value = value
+        
+
+    def setup(self):
+        print("Setup happened")
+
+
+AddSetupItem(MySetupItem)
+
