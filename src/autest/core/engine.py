@@ -20,6 +20,7 @@ from autest.runlogic.test import Test_RunLogic
 from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
+from autest.core import CopyLogic
 
 
 class Engine(object):
@@ -166,6 +167,7 @@ class Engine(object):
             'When': glb.When(),
             'File': File,
             "host": host,
+            "CopyLogic":CopyLogic,
         }
 
         old_path = sys.path[:]

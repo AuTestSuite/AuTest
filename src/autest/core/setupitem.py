@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 import autest.core.streamwriter as streamwriter
+from autest.core import CopyLogic
 import autest.common.process
 import hosts.output as host
 import autest.common.disk
@@ -86,16 +87,19 @@ class SetupItem(object):
 
     # useful util functions
     def RunCommand(self, cmd):
-        # TODO.. try to pull the logic out in to some reusable process object
-        ###########
+
         # create a StreamWriter which will write out the stream data of the run
         # to sorted files
-        output = streamwriter.StreamWriter(os.path.join(
-            self.__runable.RunDirectory,
-            "_setup_tmp_{0}_{1}".format(
-                self.ItemName.replace(" ", "_"), self.cnt)),
+        output = streamwriter.StreamWriter(
+            os.path.join(
+                self.__runable.RunDirectory,
+                "_setup_tmp_{0}_{1}".format(
+                    self.ItemName.replace(" ", "_"),
+                    self.cnt)
+            ),
             cmd,
-            self.__runable.Env)
+            self.__runable.Env
+        )
         self.cnt += 1
         # the command line we will run. We add the RunDirectory to the start of the command
         # to avoid having to deal with cwddir() issues
@@ -127,28 +131,27 @@ class SetupItem(object):
 
         return proc.returncode
 
-    def Copy(self, source, target=None, try_link=False):
+    def Copy(self, source, target=None, copy_logic=CopyLogic.Default):
+        copy_logic = CopyLogic.DefaultLogic(copy_logic)
         source, target = self._copy_setup(source, target)
-        if try_link:
+        if copy_logic != CopyLogic.Copy:
+            self._smartLink(source, target, copy_logic, self.Copy)
+        else:
+            # do the copy
+            host.WriteVerbose("setup", "Copying {0} to {1}".format(source, target))
             try:
-                self._smartLink(source, target)
-                return
-            except:
-                pass
-        host.WriteVerbose("setup", "Copying {0} to {1}".format(source, target))
-        try:
-            if os.path.isfile(source):
-                if os.path.exists(target):
-                    host.WriteVerbose(
-                        "setup", "target already exists! Replacing...")
-
-                shutil.copy2(source, target)
-
-            else:
-                autest.common.disk.copy_tree(source, target)
-        except Exception as e:
-            raise SetupError(
-                "Cannot copy {0} because {1}".format(source, str(e)))
+                # copy file
+                if os.path.isfile(source):
+                    if os.path.exists(target):
+                        host.WriteVerbose("setup", "target already exists! Replacing...")
+                    shutil.copy2(source, target)
+                # else copy a directory
+                else:
+                    autest.common.disk.copy_tree(source, target)
+            except Exception as e:
+                raise SetupError(
+                    "Cannot copy {0} because {1}".format(source, str(e))
+                )
 
     def CopyAs(self, source, targetdir, targetname=None):
         '''
@@ -219,6 +222,7 @@ class SetupItem(object):
             # given that target is None we assume that we want to copy it
             # the sandbox directory with the same name as the source
             target = os.path.join(self.SandBoxDir, os.path.basename(source))
+
         return (source, target)
 
     # check that the path give is within the sandbox
@@ -227,7 +231,8 @@ class SetupItem(object):
         # same as the SandBoxDir
         split = path.split(self.SandBoxDir)
         if os.path.isabs(path) and split[0] != '':
-            raise IOError('Target path is not within sandbox:\n {0}'.format(path))
+            raise IOError(
+                'Target path is not within sandbox:\n {0}'.format(path))
 
     def SymLink(self, source, target):
         os.symlink(source, target)
@@ -235,35 +240,59 @@ class SetupItem(object):
     def HardLink(self, source, target):
         os.link(source, target)
 
-    def _smartLink(self, source, target):
+    def _smartLink(self, source, target, link_policy, copy_func):
         '''
         Tires to make a Hard link then a SymLink then do a copy
         ToDo: look at making this overidable in what logic is used
         such as hard_copy or soft_copy as some tests might want to
         control how this smart logic is handled
         '''
-        if os.path.isfile(source):
+
+        if link_policy == CopyLogic.HardSoft or link_policy == CopyLogic.Hard:
             try:
-                host.WriteVerbose(
-                    "setup", "Hardlinking {0} to {1}".format(source, target))
+                host.WriteVerbose("setup", "Hardlinking {0} to {1}".format(source, target))
                 self.HardLink(source, target)
                 return
             except:
                 host.WriteVerbose("setup", "Hardlinking - Failed! Trying..")
-        if self.SandBoxDir == target:
-            files = os.listdir(source)
-            for x in files:
-                fullsrc = os.path.join(source, x)
-                fulldest = os.path.join(target, x)
-                self.Copy(fullsrc, fulldest, try_link=True)
-        else:
+                if link_policy == CopyLogic.HardSoft:
+                    copy_func(source, target, CopyLogic.Soft)
+                else:
+                    copy_func(source, target, CopyLogic.Copy)
+        elif link_policy == CopyLogic.Soft:
             try:
-                host.WriteVerbose(
-                    "setup", "Symlinking {0} to {1}".format(source, target))
+                host.WriteVerbose("setup", "Symlinking {0} to {1}".format(source, target))
                 self.SymLink(source, target)
             except:
                 host.WriteVerbose("setup", "Symlinking - Failed! Trying..")
-                raise
+                copy_func(source, target, CopyLogic.Copy)
+
+        elif link_policy == CopyLogic.HardSoftFiles or link_policy == CopyLogic.HardFiles:
+            # source is a directory
+            if os.path.isdir(source):
+                self.MakeDir(target)
+                files = os.listdir(source)
+                for x in files:
+                    fullsrc = os.path.join(source, x)
+                    fulldest = os.path.join(target, x)
+                    copy_func(fullsrc, fulldest, link_policy)
+            # else source is a file
+            else:
+                copy_func(fullsrc, fulldest, CopyLogic.HardSoft)
+        elif link_policy == CopyLogic.SoftFiles:
+            # source is a directory
+            if os.path.isdir(source):
+                self.MakeDir(target)
+                files = os.listdir(source)
+                for x in files:
+                    fullsrc = os.path.join(source, x)
+                    fulldest = os.path.join(target, x)
+                    copy_func(fullsrc, fulldest, link_policy)
+            # else source is file
+            else:
+                copy_func(source, target, CopyLogic.Soft)
+        else:
+            copy_func(fullsrc, fulldest, CopyLogic.Copy)
 
     def _bind(self, test):
         '''
