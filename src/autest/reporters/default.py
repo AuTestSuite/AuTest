@@ -101,7 +101,7 @@ def CheckerData(item, indent=0):
     if item.isContainer:
         for tester in item._testers:
             ret += "\n"
-            ret += CheckerData(item, 2)
+            ret += CheckerData(tester, 2)
     ret += "\n"
     return indentStr(ret, indent)
 
