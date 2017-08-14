@@ -124,8 +124,13 @@ class Not(_Container):
             tester, description="Checking that negation of the test")
 
     def test(self, eventinfo, **kw):
-        t = self._testers[0]
-        t.test(eventinfo, **kw)
+        t = self._testers[0]        
+        try:
+            t.test(eventinfo, **kw)
+        except KillOnFailureError:
+            self.Result = tester.ResultType.Passed
+            self.Reason = "The test contained test failed as expected"
+            raise
         if t.Result == tester.ResultType.Failed:
             self.Result = tester.ResultType.Passed
             self.Reason = "The test contained test failed as expected"
