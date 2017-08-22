@@ -62,6 +62,15 @@ def main():
         ['-V', '--version'], action='version',
         version='%(prog)s {0}'.format(autest.__version__))
 
+    setup.string_argument(
+        ['-C', '--clean'],
+        default='passed',
+        help='''
+        Level of cleaning for after a test is finished.
+        all > exception > failed > warning > passed > skipped > unknown> none
+        Defaults at passed
+        ''')
+
     # this is a commandline tool so make the cli host
     hosts.setDefaultArgs(setup.parser)
     # make default host
@@ -94,6 +103,31 @@ def main():
             'ForceUseShell': None
         })
     })
+
+    # taken from tester.py
+    clean_choices = {"none": -1,
+                    "unknown": 0,
+                    "skipped": 1,
+                    "passed": 2,
+                    "warning": 3,
+                    "failed": 4,
+                    "exception": 5,
+                    "all": 6}
+
+    # setup the level of cleaning
+    # print(clean)
+    # print(setup.arguments.clean)
+
+    if setup.arguments.clean:
+        if setup.arguments.clean in clean_choices:
+            clean_level = clean_choices[setup.arguments.clean]
+        else:
+            hosts.output.WriteWarning("-C/--clean value '{0}' ignored. Defaulting to cleaning all passed. See help for valid choices.".format(setup.arguments.clean))
+            clean_level = 2
+    else:
+        clean_level = 2
+
+    # print(clean_level)
 
     # setup shell environment
     env = os.environ.copy()
@@ -156,7 +190,8 @@ def main():
                       filters=setup.arguments.filters,
                       reporters=setup.arguments.reporters,
                       env=env,
-                      variables=variables)
+                      variables=variables,
+                      clean=clean_level)
 
     try:
         ret = myEngine.Start()

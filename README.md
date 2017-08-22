@@ -32,7 +32,7 @@ To install run the command to get latest published version:
 
 To install the latest development version, run the command:
 ~~~~
-pip install git+https://bitbucket.org/dragon512/reusable-gold-testing-system.git
+pip install git+https://bitbucket.org/dragon512/reusable-gold-testing-system.git@develop
 ~~~~
 
 
