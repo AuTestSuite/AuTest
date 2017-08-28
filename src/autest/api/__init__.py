@@ -9,4 +9,3 @@ from .testers import AddTester
 from .testrun import ExtendTestRun
 from .version import AuTestVersion
 from .when import AddWhenFunction
-
