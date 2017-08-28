@@ -1,6 +1,7 @@
 # pylint: disable=locally-disabled, protected-access
 from __future__ import absolute_import, division, print_function
 import os
+import sys
 import string
 import subprocess
 import time
@@ -54,7 +55,8 @@ class Process_RunLogic(RunLogic):
         # hacky function to help deal with command that need a shell without
         # breaking older test files
         lex = shlex.shlex(cmdstr, posix=True)
-        # lex.escape+="<>|"
+        if sys.platform =='win32':
+            lex.escape="" # normal escape of "\" breaks path passing
         lex.wordchars += '-$%><&.=:%^/\\'
         lex.commenters = ''
         return list(lex)
