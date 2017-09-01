@@ -6,7 +6,6 @@ from autest.common.constructor import call_base, smart_init
 from autest.exceptions.killonfailure import KillOnFailureError
 
 
-
 @smart_init
 class RunLogic(object):
     @call_base()
@@ -67,20 +66,26 @@ class RunLogic(object):
         isObjReady = True
         args = item.args
         try:
-            isObjReady = obj._isReady(hasRunFor=hasrunfor, **args)
+            isObjReady = obj._isReady(process=obj, hasRunFor=hasrunfor, **args)
         except TypeError:
             try:
-                isObjReady = obj._isReady(**args)
+                isObjReady = obj._isReady(hasRunFor=hasrunfor, **args)
             except TypeError:
-                isObjReady = obj._isReady()
+                try:
+                    isObjReady = obj._isReady(**args)
+                except TypeError:
+                    isObjReady = obj._isReady()
 
         try:
-            isReady = item.readyfunc(hasRunFor=hasrunfor, **args)
+            isReady = item.readyfunc(process=obj, hasRunFor=hasrunfor, **args)
         except TypeError:
             try:
-                isReady = item.readyfunc(**args)
+                isReady = item.readyfunc(hasRunFor=hasrunfor, **args)
             except TypeError:
-                isReady = item.readyfunc()
+                try:
+                    isReady = item.readyfunc(**args)
+                except TypeError:
+                    isReady = item.readyfunc()
 
         return isReady and isObjReady
 

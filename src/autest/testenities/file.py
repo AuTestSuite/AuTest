@@ -8,8 +8,6 @@ from autest.core.testerset import TesterSet
 import autest.testers as testers
 
 
-
-
 @smart_init
 class File(TestEnity):
     '''
