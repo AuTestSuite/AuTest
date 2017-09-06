@@ -19,9 +19,10 @@ import shutil
 class RunTestTask(Task):
 
     @call_base(Task=("self",))
-    def __init__(self, test, startlogic):
+    def __init__(self, test, startlogic, clean):
         self.__test = test  # this is the test object
         self.__logic = startlogic  # this the logic start the task with
+        self.__clean = clean
 
     # needed by higher level tasking system.
     def isSerial(self):
@@ -36,6 +37,10 @@ class RunTestTask(Task):
             self.__test._Result = testers.ResultType.Failed
             host.WriteVerbose("test_logic", "Test {0} failed with KillOnFailureError\n {1}".format(
                 self.__test.Name, self.__test.Setup._Reason))
+
+            if self.__test._Result <= self.__clean:
+                shutil.rmtree(self.__test.RunDirectory,
+                              onerror=disk.remove_read_only)
             return
         except SystemExit as e:
             self.__test._Result = testers.ResultType.Exception
@@ -44,6 +49,10 @@ class RunTestTask(Task):
                 self.__test.Name, self.__test._Reason))
             if tl:
                 tl.Stop()
+
+            if self.__test._Result <= self.__clean:
+                shutil.rmtree(self.__test.RunDirectory,
+                              onerror=disk.remove_read_only)
             return
         except Exception as e:
             self.__test._Result = testers.ResultType.Exception
@@ -52,13 +61,17 @@ class RunTestTask(Task):
                 self.__test.Name, self.__test._Reason))
             if tl:
                 tl.Stop()
+
+            if self.__test._Result <= self.__clean:
+                shutil.rmtree(self.__test.RunDirectory,
+                              onerror=disk.remove_read_only)
             return
 
         try:
             while tl.Poll():
                 time.sleep(.1)
 
-            if self.__test._Result == testers.ResultType.Passed or self.__test._Result == testers.ResultType.Skipped:
+            if self.__test._Result <= self.__clean:
                 shutil.rmtree(self.__test.RunDirectory,
                               onerror=disk.remove_read_only)
         except KeyboardInterrupt:

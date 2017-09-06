@@ -9,7 +9,7 @@ def ExtendCondition(func, name=None):
         name = func.__name__
 
     if hasattr(ConditionFactory, name):
-        host.WriteWarningf("Condition already has a '{name}' test! Overidding with new function",name=name)
+        host.WriteWarningf("Condition already has a '{name}' test! Overidding with new function", name=name)
 
     setattr(ConditionFactory, name, func)
     host.WriteVerbose("api",

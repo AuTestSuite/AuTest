@@ -8,8 +8,6 @@ from autest.core.testerset import TesterSet
 import autest.testers as testers
 
 
-
-
 @smart_init
 class File(TestEnity):
     '''
@@ -134,10 +132,10 @@ class File(TestEnity):
     def WriteOn(self, content, event=None):
         # content is a string or function taking a file handle
         def action(ev):
-            path = os.path.split(self.Name)[0]
+            path = os.path.split(self.AbsRunTimePath)[0]
             if not os.path.exists(path):
                 os.makedirs(path)
-            with open(self.Name, mode="w") as outfile:
+            with open(self.AbsRunTimePath, mode="w") as outfile:
                 if is_a.String(content):
                     outfile.writelines(content)
                 else:
@@ -157,10 +155,10 @@ class File(TestEnity):
     def WriteAppendOn(self, content, event=None):
         # content is a string or function taking a file handle
         def action(ev):
-            path = os.path.split(self.Name)[0]
+            path = os.path.split(self.AbsRunTimePath)[0]
             if not os.path.exists(path):
                 os.makedirs(path)
-            with open(self.Name, mode="a+") as outfile:
+            with open(self.AbsRunTimePath, mode="a+") as outfile:
                 if is_a.String(content):
                     outfile.writelines(content)
                 else:

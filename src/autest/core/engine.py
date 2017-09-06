@@ -35,7 +35,8 @@ class Engine(object):
                  reporters=['default'],
                  dump_report=False,
                  env=None,
-                 variables=None):
+                 variables=None,
+                 clean=2):
 
         self.__tests = {
         }  # the dict of the different tests we have {name:testobj}
@@ -49,6 +50,7 @@ class Engine(object):
         self.__ENV = env
         self.__variables = variables
         self.__reporters = reporters
+        self.__clean = clean
 
         # setup the thread poool to run all the tasks
         # if jobs > 1:
@@ -239,7 +241,7 @@ class Engine(object):
                 self.__run_test_task(self.__tests[t])
 
     def __run_test_task(self, task):
-        runtesttask.RunTestTask(task, Test_RunLogic)()
+        runtesttask.RunTestTask(task, Test_RunLogic, self.__clean)()
 
     def _make_report(self):
         info = report.ReportInfo(self.__tests.values())

@@ -14,11 +14,16 @@ def get_name(obj):
 
 class ResultType(object):
     Unknown = 0
-    Passed = 1
-    Skipped = 2
+    Skipped = 1
+    Passed = 2
     Warning = 3
     Failed = 4
     Exception = 5
+
+    # TODO dynamically generate this? 
+    # @classmethod
+    # def to_list():
+    #     return ["Unknown", "Skipped", "Passed", "Warning", "Failed", "Exception"]
 
     @classmethod
     def to_string(cls, v):
