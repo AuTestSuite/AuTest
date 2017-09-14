@@ -1,12 +1,31 @@
 import subprocess
 import re
+import os
 
 import autest.api as api
 import autest.common.ospath as ospath
 import autest.common.version as verlib
 import autest.common.is_a as is_a
+import autest.common.win32 as win32
 
 import hosts.output as host
+
+
+def IsElevated(self, msg, pass_value=0):    # default pass value of 0 == os.geteuid (which for root is 0)
+    if os.name == 'nt':
+        return self.Condition(
+            lambda: win32.user_is_admin(),
+            msg,
+            pass_value
+        )
+    elif os.name == 'posix':
+        return self.Condition(
+            lambda: os.geteuid(),
+            msg,
+            pass_value
+        )
+    else:
+        raise OSError("OS not identified. Can't check for elevated privilege.")
 
 
 def RunCommand(self, command, msg, pass_value=0, env=None, shell=False):
@@ -113,3 +132,4 @@ api.ExtendCondition(RunCommand)
 api.ExtendCondition(CheckOutput)
 api.ExtendCondition(EnsureVersion)
 api.ExtendCondition(HasProgram)
+api.ExtendCondition(IsElevated)
