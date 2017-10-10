@@ -244,25 +244,25 @@ class Engine(object):
 
                 host.WriteVerbose("engine", "The Sandbox directory was removed")
 
-            host.WriteVerbose("engine", "Loading Extensions")
-            self._load_extensions()
+        host.WriteVerbose("engine", "Loading Extensions")
+        self._load_extensions()
 
-            host.WriteVerbose("engine", "Scanning for tests")
-            self._scan_for_tests()
-            if not self.__tests:
-                host.WriteMessage("No tests found to run")
-                host.WriteMessage(
-                    "If your tests are in a different directory try using --directory=<path with tests>"
-                )
-                return ""
+        host.WriteVerbose("engine", "Scanning for tests")
+        self._scan_for_tests()
+        if not self.__tests:
+            host.WriteMessage("No tests found to run")
+            host.WriteMessage(
+                "If your tests are in a different directory try using --directory=<path with tests>"
+            )
+            return ""
 
-            host.WriteVerbose("engine", "Running tests")
-            self._run_tests()
+        host.WriteVerbose("engine", "Running tests")
+        self._run_tests()
 
-            host.WriteVerbose("engine", "Making report")
-            result = self._make_report()
+        host.WriteVerbose("engine", "Making report")
+        result = self._make_report()
 
-            return result
+        return result
 
     def __list(self):
         host.WriteVerbose("engine", "Scanning for tests")
