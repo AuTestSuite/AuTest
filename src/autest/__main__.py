@@ -12,14 +12,24 @@ import autest.core.testrun
 from autest.core.engine import Engine
 import autest.common.execfile as execfile
 
-from autest.common.settings import Settings, JobValues
+from autest.common.settings import *
 from autest.core.variables import Variables
 import autest.api as api
 
 
 def main():
+    # set default subcommand to run if there are none present
+    if len(sys.argv) >= 2:
+        if '-' in sys.argv[1] and sys.argv[1] not in ['-h', '--help']:
+            sys.argv.insert(1, 'run')
+    else:
+        sys.argv.insert(1, 'run')
+
     # create primary commandline parser
     setup = Settings()
+
+    run = setup.add_command("run", help='(Default Option) Runs tests')
+    list = setup.add_command("list", help='Lists all the test available to Autest')
 
     setup.path_argument(
         ["-D", "--directory"],
@@ -36,12 +46,6 @@ def main():
         exists=False,
         help="The root directory in which the tests will run")
 
-    setup.add_argument(
-        ["-j", "--jobs"],
-        default=1,
-        type=JobValues,
-        help="The number of test to try to run at the same time")
-
     setup.list_argument(
         ["--env"],
         metavar="Key=Value",
@@ -53,16 +57,22 @@ def main():
         default=['*'],
         help="Filter the tests run by their names")
 
-    setup.list_argument(
-        ["-R", "--reporters"],
-        default=['default'],
-        help="Names of Reporters to use for report generation")
-
     setup.add_argument(
         ['-V', '--version'], action='version',
         version='%(prog)s {0}'.format(autest.__version__))
 
-    setup.string_argument(
+    run.list_argument(
+        ["-R", "--reporters"],
+        default=['default'],
+        help="Names of Reporters to use for report generation")
+
+    run.add_argument(
+        ["-j", "--jobs"],
+        default=1,
+        type=JobValues,
+        help="The number of test to try to run at the same time")
+
+    run.string_argument(
         ['-C', '--clean'],
         default='passed',
         help='''
@@ -72,16 +82,8 @@ def main():
         ''')
 
     # this is a commandline tool so make the cli host
-    hosts.setDefaultArgs(setup.parser)
-    # make default host
-    myhost = hosts.ConsoleHost(setup.parser)
-    # setup the extended streams to run
-    hosts.Setup(myhost)
+    hosts.setDefaultArgs(setup)
 
-    # parser should have all option defined by program and or host type defined
-    setup.partial_parse()
-    hosts.output.WriteDebugf(
-        "init", "Before extension load: args = {0}\n unknown = {1}", setup.arguments, setup.unknowns)
     # -------------------------------------------
     # setup vars
     variables = Variables({
@@ -100,34 +102,36 @@ def main():
 
             # False -> autoselect logic used
             # True -> Use shell, Bad commands don't report clearly
-            'ForceUseShell': None
+            'ForceUseShell': None,
+
+            ########################
+            # Engine configuration
+            # 'Test_dir': setup.arguments.directory,
+            # 'Filters': setup.arguments.filters,
+            # 'Run_dir': setup.arguments.sandbox,
+            # 'Autest_site': setup.arguments.autest_site,
+            # 'Action': setup.arguments.subcommand,
+            ########################
+            # Command specific arguments
+            'Run': Variables({
+                # 'Jobs': setup.arguments.jobs,
+                # 'Reporters': setup.arguments.reporters,
+                # 'Clean': clean_level,
+            }),
+            'List': Variables({})
         })
     })
 
-    # taken from tester.py
-    clean_choices = {"none": -1,
-                    "unknown": 0,
-                    "skipped": 1,
-                    "passed": 2,
-                    "warning": 3,
-                    "failed": 4,
-                    "exception": 5,
-                    "all": 6}
+    # parser should have all option defined by program and or host type defined
+    setup.partial_parse()
 
-    # setup the level of cleaning
-    # print(clean)
-    # print(setup.arguments.clean)
+    # make default host
+    myhost = hosts.ConsoleHost(setup)
+    # setup the extended streams to run
+    hosts.Setup(myhost)
 
-    if setup.arguments.clean:
-        if setup.arguments.clean in clean_choices:
-            clean_level = clean_choices[setup.arguments.clean]
-        else:
-            hosts.output.WriteWarning("-C/--clean value '{0}' ignored. Defaulting to cleaning all passed. See help for valid choices.".format(setup.arguments.clean))
-            clean_level = 2
-    else:
-        clean_level = 2
-
-    # print(clean_level)
+    hosts.output.WriteDebugf(
+        "init", "Before extension load: args = {0}\n unknown = {1}", setup.arguments, setup.unknowns)
 
     # setup shell environment
     env = os.environ.copy()
@@ -139,6 +143,7 @@ def main():
             except ValueError:
                 hosts.output.WriteWarning(
                     "--env value '{0}' ignored. Needs to in the form of Key=Value".format(i))
+
     # -------------------------------------------
     # look in autest-site directory to see if we have a file to define user
     # options
@@ -180,23 +185,49 @@ def main():
         }
         execfile.execFile(options_file, _locals, _locals)
     sys.path = old_path
+
+    # setup 'run' specific arguments
+    if setup.arguments.subcommand == 'run':
+        # taken from tester.py
+        clean_choices = {"none": -1,
+                         "unknown": 0,
+                         "skipped": 1,
+                         "passed": 2,
+                         "warning": 3,
+                         "failed": 4,
+                         "exception": 5,
+                         "all": 6}
+
+        # setup the level of cleaning
+        if setup.arguments.clean:
+            if setup.arguments.clean in clean_choices:
+                variables.Autest.Run.Clean = clean_choices[setup.arguments.clean]
+            else:
+                hosts.output.WriteWarning(
+                    "-C/--clean value '{0}' ignored. Defaulting to cleaning all passed. See help for valid choices.".format(setup.arguments.clean))
+                variables.Autest.Run.Clean = 2
+        else:
+            variables.Autest.Run.Clean = 2
+
+        variables.Autest.Run.Jobs = setup.arguments.jobs
+        variables.Autest.Run.Reporters = setup.arguments.reporters
+
+    # put rest of the engine-scope args into variables
+    variables.Autest.TestDir = setup.arguments.directory
+    variables.Autest.Filters = setup.arguments.filters
+    variables.Autest.RunDir = setup.arguments.sandbox
+    variables.Autest.Autest_site = setup.arguments.autest_site
+    variables.Autest.Action = setup.arguments.subcommand
+
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options,
     # or maybe not
-    myEngine = Engine(jobs=setup.arguments.jobs,
-                      test_dir=setup.arguments.directory,
-                      run_dir=setup.arguments.sandbox,
-                      autest_site=setup.arguments.autest_site,
-                      filters=setup.arguments.filters,
-                      reporters=setup.arguments.reporters,
-                      env=env,
-                      variables=variables,
-                      clean=clean_level)
+    myEngine = Engine(env=env, variables=variables)
 
     try:
         ret = myEngine.Start()
     except SystemExit:
-        hosts.output.WriteError("Autest shutdown because of critical error!",exit=False,show_stack=False)
+        hosts.output.WriteError("Autest shutdown because of critical error!", exit=False, show_stack=False)
         ret = 1
     exit(ret)
 
