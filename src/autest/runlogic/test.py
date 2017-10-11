@@ -305,6 +305,35 @@ class Test_RunLogic(RunLogic):
             self.__running = False
         return ret
 
+    def readTest2(self, test):
+        # load the test data.  this mean exec the data
+        # create the locals we want to pass
+        locals = copy.copy(glb.Locals)
+
+        locals.update({
+            'test': test,  # backwards compat
+            'Test': test,
+            'Setup': test.Setup,
+            'Condition': conditions.ConditionFactory(test.ComposeVariables(), test.ComposeEnv()),
+            'Testers': testers,
+            # break these out of tester space
+            # to make it easier to right a test
+            'Any': testers.Any,
+            'All': testers.All,
+            'Not': testers.Not,
+            'When': glb.When(),
+            'CopyLogic':CopyLogic,
+        })
+
+        # get full path
+        fileName = os.path.join(test.TestDirectory,
+                                test.TestFile)
+        host.WriteVerbose(["test_logic", "reading"],
+                          'reading test "{0}"'.format(test.Name))
+        execFile(fileName, locals, locals)
+        host.WriteVerbose(["test_logic", "reading"],
+                          'Done reading test "{0}"'.format(test.Name))
+
     def readTest(self):
         # load the test data.  this mean exec the data
         # create the locals we want to pass

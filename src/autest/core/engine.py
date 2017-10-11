@@ -274,6 +274,13 @@ class Engine(object):
                 "If your tests are in a different directory try using --directory=<path with tests>"
             )
         else:
+            for test in self.__tests:
+                test_task = Test_RunLogic()
+                try:
+                    test_task.readTest2(self.__tests[test])
+                except:
+                    pass
+                print(self.__tests[test].Summary)
             if self.__variables.Autest.List.output_json:
                 tests = []
 
