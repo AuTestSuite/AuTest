@@ -5,6 +5,7 @@ import sys
 from fnmatch import fnmatch
 import time
 import shutil
+import json
 
 import hosts.output as host
 import autest.glb as glb
@@ -273,12 +274,20 @@ class Engine(object):
                 "If your tests are in a different directory try using --directory=<path with tests>"
             )
         else:
-            host.WriteMessage("{0}".format("Test Name"))
-            host.WriteMessage("-" * 80)
-            for name in self.__tests:
-                test = self.__tests[name]
+            if self.__variables.Autest.List.output_json:
+                tests = []
 
-                # apparently summary was never initialized
-                host.WriteMessage("{0}".format(test.Name))
+                for name in self.__tests:
+                    tests.append({"name":name, "location":None, "description":None})
+
+                host.WriteMessage(json.dumps(tests))
+            else:
+                host.WriteMessage("{0}".format("Test Name"))
+                host.WriteMessage("-" * 80)
+                for name in self.__tests:
+                    test = self.__tests[name]
+
+                    # apparently summary was never initialized
+                    host.WriteMessage("{0}".format(test.Name))
 
         return 0

@@ -81,6 +81,12 @@ def main():
         Defaults at passed
         ''')
 
+    list.add_argument(
+        ['--json'],
+        action='store_true',
+        help="outputs the list of available tests in JSON format"
+    )
+
     # this is a commandline tool so make the cli host
     hosts.setDefaultArgs(setup)
 
@@ -186,7 +192,7 @@ def main():
         execfile.execFile(options_file, _locals, _locals)
     sys.path = old_path
 
-    # setup 'run' specific arguments
+    # setup command specific arguments
     if setup.arguments.subcommand == 'run':
         # taken from tester.py
         clean_choices = {"none": -1,
@@ -211,6 +217,8 @@ def main():
 
         variables.Autest.Run.Jobs = setup.arguments.jobs
         variables.Autest.Run.Reporters = setup.arguments.reporters
+    elif setup.arguments.subcommand == 'list':
+        variables.Autest.List.output_json = setup.arguments.json
 
     # put rest of the engine-scope args into variables
     variables.Autest.TestDir = setup.arguments.directory
