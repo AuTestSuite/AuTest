@@ -22,6 +22,7 @@ from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
 from autest.core import CopyLogic
+from .test import loadTest
 
 
 class Engine(object):
@@ -274,11 +275,16 @@ class Engine(object):
                 "If your tests are in a different directory try using --directory=<path with tests>"
             )
         else:
+            for test in self.__tests.values():
+                try:
+                    loadTest(test)
+                except:
+                    pass
             if self.__variables.Autest.List.output_json:
                 tests = []
 
-                for name in self.__tests:
-                    tests.append({"name":name, "location":None, "description":None})
+                for test in self.__tests.values():
+                    tests.append({"name": test.Name, "description": test.Summary})
 
                 host.WriteMessage(json.dumps(tests))
             else:
@@ -288,6 +294,6 @@ class Engine(object):
                     test = self.__tests[name]
 
                     # apparently summary was never initialized
-                    host.WriteMessage("{0}".format(test.Name))
+                    host.WriteMessage("{0}\t\t{1}".format(test.Name, test.Summary))
 
         return 0
