@@ -14,14 +14,13 @@ import autest.testers as testers
 from autest.core import conditions
 from autest.core import CopyLogic
 from autest.core.eventinfo import *
+from autest.core.test import loadTest
 from autest.core.order import GenerateStartOrderedList, GenerateEndOrderedList
 from autest.exceptions.killonfailure import KillOnFailureError
 
 from .runlogic import RunLogic
 from .process import Process_RunLogic
 from .testrun import TestRun_RunLogic
-
-
 
 
 @smart_init
@@ -87,7 +86,7 @@ class Test_RunLogic(RunLogic):
         os.makedirs(self.__test.RunDirectory)
         # read the test
         try:
-            self.readTest()
+            loadTest(self.__test)
         except:
             # fill in error case....
             raise
@@ -279,7 +278,7 @@ class Test_RunLogic(RunLogic):
                                self.__tr_running_processes)
             else:
                 self.StopItems(
-                    self.__running_processes + self.__tr_running_processes, 
+                    self.__running_processes + self.__tr_running_processes,
                     self.__test.ComposeVariables().Autest.StopProcessLongDelaySeconds,
                     self.__test.ComposeVariables().Autest.StopProcessShortDelaySeconds)
             # call finished event
@@ -304,61 +303,3 @@ class Test_RunLogic(RunLogic):
 
             self.__running = False
         return ret
-
-    def readTest2(self, test):
-        # load the test data.  this mean exec the data
-        # create the locals we want to pass
-        locals = copy.copy(glb.Locals)
-
-        locals.update({
-            'test': test,  # backwards compat
-            'Test': test,
-            'Setup': test.Setup,
-            'Condition': conditions.ConditionFactory(test.ComposeVariables(), test.ComposeEnv()),
-            'Testers': testers,
-            # break these out of tester space
-            # to make it easier to right a test
-            'Any': testers.Any,
-            'All': testers.All,
-            'Not': testers.Not,
-            'When': glb.When(),
-            'CopyLogic':CopyLogic,
-        })
-
-        # get full path
-        fileName = os.path.join(test.TestDirectory,
-                                test.TestFile)
-        host.WriteVerbose(["test_logic", "reading"],
-                          'reading test "{0}"'.format(test.Name))
-        execFile(fileName, locals, locals)
-        host.WriteVerbose(["test_logic", "reading"],
-                          'Done reading test "{0}"'.format(test.Name))
-
-    def readTest(self):
-        # load the test data.  this mean exec the data
-        # create the locals we want to pass
-        locals = copy.copy(glb.Locals)
-
-        locals.update({
-            'test': self.__test,  # backwards compat
-            'Test': self.__test,
-            'Setup': self.__test.Setup,
-            'Condition': conditions.ConditionFactory(self.__test.ComposeVariables(), self.__test.ComposeEnv()),
-            'Testers': testers,
-            # break these out of tester space
-            # to make it easier to right a test
-            'Any': testers.Any,
-            'All': testers.All,
-            'Not': testers.Not,
-            'When': glb.When(),
-            'CopyLogic':CopyLogic,
-        })
-
-        # get full path
-        fileName = os.path.join(self.__test.TestDirectory,
-                                self.__test.TestFile)
-        host.WriteVerbose(["test_logic", "reading"],
-                          'reading test "{0}"'.format(self.__test.Name))
-        execFile(fileName, locals, locals)
-        host.WriteVerbose(["test_logic", "reading"],
-                          'Done reading test "{0}"'.format(self.__test.Name))
