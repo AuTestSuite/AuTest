@@ -8,7 +8,24 @@ import autest.common.version as verlib
 import autest.common.is_a as is_a
 import autest.common.win32 as win32
 
+import pip
+
 import hosts.output as host
+
+
+def HasPythonPackage(self, package, msg):
+    def checkPackage():
+        for pkg in pip.get_installed_distributions():
+            if package == pkg.project_name:
+                return True
+
+        return False
+
+    return self.Condition(
+        checkPackage,
+        msg,
+        True
+    )
 
 
 def IsElevated(self, msg, pass_value=0):    # default pass value of 0 == os.geteuid (which for root is 0)
@@ -133,3 +150,4 @@ api.ExtendCondition(CheckOutput)
 api.ExtendCondition(EnsureVersion)
 api.ExtendCondition(HasProgram)
 api.ExtendCondition(IsElevated)
+api.ExtendCondition(HasPythonPackage)
