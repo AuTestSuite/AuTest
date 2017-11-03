@@ -96,6 +96,7 @@ class Engine(object):
             'RegisterFileType': api.RegisterFileType,
             'AddTestRunSet': api.ExtendTest,  # backward compat
             'ExtendTest': api.ExtendTest,
+            'ExtendTestRun': api.ExtendTestRun,
             'AddSetupTask': api.AddSetupItem,  # backward compat
             'AddSetupItem': api.AddSetupItem,
             'AddTester': api.AddTester,
