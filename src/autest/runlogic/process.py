@@ -261,7 +261,9 @@ class Process_RunLogic(RunLogic):
             if curr_time - self.__last_event_time > .5:
                 # make event info object
                 event_info = eventinfo.RunningInfo(self.__start_time,
-                                                   curr_time)
+                                                   curr_time,
+                                                   eventinfo.RunlogicWrapper(self)
+                                                   )
                 # call event
                 try:
                     self._process.RunningEvent(event_info)
@@ -287,3 +289,7 @@ class Process_RunLogic(RunLogic):
 
     def Wait(self, timeout):
         return self.__proc.waitTimeOut(timeout)
+
+    @property
+    def pid(self):
+        return self.__proc.pid
