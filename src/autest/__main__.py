@@ -101,7 +101,7 @@ def main():
             #  Short delay after first process kill before next will be kill
             'StopProcessShortDelaySeconds': 1,
             #  delay after control-c before kill
-            'KillDelaySecond': 1,
+            'KillDelaySecond': 10, # most programs should finish in tens second
 
             ########################
             # Process Spawning
