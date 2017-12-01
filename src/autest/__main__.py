@@ -11,6 +11,7 @@ import autest
 import autest.core.testrun
 from autest.core.engine import Engine
 import autest.common.execfile as execfile
+import autest.common.version as version
 
 from autest.common.settings import *
 from autest.core.variables import Variables
@@ -174,6 +175,7 @@ def main():
                 'AutestSitePath': path,
                 "host": hosts.output,
                 'AuTestVersion': api.AuTestVersion,
+                'Version': version.Version,
             }
             execfile.execFile(options_file, _locals, _locals)
 
@@ -194,6 +196,7 @@ def main():
                 "host": hosts.output,
                 'AutestSitePath': path,
                 'AuTestVersion': api.AuTestVersion,
+                'Version': version.Version,
             }
             execfile.execFile(options_file, _locals, _locals)
 

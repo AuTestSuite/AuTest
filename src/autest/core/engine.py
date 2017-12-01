@@ -10,6 +10,7 @@ import json
 import hosts.output as host
 import autest.glb as glb
 import autest.common.execfile as execfile
+import autest.common.version as version
 import autest.api as api
 from . import setupitem
 from . import runtesttask
@@ -23,6 +24,7 @@ import autest.testers as testers
 from autest.core import conditions
 from autest.core import CopyLogic
 from .test import loadTest
+
 
 
 class Engine(object):
@@ -79,7 +81,7 @@ class Engine(object):
 
         # Which directory to use
         autest_sites = self.__autest_site
-        
+
         # copy current sys.path
         old_path = sys.path[:]
 
@@ -119,17 +121,18 @@ class Engine(object):
                 'File': File,
                 "host": host,
                 "CopyLogic": CopyLogic,
+                'Version': version.Version,
             }
 
             # given it exists we want to load data from it
             if os.path.exists(path):
                 host.WriteVerbose("engine",
-                                "Loading Extensions from {0}".format(path))
+                                  "Loading Extensions from {0}".format(path))
                 for f in os.listdir(path):
                     f = os.path.join(path, f)
                     if os.path.isfile(f) and f.endswith("test.ext"):
                         execfile.execFile(f, _locals, _locals)
-            
+
             sys.path = old_path
 
     def _scan_for_tests(self):
