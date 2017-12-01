@@ -1,4 +1,3 @@
-import app
 
 Test.Summary="Test a case of is ready logic for start different propocesses"
 

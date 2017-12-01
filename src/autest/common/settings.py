@@ -56,6 +56,10 @@ class BaseSettings(object):
         self.add_argument(arguments, type=lambda x: self._path(
             exists, x), default=default, required=required, help=help, metavar=metavar, dest=dest, commands=commands)
 
+    def path_list_argument(self, arguments, nargs="*", default=None, required=None, help=None, metavar=None, dest=None, exists=True, commands=None):
+        self.add_argument(arguments, type=lambda x: self._path(
+            exists, x), nargs=nargs, default=default, required=required, help=help, metavar=metavar, dest=dest, commands=commands)
+
     def bool_argument(self, arguments, default=None, required=None, help=None, metavar=None, dest=None, commands=None):
         self.add_argument(arguments, type=self._bool, default=default,
                           required=required, help=help, metavar=metavar, dest=dest, commands=commands)
@@ -92,7 +96,7 @@ class BaseSettings(object):
         elif tmp in opt_false_values:
             return False
         else:
-            msg = 'Invalid value Boolean value : "{0}"\n Valid options are {0}'.format(arg,
+            msg = 'Invalid value Boolean value : "{0}"\n Valid options are {1}'.format(arg,
                                                                                        opt_true_values | opt_false_values)
             raise argparse.ArgumentTypeError(msg)
 
@@ -119,6 +123,10 @@ class RestrictedBase(BaseSettings):
     def path_argument(self, arguments, default=None, required=None, help=None, metavar=None, dest=None, exists=True):
         self.add_argument(arguments, type=lambda x: self._path(
             exists, x), default=default, required=required, help=help, metavar=metavar, dest=dest)
+
+    def path_list_argument(self, arguments, nargs="*", default=None, required=None, help=None, metavar=None, dest=None, exists=True):
+        self.add_argument(arguments, type=lambda x: self._path(
+            exists, x), nargs=nargs, default=default, required=required, help=help, metavar=metavar, dest=dest)
 
     def bool_argument(self, arguments, default=None, required=None, help=None, metavar=None, dest=None):
         self.add_argument(arguments, type=self._bool, default=default,
