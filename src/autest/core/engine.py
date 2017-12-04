@@ -10,6 +10,7 @@ import json
 import hosts.output as host
 import autest.glb as glb
 import autest.common.execfile as execfile
+import autest.common.version as version
 import autest.api as api
 from . import setupitem
 from . import runtesttask
@@ -25,6 +26,7 @@ from autest.core import CopyLogic
 from .test import loadTest
 
 
+
 class Engine(object):
     """description of class"""
 
@@ -37,7 +39,7 @@ class Engine(object):
         self.__run_dir = os.path.abspath(variables.Autest.RunDir or './_sandbox')  # this is the directory to run the tests in
 
         # any special autest directory to look up.  None uses standard one
-        self.__autest_site = variables.Autest.Autest_site
+        self.__autest_site = variables.Autest.AutestSites
         self.__filters = variables.Autest.Filters or '*'                           # which set of tests to run
         self.__action = variables.Autest.Action or 'default'
 
@@ -78,71 +80,60 @@ class Engine(object):
         # load files of our extension type in the directory
 
         # Which directory to use
-        if self.__autest_site is None:
-            # this is the default
-            path = os.path.join(self.__test_dir, 'autest-site')
-            # hack to deal with backward compatiblity
-            old_path = os.path.join(self.__test_dir, 'gtest-site')
-            if not os.path.exists(path) and os.path.exists(old_path):
-                host.WriteWarning(
-                    "Depracated gest-site found!\n Please rename to autest-site")
-                path = os.path.join(self.__test_dir, 'gtest-site')
-        else:
-            # This is a custom location
-            path = os.path.abspath(self.__autest_site)
+        autest_sites = self.__autest_site
 
-        # add expected API function so they can be called
-        _locals = {
-            'RegisterFileType': api.RegisterFileType,
-            'AddTestRunSet': api.ExtendTest,  # backward compat
-            'ExtendTest': api.ExtendTest,
-            'ExtendTestRun': api.ExtendTestRun,
-            'AddSetupTask': api.AddSetupItem,  # backward compat
-            'AddSetupItem': api.AddSetupItem,
-            'AddTester': api.AddTester,
-            'SetupTask': setupitem.SetupItem,  # backward compat
-            'SetupItem': setupitem.SetupItem,
-            'AddTestRunMember': api.AddTestEnityMember,  # backward compat
-            'AddTestEnityMember': api.AddTestEnityMember,
-            'ExtendCondition': api.ExtendCondition,
-            'AddWhenFunction': api.AddWhenFunction,
-            'AddMethodToInstance': api.AddMethodToInstance,
-            'AuTestVersion': api.AuTestVersion,
-            'AUTEST_SITE_PATH': path,
-            'SetupError': SetupError,
-            # make it easy to define extension
-            'Condition': conditions.ConditionFactory(self.__variables, self.__ENV),
-            'Testers': testers,
-            'Tester': testers.Tester,
-            # break these out of tester space
-            # to make it easier to right a test
-            'Any': testers.Any,
-            'All': testers.All,
-            'Not': testers.Not,
-            'When': glb.When(),
-            'File': File,
-            "host": host,
-            "CopyLogic": CopyLogic,
-        }
-
+        # copy current sys.path
         old_path = sys.path[:]
-        sys.path.append(path)
 
-        # given it exists we want to load data from it
-        if os.path.exists(path):
-            host.WriteVerbose("engine",
-                              "Loading Extensions from {0}".format(path))
-            for f in os.listdir(path):
-                f = os.path.join(path, f)
-                if os.path.isfile(f) and f.endswith("test.ext"):
-                    execfile.execFile(f, _locals, _locals)
-        elif self.__autest_site is not None:
-            host.WriteError(
-                "Custom autest-site path note found. Looking for:\n {0}".
-                format(path))
-        else:
-            host.WriteVerbose("engine", "autest-site path not found")
-        sys.path = old_path
+        for path in autest_sites:
+            # add autest-site to sys.path to help with loading code
+            sys.path.append(path)
+
+            # add expected API function so they can be called
+            _locals = {
+                'RegisterFileType': api.RegisterFileType,
+                'AddTestRunSet': api.ExtendTest,  # backward compat
+                'ExtendTest': api.ExtendTest,
+                'ExtendTestRun': api.ExtendTestRun,
+                'AddSetupTask': api.AddSetupItem,  # backward compat
+                'AddSetupItem': api.AddSetupItem,
+                'AddTester': api.AddTester,
+                'SetupTask': setupitem.SetupItem,  # backward compat
+                'SetupItem': setupitem.SetupItem,
+                'AddTestRunMember': api.AddTestEnityMember,  # backward compat
+                'AddTestEnityMember': api.AddTestEnityMember,
+                'ExtendCondition': api.ExtendCondition,
+                'AddWhenFunction': api.AddWhenFunction,
+                'AddMethodToInstance': api.AddMethodToInstance,
+                'AuTestVersion': api.AuTestVersion,
+                'AUTEST_SITE_PATH': path,
+                'SetupError': SetupError,
+                # make it easy to define extension
+                'Condition': conditions.ConditionFactory(self.__variables, self.__ENV),
+                'Testers': testers,
+                'Tester': testers.Tester,
+                # break these out of tester space
+                # to make it easier to right a test
+                'Any': testers.Any,
+                'All': testers.All,
+                'Not': testers.Not,
+                'When': glb.When(),
+                'File': File,
+                "host": host,
+                "CopyLogic": CopyLogic,
+                'Version': version.Version,
+            }
+
+            # given it exists we want to load data from it
+            if os.path.exists(path):
+                host.WriteVerbose("engine",
+                                  "Loading Extensions from {0}".format(path))
+                for f in os.listdir(path):
+                    f = os.path.join(path, f)
+                    if os.path.isfile(f) and f.endswith("test.ext"):
+                        execfile.execFile(f, _locals, _locals)
+
+            sys.path = old_path
 
     def _scan_for_tests(self):
         # scan for tests in and under the provided test directory

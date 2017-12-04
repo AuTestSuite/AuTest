@@ -11,6 +11,7 @@ import autest
 import autest.core.testrun
 from autest.core.engine import Engine
 import autest.common.execfile as execfile
+import autest.common.version as version
 
 from autest.common.settings import *
 from autest.core.variables import Variables
@@ -36,9 +37,9 @@ def main():
         default=os.path.abspath('.'),
         help="The directory with all the tests in them")
 
-    setup.path_argument(
+    setup.path_list_argument(
         ["--autest-site"],
-        help="A user provided autest-site directory to use instead of the default")
+        help="A user provided autest-site director(y)ies to use instead of the default.")
 
     setup.path_argument(
         ["--sandbox"],
@@ -153,43 +154,53 @@ def main():
     # -------------------------------------------
     # look in autest-site directory to see if we have a file to define user
     # options
-    if setup.arguments.autest_site is None:
+    autest_sites = setup.arguments.autest_site
+    if autest_sites is None:
         # this is the default
-        path = os.path.join(setup.arguments.directory, 'autest-site')
+        autest_sites = [os.path.join(setup.arguments.directory, 'autest-site')]
     else:
         # This is a custom location
-        path = os.path.abspath(setup.arguments.autest_site)
+        autest_sites = [os.path.abspath(autest_site) for autest_site in autest_sites]
 
     old_path = sys.path[:]
-    sys.path.append(path)
+    for path in autest_sites:
+        sys.path.append(path)
+        
     # see if we have a file to load to get new options
-    options_file = os.path.join(path, "init.cli.ext")
-    if os.path.exists(options_file):
-        _locals = {
-            'Settings': setup,
-            'AutestSitePath': path,
-            "host": hosts.output,
-            'AuTestVersion': api.AuTestVersion,
-        }
-        execfile.execFile(options_file, _locals, _locals)
+    for path in autest_sites:
+        options_file = os.path.join(path, "init.cli.ext")
+        if os.path.exists(options_file):
+            _locals = {
+                'Settings': setup,
+                'AutestSitePath': path,
+                "host": hosts.output,
+                'AuTestVersion': api.AuTestVersion,
+                'Version': version.Version,
+            }
+            execfile.execFile(options_file, _locals, _locals)
+
     # parse the options and error if we have unknown options
     setup.final_parse()
     hosts.output.WriteDebugf(
         "init", "After extension load: args = {0}", setup.arguments)
 
     # see if we have any custom setup we want to do globally.
-    options_file = os.path.join(path, "setup.cli.ext")
-    if os.path.exists(options_file):
-        _locals = {
-            'os': os,
-            'ENV': env,
-            'Variables': variables,
-            'Arguments': setup.arguments,
-            "host": hosts.output,
-            'AutestSitePath': path,
-            'AuTestVersion': api.AuTestVersion,
-        }
-        execfile.execFile(options_file, _locals, _locals)
+    for path in autest_sites:
+        options_file = os.path.join(path, "setup.cli.ext")
+        if os.path.exists(options_file):
+            _locals = {
+                'os': os,
+                'ENV': env,
+                'Variables': variables,
+                'Arguments': setup.arguments,
+                "host": hosts.output,
+                'AutestSitePath': path,
+                'AuTestVersion': api.AuTestVersion,
+                'Version': version.Version,
+            }
+            execfile.execFile(options_file, _locals, _locals)
+
+    #reset sys.path to orginal value
     sys.path = old_path
 
     # setup command specific arguments
@@ -224,19 +235,24 @@ def main():
     variables.Autest.TestDir = setup.arguments.directory
     variables.Autest.Filters = setup.arguments.filters
     variables.Autest.RunDir = setup.arguments.sandbox
-    variables.Autest.Autest_site = setup.arguments.autest_site
+    variables.Autest.AutestSites = autest_sites
     variables.Autest.Action = setup.arguments.subcommand
 
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options,
     # or maybe not
+    #try:
     myEngine = Engine(env=env, variables=variables)
 
     try:
-        ret = myEngine.Start()
+        ret = myEngine.Start()    
     except SystemExit:
         hosts.output.WriteError("Autest shutdown because of critical error!", exit=False, show_stack=False)
         ret = 1
+    #except Exception:
+        #hosts.output.WriteError("Autest shutdown because of critical error!", exit=False, show_stack=True)
+        #ret = 1
+
     exit(ret)
 
 
