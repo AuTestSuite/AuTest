@@ -38,8 +38,11 @@ The Resuable Gold testing system is not about making another unit testing framew
         entry_points={
           'console_scripts': ['autest = autest.__main__:main']
           },
-        install_requires =["colorama",
-                "future"],
+        install_requires =[
+                "colorama",
+                "future",
+                "psutil"
+                ],
 
         package_data = {
         # If any package contains *.txt or *.rst files, include them:

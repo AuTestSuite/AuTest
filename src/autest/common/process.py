@@ -4,12 +4,14 @@ Module overrides Popen and introduces killtree function
 
 from __future__ import absolute_import, division, print_function
 
-import subprocess
-import os
-import signal
-
 import ctypes
+import os
+import pprint
+import signal
+import subprocess
 import time
+
+import psutil
 
 import hosts.output as host
 
@@ -40,6 +42,7 @@ if os.name == 'nt':
         #else:
         win32.TerminateJobObject(self._job, -1)
             #host.WriteVerbosef(['process-kill'], "Process {0} finished", self.pid)
+        return True
 
     def waitTimeOut(process, timeout):
         # WaitForSingleObject expects timeout in milliseconds, so we convert it
@@ -98,7 +101,7 @@ if os.name == 'nt':
         process._job = job
         return process
 else:
-
+    
     def killtree(self, kill_delay=1):
         '''
         Terminates a process and all its children
@@ -106,13 +109,21 @@ else:
         # pylint: disable=locally-disabled, no-member
         # try to kill group with a ctrl-C
         pgid = os.getpgid(self.pid)
-        host.WriteVerbosef(['process-kill'], "sent signal.SIGINT to process group {0}", pgid)
-        os.killpg(pgid, signal.SIGINT)
-        host.WriteVerbosef(['process-kill'], "waiting up to {0} sec before sending signal.SIGKILL", kill_delay)
+        proc = psutil.Process(self.pid)
+        children = proc.children(recursive=True)
+        timeout = kill_delay if kill_delay > 0 else 2
+        # this should kill the mian process and any children
+        # no kill_delay mean force kill
+        if kill_delay > 0:
+            host.WriteVerbosef(['process-kill'], "sent signal.SIGINT to process group {0}", pgid)
+            os.killpg(pgid, signal.SIGINT)
+            host.WriteVerbosef(['process-kill'], "waiting up to {0} sec before sending signal.SIGKILL", kill_delay)
         if self.waitTimeOut(kill_delay):
-            host.WriteVerbosef(['process-kill'], "Process group {0} still running! Sending signal.SIGKILL!!", pgid)
+            if kill_delay > 0:
+                host.WriteVerbosef(['process-kill'], "Process group {0} still running! Sending signal.SIGKILL!!", pgid)
             try:
                 os.killpg(pgid, signal.SIGKILL)
+                self.waitTimeOut(timeout)
             except OSError as e:
                 # If this a 3 (no such process) error we ignore it
                 # mac os will throw permission errors ie value 1
@@ -120,6 +131,35 @@ else:
                     raise
         else:
             host.WriteVerbosef(['process-kill'], "Process group {0} finished", pgid)
+        
+        # some time however the children still live.. need to force kill them
+        still_running = False
+        alive=[]
+        for child in children:
+            if child.is_running():
+                try:
+                    still_running = True
+                    host.WriteVerbosef(['process-kill'],'child process name: "{0}" pid: "{1}"" is still running, killing process', child.name(), child.pid)
+                    try:
+                        os.kill(child.pid, signal.SIGKILL)
+                        alive.append(child)
+                    except OSError as e:
+                        # If this a 3 (no such process) error we ignore it
+                        # mac os will throw permission errors ie value 1
+                        if e.errno != 3 and e.errno != 1:
+                            raise
+                except psutil.NoSuchProcess:
+                    # possible race
+                    pass
+        #if children still running.. wait a moment for them to die
+        if still_running:                     
+            gone, alive = psutil.wait_procs(alive, timeout=timeout)
+            # if something is still alive.. something is messed up            
+            if alive:
+                host.WriteWarningf("Unable to Kill all children processes!\n Processes still alive are: {0}",pprint.pformat(alive))
+                return False
+        return True
+
 
     def waitTimeOut(process, timeout):
         startTime = time.time()
