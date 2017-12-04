@@ -18,10 +18,33 @@ class StartedInfo(EventInfo):
         pass
 
 
+#proxy object for runnable object to retrict what the user can call
+class RunlogicWrapper(object):
+    def __init__(self,runlogic):
+        self.__runlogic = runlogic
+
+    def isRunning(self):
+        return self.__runlogic.isRunning()
+
+    def Stop(self):
+        return self.__runlogic.Stop()
+
+    def isProcess(self):
+        return self.pid is not None 
+
+    def pid(self):
+        try:
+            return self.__runlogic.pid
+        except:
+            return None 
+
+
 class RunningInfo(EventInfo):
-    def __init__(self, start, current):
+    def __init__(self, start, current, runtime):
         self.startTime = start
         self.currentTime = current
+        self.object = runtime
+        
         super(RunningInfo, self).__init__()
 
     @property

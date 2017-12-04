@@ -1,0 +1,18 @@
+
+Test.Summary = "Test stopping a test via the Runtime event and custom function"
+
+
+def StopProcess(event,time):
+    if event.TotalRunTime > time:
+        event.object.Stop()
+    return 0, "this is a test", "this is what happened"
+
+
+t = Test.AddTestRun("setup")
+t.RunningEvent.Connect(
+    Testers.Lambda(
+        lambda ev: StopProcess(ev,1)
+    )
+)
+t.Command = "python -c 'from time import sleep; sleep(10)'"
+t.TimeOut = 5

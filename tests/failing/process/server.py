@@ -14,7 +14,7 @@ else:
 def main( name, wait_time, port ):
     start = time.time()
     print(sys.argv[0], "Delay for:", wait_time, "seconds")
-    sys.stderr.flush()
+    sys.stdout.flush()
     time.sleep(wait_time)
     SocketServer.TCPServer.allow_reuse_address=True
     Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
@@ -25,6 +25,7 @@ def main( name, wait_time, port ):
             httpd.serve_forever()
         except KeyboardInterrupt:
             print("exiting")
+            sys.exit(0)
             return
 
 if __name__ == '__main__':

@@ -117,7 +117,7 @@ class TestRun_RunLogic(RunLogic):
         if self.__running_default.isRunning():
             self.PollItems(self.__running_processes)
             # call running event
-            self.__tr.RunningEvent(RunningInfo(self.__start_time, time.time()))
+            self.__tr.RunningEvent(RunningInfo(self.__start_time, time.time(),RunlogicWrapper(self)))
             return True
 
         # call poll to allow all event to go off

@@ -194,7 +194,7 @@ class Test_RunLogic(RunLogic):
                 self.PollItems(self.__running_processes)
                 # call running event on this test object
                 self.__test.RunningEvent(
-                    RunningInfo(self.__start_time, time.time()))
+                    RunningInfo(self.__start_time, time.time(),RunlogicWrapper(self)))
             except KillOnFailureError:
                 # if we catch this here .. whole test has to stop
                 # stop current run

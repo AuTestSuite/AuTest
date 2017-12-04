@@ -3,18 +3,18 @@ from time import sleep
 import sys
 import argparse
 
-
 def main(name, filename, wait_time):
-    print('hello then!')
+    print('Waiting {time} second to open {file}'.format(time=wait_time, file=filename))
     sleep(wait_time)
     f = open(filename, 'w')
+    print('file is open: {file}'.format(file=filename))
     f.write('caught at the right time')
-    print('file is changed now!!')
+    print('First file change: {file}'.format(file=filename))
     f.close()
-    sleep(wait_time/2)
+    sleep(wait_time / 2)
     f = open(filename, 'w')
     f.write('too late now!')
-    print('file is changed now!!')
+    print('Second file change: {file}'.format(file=filename))
     f.close()
     print(name, "Done")
 
