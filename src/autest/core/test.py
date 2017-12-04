@@ -1,15 +1,22 @@
 from __future__ import absolute_import, division, print_function
-from . import setup
-from . import conditions
-from . import testrun
+
+import os
+import copy
+
+import autest.common.is_a as is_a
+import autest.testers as testers
+import autest.glb as glb
+import hosts.output as host
+
 from .runable import Runable
 from .order import Order
 from .item import Item
-import autest.common.is_a as is_a
-import autest.testers.tester as testers
 from autest.common.constructor import call_base, smart_init
-
-import os
+from autest.common.execfile import execFile
+from . import setup
+from . import conditions
+from . import testrun
+from . import CopyLogic
 
 
 @smart_init
@@ -142,3 +149,33 @@ class Test(Runable, Order, Item):
     @ContinueOnFail.setter
     def ContinueOnFail(self, val):
         self.__continueonfail = val
+
+
+def loadTest(test):
+    # load the test data.  this mean exec the data
+    # create the locals we want to pass
+    locals = copy.copy(glb.Locals)
+
+    locals.update({
+        'test': test,  # backwards compat
+        'Test': test,
+        'Setup': test.Setup,
+        'Condition': conditions.ConditionFactory(test.ComposeVariables(), test.ComposeEnv()),
+        'Testers': testers,
+        # break these out of tester space
+        # to make it easier to right a test
+        'Any': testers.Any,
+        'All': testers.All,
+        'Not': testers.Not,
+        'When': glb.When(),
+        'CopyLogic': CopyLogic,
+    })
+
+    # get full path
+    fileName = os.path.join(test.TestDirectory,
+                            test.TestFile)
+    host.WriteVerbose(["test_logic", "reading"],
+                      'reading test "{0}"'.format(test.Name))
+    execFile(fileName, locals, locals)
+    host.WriteVerbose(["test_logic", "reading"],
+                      'Done reading test "{0}"'.format(test.Name))

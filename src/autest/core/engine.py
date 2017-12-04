@@ -5,6 +5,7 @@ import sys
 from fnmatch import fnmatch
 import time
 import shutil
+import json
 
 import hosts.output as host
 import autest.glb as glb
@@ -21,40 +22,33 @@ from autest.exceptions.setuperror import SetupError
 import autest.testers as testers
 from autest.core import conditions
 from autest.core import CopyLogic
+from .test import loadTest
 
 
 class Engine(object):
     """description of class"""
 
-    def __init__(self,
-                 jobs=1,
-                 test_dir='./',
-                 run_dir="./_sandbox",
-                 autest_site=None,
-                 filters='*',
-                 reporters=['default'],
-                 dump_report=False,
-                 env=None,
-                 variables=None,
-                 clean=2):
-
-        self.__tests = {
-        }  # the dict of the different tests we have {name:testobj}
-        self.__jobs = jobs  # how many jobs to try to run at a given time
-        self.__test_dir = test_dir  # this the root directory to look for the tests
-        self.__run_dir = os.path.abspath(
-            run_dir)  # this is the directory to run the tests in
-        # any special autest directory to look up.  None uses standard one
-        self.__autest_site = autest_site
-        self.__filters = filters  # which set of tests to run
+    def __init__(self, dump_report=False, env=None, variables=None):
+        self.__tests = {}                                                           # the dict of the different tests we have {name:testobj}
         self.__ENV = env
         self.__variables = variables
-        self.__reporters = reporters
-        self.__clean = clean
 
-        # setup the thread poool to run all the tasks
+        self.__test_dir = variables.Autest.TestDir or './'                         # this the root directory to look for the tests
+        self.__run_dir = os.path.abspath(variables.Autest.RunDir or './_sandbox')  # this is the directory to run the tests in
+
+        # any special autest directory to look up.  None uses standard one
+        self.__autest_site = variables.Autest.Autest_site
+        self.__filters = variables.Autest.Filters or '*'                           # which set of tests to run
+        self.__action = variables.Autest.Action or 'default'
+
+        self.__command = {
+            'run': self.__run,
+            'list': self.__list
+        }
+
+        # setup the thread pool to run all the tasks
         # if jobs > 1:
-        #self.__pool = ThreadPool(jobs)
+        # self.__pool = ThreadPool(jobs)
 
         # set the engine to be easy to access
         if glb.Engine:
@@ -62,7 +56,6 @@ class Engine(object):
         glb.Engine = self
 
     def Start(self):
-
         # load setup items
         import autest.setupitems
         # load testrun items
@@ -74,51 +67,10 @@ class Engine(object):
         # load condition tests
         import autest.conditions
 
-        if os.path.exists(self.__run_dir):
-
-            host.WriteVerbose(
-                "engine", "The Sandbox directory exists, will try to remove")
-            oldExceptionArgs = None
-            while True:
-                try:
-                    shutil.rmtree(self.__run_dir, onerror=remove_read_only)
-                except BaseException as e:
-                    if e.args != oldExceptionArgs:
-                        # maybe this is Windows issue where antivirus won't let
-                        # us remove
-                        # some random directory, so we're waiting & retrying
-                        oldExceptionArgs = e.args
-                        time.sleep(1)
-                        continue
-                    host.WriteError(
-                        ("Unable to remove sandbox directory for clean test run"
-                         + "\n Reason: {0}").format(e),
-                        show_stack=False)
-                    raise
-                else:
-                    # no exceptions, the directory was wiped
-                    break
-            host.WriteVerbose("engine", "The Sandbox directory was removed")
-
-        host.WriteVerbose("engine", "Loading Extensions")
-        self._load_extensions()
-
-        host.WriteVerbose("engine", "Scanning for tests")
-        self._scan_for_tests()
-        if not self.__tests:
-            host.WriteMessage("No tests found to run")
-            host.WriteMessage(
-                "If your tests are in a different directory try using --directory=<path with tests>"
-            )
-            return ""
-
-        host.WriteVerbose("engine", "Running tests")
-        self._run_tests()
-
-        host.WriteVerbose("engine", "Making report")
-        result = self._make_report()
-
-        return result
+        if self.__action in self.__command:
+            return self.__command[self.__action]()
+        else:   # throw error since command is not valid for whatever reason
+            raise SetupError("Command {0} is not valid.".format(self.__action))
 
     def _load_extensions(self):
         # avoid import issues
@@ -144,9 +96,10 @@ class Engine(object):
             'RegisterFileType': api.RegisterFileType,
             'AddTestRunSet': api.ExtendTest,  # backward compat
             'ExtendTest': api.ExtendTest,
+            'ExtendTestRun': api.ExtendTestRun,
             'AddSetupTask': api.AddSetupItem,  # backward compat
             'AddSetupItem': api.AddSetupItem,
-            'AddTester':api.AddTester,
+            'AddTester': api.AddTester,
             'SetupTask': setupitem.SetupItem,  # backward compat
             'SetupItem': setupitem.SetupItem,
             'AddTestRunMember': api.AddTestEnityMember,  # backward compat
@@ -154,7 +107,7 @@ class Engine(object):
             'ExtendCondition': api.ExtendCondition,
             'AddWhenFunction': api.AddWhenFunction,
             'AddMethodToInstance': api.AddMethodToInstance,
-            'AuTestVersion':api.AuTestVersion,
+            'AuTestVersion': api.AuTestVersion,
             'AUTEST_SITE_PATH': path,
             'SetupError': SetupError,
             # make it easy to define extension
@@ -169,7 +122,7 @@ class Engine(object):
             'When': glb.When(),
             'File': File,
             "host": host,
-            "CopyLogic":CopyLogic,
+            "CopyLogic": CopyLogic,
         }
 
         old_path = sys.path[:]
@@ -231,7 +184,7 @@ class Engine(object):
     def _run_tests(self):
         if self.__jobs > 1:
             # for t in self.__tests.values():
-                #self.__pool.addTask(self.__run_test_task, t)
+                # self.__pool.addTask(self.__run_test_task, t)
             # self.__pool.waitCompletion()
             pass
         else:
@@ -261,3 +214,87 @@ class Engine(object):
             return 1  # something failed
         else:
             return 0
+
+    # functions for different commands
+    def __run(self):
+        self.__jobs = self.__variables.Autest.Run.Jobs or 1                                    # how many jobs to try to run at a given time
+        self.__reporters = self.__variables.Autest.Run.Reporters or ['default']
+        self.__clean = self.__variables.Autest.Run.Clean or 2
+
+        if os.path.exists(self.__run_dir):
+            host.WriteVerbose(
+                "engine", "The Sandbox directory exists, will try to remove")
+            oldExceptionArgs = None
+            while True:
+                try:
+                    shutil.rmtree(self.__run_dir, onerror=remove_read_only)
+                except BaseException as e:
+                    if e.args != oldExceptionArgs:
+                        # maybe this is Windows issue where antivirus won't let
+                        # us remove
+                        # some random directory, so we're waiting & retrying
+                        oldExceptionArgs = e.args
+                        time.sleep(1)
+                        continue
+                    host.WriteError(
+                        ("Unable to remove sandbox directory for clean test run"
+                            + "\n Reason: {0}").format(e),
+                        show_stack=False)
+                    raise
+                else:
+                    # no exceptions, the directory was wiped
+                    break
+
+                host.WriteVerbose("engine", "The Sandbox directory was removed")
+
+        host.WriteVerbose("engine", "Loading Extensions")
+        self._load_extensions()
+
+        host.WriteVerbose("engine", "Scanning for tests")
+        self._scan_for_tests()
+        if not self.__tests:
+            host.WriteMessage("No tests found to run")
+            host.WriteMessage(
+                "If your tests are in a different directory try using --directory=<path with tests>"
+            )
+            return ""
+
+        host.WriteVerbose("engine", "Running tests")
+        self._run_tests()
+
+        host.WriteVerbose("engine", "Making report")
+        result = self._make_report()
+
+        return result
+
+    def __list(self):
+        host.WriteVerbose("engine", "Scanning for tests")
+        self._scan_for_tests()
+        if not self.__tests:
+            host.WriteMessage("No tests found")
+            host.WriteMessage(
+                "If your tests are in a different directory try using --directory=<path with tests>"
+            )
+        else:
+            for test in self.__tests.values():
+                try:
+                    loadTest(test)
+                except:
+                    pass
+            if self.__variables.Autest.List.output_json:
+                tests = []
+
+                for test in self.__tests.values():
+                    tests.append({"name": test.Name, "description": test.Summary})
+
+                host.WriteMessage(json.dumps(tests))
+            else:
+                host.WriteMessage("{0}".format("Test Name"))
+                host.WriteMessage("-" * 80)
+                for name in self.__tests:
+                    test = self.__tests[name]
+
+                    # apparently summary was never initialized
+                    host.WriteMessage("{0}\t\t{1}".format(test.Name, test.Summary))
+
+        return 0

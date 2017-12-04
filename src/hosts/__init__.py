@@ -53,26 +53,26 @@ class extendAction(argparse.Action):
 def setDefaultArgs(argparser):
     defaults = argparser.add_argument_group(
         'Console options', 'Arguments unique to console')
-    defaults.add_argument("--show-color",
+    defaults.add_argument(["--show-color"],
                           action='store_true',
                           help="Show colored output")
 
-    defaults.add_argument("--disable-color",
+    defaults.add_argument(["--disable-color"],
                           dest='show_color',
                           action='store_false',
                           help="Disable colored output")
 
-    defaults.add_argument("--verbose", "-v",
+    defaults.add_argument(["--verbose", "-v"],
                           action=extendAction,
                           nargs='*',
-                          metavar="CATAGORY",
-                          help="Display all verbose messages or only messages of provided catagories")
+                          metavar="CATEGORY",
+                          help="Display all verbose messages or only messages of provided categories")
 
-    defaults.add_argument("--debug",
+    defaults.add_argument(["--debug"],
                           action=extendAction,
                           nargs='*',
-                          metavar="CATAGORY",
-                          help="Display all debug messages or only messages of provided catagories")
+                          metavar="CATEGORY",
+                          help="Display all debug messages or only messages of provided categories")
 
 
 def Setup(defaultHost=None, hosts=[]):

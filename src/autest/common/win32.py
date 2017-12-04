@@ -20,7 +20,7 @@ if os.name == 'nt':
         ctypes.set_last_error(ERROR_INVALID_FUNCTION)
         return 0
 
-    def tryKernal32(name, restype, argtypes):
+    def tryKernel32(name, restype, argtypes):
         ''' Util function that allows us to test to see if we can import a function
             or not. This allows us to get at "new" win32 function on newer setups
             while not breaking older setups
@@ -28,6 +28,22 @@ if os.name == 'nt':
 
         try:
             func = getattr(ctypes.windll.kernel32, name)
+        except AttributeError:
+            return _stubFunction
+
+        func.argtypes = argtypes
+        func.restype = restype
+
+        return func
+
+    def tryAdvapi32(name, restype, argtypes):
+        ''' Util function that allows us to test to see if we can import a function
+            or not. This allows us to get at "new" advapi32 function on newer setups
+            while not breaking older setups
+        '''
+
+        try:
+            func = getattr(ctypes.windll.advapi32, name)
         except AttributeError:
             return _stubFunction
 
@@ -278,69 +294,108 @@ if os.name == 'nt':
         _fields_ = [('ControlFlags', DWORD),
                     ('_JOBOBJECT_CPU_RATE_CONTROL_INFORMATION', _JOBOBJECT_CPU_RATE_CONTROL_INFORMATION)]
 
+    # structs and constants used to check for admin prilvileges
+    class SID_IDENTIFIER_AUTHORITY(ctypes.Structure):
+        _fields_ = [('byte0', ctypes.c_byte),
+                    ('byte1', ctypes.c_byte),
+                    ('byte2', ctypes.c_byte),
+                    ('byte3', ctypes.c_byte),
+                    ('byte4', ctypes.c_byte),
+                    ('byte5', ctypes.c_byte)]
+
+    SECURITY_BUILTIN_DOMAIN_RID = 0x20
+    DOMAIN_ALIAS_RID_ADMINS = 0x220
 
 ##############################################################
     # function not currently in any good order
 ##############################################################
 
     # basic handle handling
-    CloseHandle = tryKernal32("CloseHandle", BOOL, (HANDLE,))
+    CloseHandle = tryKernel32("CloseHandle", BOOL, (HANDLE,))
 
-    CreateToolhelp32Snapshot = tryKernal32(
+    CreateToolhelp32Snapshot = tryKernel32(
         "CreateToolhelp32Snapshot", HANDLE, (DWORD, DWORD))
 
     # Debugging API
-    DebugActiveProcess = tryKernal32("DebugActiveProcess", BOOL, (DWORD,))
-    DebugActiveProcessStop = tryKernal32(
+    DebugActiveProcess = tryKernel32("DebugActiveProcess", BOOL, (DWORD,))
+    DebugActiveProcessStop = tryKernel32(
         "DebugActiveProcessStop", BOOL, (DWORD,))
 
     # Process/thread handling
-    Process32First = tryKernal32(
+    Process32First = tryKernel32(
         "Process32First", BOOL, (HANDLE, ctypes.POINTER(ProcessEntry32)))
-    Process32Next = tryKernal32(
+    Process32Next = tryKernel32(
         "Process32Next", BOOL, (HANDLE, ctypes.POINTER(ProcessEntry32)))
 
-    Thread32First = tryKernal32(
+    Thread32First = tryKernel32(
         "Thread32First", BOOL, (HANDLE, ctypes.POINTER(ThreadEntry32)))
-    Thread32Next = tryKernal32(
+    Thread32Next = tryKernel32(
         "Thread32Next", BOOL, (HANDLE, ctypes.POINTER(ThreadEntry32)))
 
-    OpenThread = tryKernal32("OpenThread", HANDLE, (DWORD, BOOL, DWORD))
-    SuspendThread = tryKernal32("SuspendThread", DWORD, (HANDLE,))
+    OpenThread = tryKernel32("OpenThread", HANDLE, (DWORD, BOOL, DWORD))
+    SuspendThread = tryKernel32("SuspendThread", DWORD, (HANDLE,))
 
-    OpenProcess = tryKernal32("OpenProcess", HANDLE, (DWORD, BOOL, DWORD))
-    TerminateProcess = tryKernal32(
+    OpenProcess = tryKernel32("OpenProcess", HANDLE, (DWORD, BOOL, DWORD))
+    TerminateProcess = tryKernel32(
         "TerminateProcess", BOOL, (HANDLE, ctypes.c_uint))
-    GetProcessTimes = tryKernal32(
+    GetProcessTimes = tryKernel32(
         "GetProcessTimes", BOOL, (HANDLE, LPFILETIME, LPFILETIME, LPFILETIME, LPFILETIME))
 
     # the wait function
-    WaitForSingleObject = tryKernal32(
+    WaitForSingleObject = tryKernel32(
         "WaitForSingleObject", DWORD, (HANDLE, DWORD))
 
     # Job object
-    CreateJobObject = tryKernal32(
+    CreateJobObject = tryKernel32(
         "CreateJobObjectW", HANDLE, (ctypes.POINTER(SECURITY_ATTRIBUTES), LPWSTR))
-    AssignProcessToJobObject = tryKernal32(
+    AssignProcessToJobObject = tryKernel32(
         "AssignProcessToJobObject", BOOL, (HANDLE, HANDLE))
-    TerminateJobObject = tryKernal32(
+    TerminateJobObject = tryKernel32(
         "TerminateJobObject", BOOL, (HANDLE, UINT))
-    SetInformationJobObject = tryKernal32(
+    SetInformationJobObject = tryKernel32(
         "SetInformationJobObject", BOOL, (HANDLE, ctypes.c_uint32, LPVOID, DWORD))
-    QueryInformationJobObject = tryKernal32(
+    QueryInformationJobObject = tryKernel32(
         "QueryInformationJobObject", BOOL, (HANDLE, ctypes.c_uint32, LPVOID, DWORD, LPVOID))
 
     # file APIs
-    CreateSymbolicLink = tryKernal32(
+    CreateSymbolicLink = tryKernel32(
         'CreateSymbolicLinkW', BOOLEAN, (LPWSTR, LPWSTR, DWORD))
-    CreateHardLink = tryKernal32(
+    CreateHardLink = tryKernel32(
         'CreateHardLinkW', BOOLEAN, (LPWSTR, LPWSTR, DWORD))
-    CopyFile = tryKernal32('CopyFileW', BOOLEAN, (LPWSTR, LPWSTR, BOOL))
-    DeleteFile = tryKernal32('DeleteFileW', BOOLEAN, (LPWSTR,))
+    CopyFile = tryKernel32('CopyFileW', BOOLEAN, (LPWSTR, LPWSTR, BOOL))
+    DeleteFile = tryKernel32('DeleteFileW', BOOLEAN, (LPWSTR,))
+
+    # advapi functions used for privilege checking
+    _AllocateAndInitializeSid = tryAdvapi32("AllocateAndInitializeSid", BOOL,
+                                            (ctypes.POINTER(SID_IDENTIFIER_AUTHORITY), BYTE, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, ctypes.c_void_p()))
+
+    _CheckTokenMembership = tryAdvapi32("CheckTokenMembership", BOOL,
+                                        (HANDLE, ctypes.c_void_p(), ctypes.POINTER(BOOL)))
+
+    FreeSid = tryAdvapi32("FreeSid", LPVOID, (LPVOID,))
+
+    def AllocateAndInitializeSid(pIdentifierAuthority, nSubAuthorityCount,
+                                 dwSubAuthority0, dwSubAuthority1, dwSubAuthority2, dwSubAuthority3, dwSubAuthority4, dwSubAuthority5, dwSubAuthority6, dwSubAuthority7):
+
+        admin_group = ctypes.c_void_p()
+
+        if not _AllocateAndInitializeSid(pIdentifierAuthority, nSubAuthorityCount, dwSubAuthority0, dwSubAuthority1, dwSubAuthority2, dwSubAuthority3,
+                                         dwSubAuthority4, dwSubAuthority5, dwSubAuthority6, dwSubAuthority7, ctypes.byref(admin_group)):
+            raise WindowsError(ctypes.GetLastError(), ctypes.FormatError(ctypes.GetLastError()))
+
+        return admin_group
+
+    def CheckTokenMembership(TokenHandle, SidToCheck):
+        is_admin = BOOL()
+
+        if not _CheckTokenMembership(TokenHandle, SidToCheck, ctypes.byref(is_admin)):
+            raise WindowsError(ctypes.GetLastError(), ctypes.FormatError(ctypes.GetLastError()))
+
+        return is_admin
 
     def _long_path(path):
         if len(path) >= 200 and not path.startswith("\\\\?\\"):
-            path = "\\\\?\\" + os.path.abspath(path)        
+            path = "\\\\?\\" + os.path.abspath(path)
         return path
 
     # some overides.. might want to do this differently later
@@ -371,3 +426,15 @@ if os.name == 'nt':
 
     os.symlink = win32_symlink
 
+    def user_is_admin():
+        nt_authority = SID_IDENTIFIER_AUTHORITY()
+        nt_authority.byte5 = 5
+
+        administrator_group = AllocateAndInitializeSid(
+            nt_authority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0)
+
+        try:
+            # invert C boolean, in Condition.IsElevated, we are using 0 as pass value since 0 is uid for root in *nixes
+            return not CheckTokenMembership(0, administrator_group)
+        finally:
+            FreeSid(administrator_group)
