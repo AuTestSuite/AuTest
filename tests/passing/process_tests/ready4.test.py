@@ -9,5 +9,6 @@ s=tr.Processes.Process("server","python server --time=1 --port 8080",returncode=
 s.Ready=When.PortOpen(8080)
 tr.Command="curl 127.0.0.1:8080"
 tr.ReturnCode=0
-tr.Processes.Default.StartBefore(tr.Processes.server,ready=When.PortOpen(8080))
+# port open and 2 second delay
+tr.Processes.Default.StartBefore(tr.Processes.server,ready=2)
 

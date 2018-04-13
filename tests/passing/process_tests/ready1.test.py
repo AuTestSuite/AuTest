@@ -8,4 +8,4 @@ tr=Test.AddTestRun()
 tr.Processes.Process("server","python server --time=1 --port 8080",returncode=None)
 tr.Command="curl 127.0.0.1:8080"
 tr.ReturnCode=0
-tr.Processes.Default.StartBefore(tr.Processes.server,ready=When.PortOpen(8080))
+tr.Processes.Default.StartBefore(tr.Processes.server,ready=When.PortReady(8080))

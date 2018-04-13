@@ -2,6 +2,7 @@ test.Summary="Test the setup of Setup Copy logic"
 
 # copy
 
+# this makes an empty link on purpose for the test
 Setup.Copy("a.txt","a.link.txt",copy_logic=CopyLogic.Soft)
 
 Setup.Copy.FromDirectory("data",copy_logic=CopyLogic.SoftFiles)
