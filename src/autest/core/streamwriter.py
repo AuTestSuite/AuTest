@@ -56,6 +56,7 @@ class PipeRedirector(object):
             self.thread = None
             self.writer = None
 
+
 test_search = 0
 test_match = 1
 
@@ -113,6 +114,7 @@ def is_debug(str):
         if do_test(test, str):
             return True
     return False
+
 
 full_stream_file = 'stream.all.txt'
 out_stream_file = 'stream.stdout.txt'
@@ -239,58 +241,60 @@ class StreamWriter(object):
         self.verbosefile.close()
         self.debugfile.close()
 
+    def _write(self, text, stream):
+
+        brkup = text[1].split('\n')
+        grpstr = ''  # the string we will write out
+
+        # number of items we have
+        break_size = len(brkup)-1
+        for cnt, s in enumerate(brkup):
+            if cnt < break_size:
+                # we did not assign anything yet
+                if grpstr == '':
+                    # add a newline
+                    grpstr = s + '\n'
+                elif s and (s[0] == ' ' or s[0] == '\t'):  # group indented text
+                    grpstr += s + '\n'
+                else:
+                    # write out what we have
+                    self.both.write(grpstr.encode("utf-8"))
+                    self._smart_match(grpstr)
+                    stream.write(grpstr.encode("utf-8"))
+                    # reset string to new data
+                    grpstr = s + '\n'
+
+            else:
+                # we are at the end
+                # we did not assign anything yet
+                if grpstr == '':
+                    # add a newline
+                    grpstr = s
+                elif s and (s[0] == ' ' or s[0] == '\t'):  # group indented text
+                    grpstr += s
+                else:
+                    # write out what we have
+                    self.both.write(grpstr.encode("utf-8"))
+                    self._smart_match(grpstr)
+                    stream.write(grpstr.encode("utf-8"))
+                    # reset string to new data
+                    grpstr = s
+
+        # write out last piece of data
+        if grpstr:
+
+            self.both.write(grpstr.encode("utf-8"))
+            self._smart_match(grpstr)
+            stream.write(grpstr.encode("utf8"))
+
     def _empty_cache(self):
 
         for text in self.cache:
-
             if text[0] == StreamWriter.stdout:
-                brkup = text[1].split('\n')
-                grpstr = ''
-                # strip the end if it is ''
-                if brkup[-1] == '':
-                    brkup = brkup[:-1]
-                for s in brkup:
-                    if s == '':
-                        grpstr += s + '\n'
-                    elif grpstr == '':
-                        grpstr = s + '\n'
-                    elif s[0] == ' ' or s[0] == '\t':  # group indented text
-                        grpstr += s + '\n'
-                    else:
-                        self.both.write(grpstr.encode("utf-8"))
-                        if not self._smart_match(grpstr):
-                            pass
-                        self.outfile.write(grpstr.encode("utf-8"))
-                        grpstr = s + '\n'
-                else:
-                    self.both.write(grpstr.encode("utf-8"))
-                    if not self._smart_match(grpstr):
-                        pass
-                    self.outfile.write(grpstr.encode("utf8"))
+                self._write(text, self.outfile)
+
             elif text[0] == StreamWriter.stderr:
-                brkup = text[1].split('\n')
-                grpstr = ''
-                # strip the end if it is ''
-                if brkup[-1] == '':
-                    brkup = brkup[:-1]
-                for s in brkup:
-                    if s == '':
-                        grpstr += s + '\n'
-                    elif grpstr == '':
-                        grpstr = s + '\n'
-                    elif s[0] == ' ' or s[0] == '\t':  # group indented text
-                        grpstr += s + '\n'
-                    else:
-                        self.both.write(grpstr.encode("utf8"))
-                        if not self._smart_match(grpstr):
-                            pass
-                        self.errfile.write(grpstr.encode("utf8"))
-                        grpstr = s + '\n'
-                else:
-                    self.both.write(grpstr.encode("utf8"))
-                    if not self._smart_match(grpstr):
-                        pass
-                    self.errfile.write(grpstr.encode("utf8"))
+                self._write(text, self.errfile)
             else:
                 # we have some error or unknown code
                 pass

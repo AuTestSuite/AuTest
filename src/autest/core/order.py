@@ -196,7 +196,7 @@ def SortStartOrderedList(lst, startidx=0):
                 except KeyError:
                     d[k] = [i]
             else:
-                "{0} is already a depends on {1}".format(i, k)
+                "{0} is already a depends on {1}".format(i.Name, k)
 
     # Sort the items in the list based on depends mapping
     return sort.depends_back_sort(lst, d)
@@ -222,7 +222,7 @@ def SortEndOrderedList(lst, startidx=0):
                 except KeyError:
                     d[k] = [i]
             else:
-                "{0} is already a depends on {1}".format(i, k)
+                "{0} is already a depends on {1}".format(i.Name, k)
 
     # Sort the items in the list based on depends mapping
     return sort.depends_back_sort(lst, d)
@@ -257,14 +257,14 @@ def GenerateStartOrderedList(item):
 
     def getlst(data, stack, default_proc):
         ret = []
-
         for obj, func_info in data.items():
             info = ordered_item_t(obj, func_info[0], func_info[1])
             # break any loops
             if info in stack:
-                host.WriteMessagef(
+                host.WriteVerbosef(
                     "Ignoring adding {0} to start order as it is already exist, breaking loop.",
-                    info)
+                    info.object.Name)
+                ret.append(info)
                 continue
             stack.append(info)
             ret.extend(getlst(obj.StartBefore(), stack, default_proc))
@@ -278,8 +278,13 @@ def GenerateStartOrderedList(item):
         fat_lst.extend(getlst(item.StartBefore(), [], item))
         fat_lst.append(ordered_item_t(item, item._isReady, {}))
         fat_lst.extend(getlst(item.StartAfter(), [], item))
-
-    return fat_lst
+    # flatten the list by taking the last item
+    ret = []
+    fat_lst.reverse()
+    for i in fat_lst:        
+        if i not in ret:
+            ret=[i]+ret
+    return ret
 
 
 def GenerateEndOrderedList(item):
@@ -300,7 +305,7 @@ def GenerateEndOrderedList(item):
             info = ordered_item_t(obj, None, {})
             # break any loops
             if info in stack:
-                host.WriteMessagef(
+                host.WriteVerbosef(
                     "Ignoring adding {0} to start order as it is already exist, breaking loop.",
                     info)
                 continue
@@ -317,4 +322,11 @@ def GenerateEndOrderedList(item):
         fat_lst.append(ordered_item_t(item, None, {}))
         fat_lst.extend(getlst(item.EndAfter(), [], item))
 
-    return fat_lst
+    # flatten the list by taking the last item
+    ret = []
+    fat_lst.reverse()
+    for i in fat_lst:        
+        if i not in ret:
+            ret=[i]+ret
+
+    return ret
