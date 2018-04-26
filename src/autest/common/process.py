@@ -41,8 +41,9 @@ if os.name == 'nt':
         #win32.TerminateJobObject(self._job, -1)
         # else:
         win32.TerminateJobObject(self._job, -1)
+        sig_used = 9
         #host.WriteVerbosef(['process-kill'], "Process {0} finished", self.pid)
-        return True
+        return sig_used
 
     def waitTimeOut(process, timeout):
         # WaitForSingleObject expects timeout in milliseconds, so we convert it
