@@ -82,6 +82,12 @@ def main():
         Defaults at passed
         ''')
 
+    run.int_argument(
+        ['--normalize-kill'],
+        default=None,
+        help='Normalizes the exit code when a process is given SIGKILL'
+    )
+
     list.add_argument(
         ['--json'],
         action='store_true',
@@ -102,7 +108,7 @@ def main():
             #  Short delay after first process kill before next will be kill
             'StopProcessShortDelaySeconds': 1,
             #  delay after control-c before kill
-            'KillDelaySecond': 10, # most programs should finish in tens second
+            'KillDelaySecond': 10,  # most programs should finish in tens second
 
             ########################
             # Process Spawning
@@ -165,7 +171,7 @@ def main():
     old_path = sys.path[:]
     for path in autest_sites:
         sys.path.append(path)
-        
+
     # see if we have a file to load to get new options
     for path in autest_sites:
         options_file = os.path.join(path, "init.cli.ext")
@@ -181,6 +187,7 @@ def main():
 
     # parse the options and error if we have unknown options
     setup.final_parse()
+
     hosts.output.WriteDebugf(
         "init", "After extension load: args = {0}", setup.arguments)
 
@@ -200,7 +207,7 @@ def main():
             }
             execfile.execFile(options_file, _locals, _locals)
 
-    #reset sys.path to orginal value
+    # reset sys.path to orginal value
     sys.path = old_path
 
     # setup command specific arguments
@@ -228,6 +235,7 @@ def main():
 
         variables.Autest.Run.Jobs = setup.arguments.jobs
         variables.Autest.Run.Reporters = setup.arguments.reporters
+        variables.Autest.NormalizeKill = setup.arguments.normalize_kill
     elif setup.arguments.subcommand == 'list':
         variables.Autest.List.output_json = setup.arguments.json
 
@@ -241,15 +249,15 @@ def main():
     # this is a cli program so we only make one engine and run it
     # a GUI might make a new GUI for every run as it might have new options,
     # or maybe not
-    #try:
+    # try:
     myEngine = Engine(env=env, variables=variables)
 
     try:
-        ret = myEngine.Start()    
+        ret = myEngine.Start()
     except SystemExit:
         hosts.output.WriteError("Autest shutdown because of critical error!", exit=False, show_stack=False)
         ret = 1
-    #except Exception:
+    # except Exception:
         #hosts.output.WriteError("Autest shutdown because of critical error!", exit=False, show_stack=True)
         #ret = 1
 

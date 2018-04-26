@@ -55,8 +55,8 @@ class Process_RunLogic(RunLogic):
         # hacky function to help deal with command that need a shell without
         # breaking older test files
         lex = shlex.shlex(cmdstr, posix=True)
-        if sys.platform =='win32':
-            lex.escape="" # normal escape of "\" breaks path passing
+        if sys.platform == 'win32':
+            lex.escape = ""  # normal escape of "\" breaks path passing
         lex.wordchars += '-$%><&.=:%^/\\@'
         lex.commenters = ''
         return list(lex)
@@ -283,8 +283,12 @@ class Process_RunLogic(RunLogic):
         host.WriteVerbosef(['process'], 'Stopping process {0}',
                            self._process.Name)
         if self.isRunning():
-            self.__proc.killtree(
+            signum = self.__proc.killtree(
                 self._process.ComposeVariables().Autest.KillDelaySecond)
+            if signum == 9 and self._process.ComposeVariables().Autest.NormalizeKill is not None:  # SIGKILL
+                host.WriteVerbosef(
+                    ['process-kill'], 'Normalizing SIGKILL exit code for process {0} to {1}', self._process.Name, self._process.ComposeVariables().Autest.NormalizeKill)
+                self.__proc.returncode = self._process.ComposeVariables().Autest.NormalizeKill
         self.Cleanup()
 
     def Wait(self, timeout):
