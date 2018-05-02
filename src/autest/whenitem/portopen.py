@@ -4,19 +4,19 @@ import hosts.output as host
 import psutil
 
 
-def PortOpen(port, address=None, timeout=None):
+def PortOpen(port, address=None, timeout=None, address_family="inet4"):
     '''
     This function is more like a stat test. The value of it is that no traffic happens.
-    The issue with it is that the source of the port moght not be ready to accept data
-    ... if for some reason psutil fails here, we will fall back on the PortReady logic
+    The issue with it is that the source of the port might not be ready to accept data.
+    If for some reason psutil fails here, we will fall back on the PortReady logic
     '''
     ret = False
 
     try:
-        netstate = psutil.net_connections('inet4')
+        netstate = psutil.net_connections(address_family)
     except:
         netstate = None
-    
+
     # if no port are being read.. we probally have some system issue with the library
     # and should fall back to older logic
     if netstate:
@@ -31,6 +31,14 @@ def PortOpen(port, address=None, timeout=None):
     return ret
 
 
+def PortOpenv4(port, address=None, timeout=None):
+    return PortOpen(port=port, address=address, timeout=timeout, address_family='inet4')
+
+
+def PortOpenv6(port, address=None, timeout=None):
+    return PortOpen(port=port, address=address, timeout=timeout, address_family='inet6')
+
+
 def PortReady(port, address=None, timeout=None):
     '''
     The logic here is to open a port. this causes some traffic on the host of the port
@@ -40,7 +48,6 @@ def PortReady(port, address=None, timeout=None):
     needed, such as sending a test packet/message of some kind that the application understand.
     '''
 
-    netstate = psutil.net_connections('inet4')
     ret = False
 
     if address is None:
@@ -64,4 +71,6 @@ def PortReady(port, address=None, timeout=None):
 
 
 AddWhenFunction(PortOpen)
+AddWhenFunction(PortOpenv4)
+AddWhenFunction(PortOpenv6)
 AddWhenFunction(PortReady)
