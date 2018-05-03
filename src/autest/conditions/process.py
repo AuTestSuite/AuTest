@@ -1,30 +1,32 @@
-import subprocess
-import re
+import json
 import os
-
-import autest.api as api
-import autest.common.ospath as ospath
-import autest.common.version as verlib
-import autest.common.is_a as is_a
-import autest.common.win32 as win32
+import re
+import subprocess
 
 import pip
 
+import autest.api as api
+import autest.common.is_a as is_a
+import autest.common.ospath as ospath
+import autest.common.version as verlib
+import autest.common.win32 as win32
 import hosts.output as host
 
 
 def HasPythonPackage(self, package, msg):
-    def checkPackage():
-        for pkg in pip.get_installed_distributions():
-            if package == pkg.project_name:
+
+    def _check(output):
+        lst = json.loads(output)
+        for i in lst:
+            if i['name'] == package:
                 return True
+            return False
 
-        return False
-
-    return self.Condition(
-        checkPackage,
-        msg,
-        True
+    return self.CheckOutput(
+        "pip list --format json",
+        _check,
+        msg.format(package=package),
+        shell=False
     )
 
 
