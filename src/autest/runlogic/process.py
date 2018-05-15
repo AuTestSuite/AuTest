@@ -57,7 +57,7 @@ class Process_RunLogic(RunLogic):
         lex = shlex.shlex(cmdstr, posix=True)
         if sys.platform == 'win32':
             lex.escape = ""  # normal escape of "\" breaks path passing
-        lex.wordchars += '-$%><&.=:%^/\\@'
+        lex.wordchars += '-$%><&.=:%^/\\@[]'
         lex.commenters = ''
         return list(lex)
 
