@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 from builtins import map
 import sys
+import inspect
 
 from . import common
 import hosts.glb as glb
@@ -75,15 +76,24 @@ def WriteProgress(task, msg=None, progress=None, completed=False):
 
 # some utility functions
 
-def getCurrentStack(start_depth=0):
+def getCurrentStack(start_depth=0, matchfunc=None):
     '''
     start_depth tell us where on the stack to
     start getting data, this way we can pass information
     up the stack where the issue is to the user and hide
     where the error is reported
+
+    matchfunc is a function that will be used to look for
+    somthing in a stack to see if this stack is the one we 
+    want to report. Useful for cases in which we are processing
+    a script or something from the user and we want to report the
+    error at the point in which the user defined something
+    if matchfunc fails to find a match, start_depth will be used instead
     '''
-    frame = sys._getframe(1+start_depth)
-    filename = frame.f_code.co_filename
-    lineno = frame.f_lineno
-    routine = frame.f_code.co_name
-    return (filename, lineno, routine)
+
+    stack = inspect.stack()
+    if matchfunc:
+        for info in stack:
+            if matchfunc(info):
+                return inspect.getframeinfo(info[0])
+    return inspect.getframeinfo(inspect.stack()[1+start_depth][0])

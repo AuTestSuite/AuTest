@@ -2,6 +2,9 @@ from __future__ import absolute_import, division, print_function
 
 from builtins import object
 
+from .stringdict import StringDict
+
+
 class Condition(object):
     def __init__(self, testfunc, reason, pass_value, neg_reason=None):
         self.__func = testfunc
@@ -40,7 +43,7 @@ class ConditionFactory(object):
 
     def __init__(self, variables, env):
         self.__variables = variables
-        self.__env = env
+        self.__env = StringDict(env)
 
     @property
     def Variables(self):

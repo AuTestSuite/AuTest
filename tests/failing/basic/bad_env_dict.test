@@ -1,0 +1,7 @@
+Test.Summary="Test that we error when a environment is set to a non string value"
+
+Test.Env={"foo":9}
+
+t=Test.AddTestRun("setup")
+t.Command="python --version"
+t.ReturnCode=0

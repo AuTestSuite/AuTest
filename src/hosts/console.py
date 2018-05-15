@@ -1,7 +1,10 @@
 from __future__ import absolute_import, division, print_function
-import sys
-import os
+
+import inspect
 import linecache
+import os
+import sys
+
 import colorama
 
 from . import interfaces
@@ -31,22 +34,16 @@ class ConsoleHost(interfaces.UIHost):
     # our overrides
     def formatStack(self, stack):
 
-        if stack is not None:
-            filename, lineno, routine = stack
-        else:
-            frame = sys._getframe(5)
-            filename = frame.f_code.co_filename
-            lineno = frame.f_lineno
-            routine = frame.f_code.co_name
-        content = self.get_contents(filename, lineno)
+        if stack is None:
+            stack = inspect.getframeinfo(sys._getframe(5))
+        content = self.get_contents(stack.filename, stack.lineno)
         msg = ' File: "{filename}", line: {lineno}, in "{routine}"\n{content}\n'.format(
-            filename=filename,
-            lineno=lineno,
-            routine=routine,
+            filename=stack.filename,
+            lineno=stack.lineno,
+            routine=stack.function,
             content=content
-            )
+        )
         return msg
-
 
     def get_contents(self, filename, lineno):
         content = ''
@@ -57,11 +54,11 @@ class ConsoleHost(interfaces.UIHost):
 
         if lineno > 3:
             content += " {lineno_color}{lineno}:     {code_color}{line}".format(
-                    lineno_color=lineno_color,
-                    code_color=code_color,
-                    line=linecache.getline(filename, lineno - 3),
-                    lineno=lineno - 3
-                )
+                lineno_color=lineno_color,
+                code_color=code_color,
+                line=linecache.getline(filename, lineno - 3),
+                lineno=lineno - 3
+            )
         if lineno > 2:
             content += " {lineno_color}{lineno}:     {code_color}{line}".format(
                 lineno_color=lineno_color,

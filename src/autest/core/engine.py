@@ -24,7 +24,7 @@ import autest.testers as testers
 from autest.core import conditions
 from autest.core import CopyLogic
 from .test import loadTest
-
+from .stringdict import StringDict
 
 
 class Engine(object):
@@ -32,7 +32,7 @@ class Engine(object):
 
     def __init__(self, dump_report=False, env=None, variables=None):
         self.__tests = {}                                                           # the dict of the different tests we have {name:testobj}
-        self.__ENV = env
+        self.__ENV = StringDict(env)
         self.__variables = variables
 
         self.__test_dir = variables.Autest.TestDir or './'                         # this the root directory to look for the tests

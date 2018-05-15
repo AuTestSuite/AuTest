@@ -1,19 +1,21 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
-import hosts.output as host
-from autest.common.constructor import call_base, smart_init
+
+import abc
+
+from future.utils import with_metaclass
 
 import autest.common.event as event
 import autest.common.is_a as is_a
+import autest.glb as glb
+import autest.testers as testers
+import hosts.output as host
+from autest.common.constructor import call_base, smart_init
 
 from .delayeventmapper import DelayedEventMapper
 from .metaclass import _test_enity__metaclass__
-from .variables import Variables
+from .stringdict import StringDict
 from .testerset import TesterSet
-import autest.testers as testers
-
-from future.utils import with_metaclass
-import abc
+from .variables import Variables
 
 # This is the base class needed to define some runable event object
 # in the frame work
@@ -32,7 +34,7 @@ class Runable(with_metaclass(_test_enity__metaclass__, DelayedEventMapper)):
         self.__FinishedEvent = event.Event()
         self.__CleanupEvent = event.Event()
 
-        self.__env = {}
+        self.__env = StringDict()
         self.__variables = Variables(
             parent=parent.Variables if parent else None)
         self.__parent = parent
@@ -99,8 +101,8 @@ class Runable(with_metaclass(_test_enity__metaclass__, DelayedEventMapper)):
     @Env.setter
     def Env(self, val):
         if not is_a.Dict(val):
-            raise TypeError("value needs to be a dict type")
-        self.__env = val
+            raise TypeError("value needs to be a dict type")        
+        self.__env = StringDict(val)
 
     def ComposeVariables(self):
         ret = Variables()

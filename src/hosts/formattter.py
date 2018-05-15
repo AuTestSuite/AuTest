@@ -1,9 +1,10 @@
 from __future__ import absolute_import, division, print_function
-import sys
-import linecache
 
-from .interfaces import uihost
+import linecache
+import sys
+
 from .common import is_a
+from .interfaces import uihost
 
 # this class does two functions
 # 1) formats the message
@@ -21,7 +22,7 @@ class Formatter(uihost.UIHost):
         self.__host_debug_catagory = defaultHost.debugCatagories
 
     def AddHost(self, host):
-        #<fill in>
+        # <fill in>
         self.__host_verbose_catagory = host.verboseCatagories
         self.__host_debug_catagory = host.debugCatagories
 
@@ -83,16 +84,15 @@ class Formatter(uihost.UIHost):
         msg = host.formatStack(stack)
         # If this is None, we will do the formating
         if not msg:
-            if stack is not None:
-                filename, lineno, routine = stack
-            else:
-                frame = sys._getframe(4)
-                filename = frame.f_code.co_filename
-                lineno = frame.f_lineno
-                routine = frame.f_code.co_name
-            content = self.get_contents(filename, lineno)
-            msg = ' File: "%s", line: %s, in "%s"\n %s\n' % (filename, lineno,
-                                                             routine, content)
+            if stack is None:
+                stack = inspect.getframeinfo(sys._getframe(4))
+            content = self.get_contents(stack.filename, stack.lineno)
+            msg = ' File: "{filename}", line: {lineno}, in "{routine}"\n{content}\n'.format(
+                filename=stack.filename,
+                lineno=stack.lineno,
+                routine=stack.function,
+                content=content
+            )
         return msg
 
     def _formatStdOut(self, msglst, **kw):
