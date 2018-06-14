@@ -23,7 +23,7 @@ def HasPythonPackage(self, package, msg):
             return False
 
     return self.CheckOutput(
-        "pip list --format json",
+        ["pip", "list", "--format", "json"],
         _check,
         msg.format(package=package),
         shell=False
@@ -58,12 +58,14 @@ def RunCommand(self, command, msg, pass_value=0, env=None, shell=False):
 def CheckOutput(self, command, check_func, msg, pass_value=True, neg_msg=None, shell=False):
     def check_logic():
         try:
+            host.WriteVerbose(["setup"], "Running command:\n", command)
             output = subprocess.check_output(
                 command, universal_newlines=True,
                 stderr=subprocess.STDOUT,
                 shell=shell
             )
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, OSError):
+            host.WriteVerbose(["setup"], "Command Failed")
             return False
         return check_func(output)
 
