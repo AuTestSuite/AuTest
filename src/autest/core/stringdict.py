@@ -11,10 +11,10 @@ class StringDict(dict):
 
     @staticmethod
     def _process_args(mapping=(), **kwargs):
-        if hasattr(mapping, 'iteritems'):
-            mapping = getattr(mapping, 'iteritems')()
+        if hasattr(mapping, 'items'):
+            mapping = getattr(mapping, 'items')()
         ret = []
-        for k, v in chain(mapping, getattr(kwargs, 'iteritems')()):
+        for k, v in chain(mapping, getattr(kwargs, 'items')()):
             if not is_a.String(v):
                 host.WriteError(
                     "Value must be a string",
