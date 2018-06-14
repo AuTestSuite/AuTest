@@ -56,6 +56,12 @@ class PipeRedirector(object):
             self.thread = None
             self.writer = None
 
+    def __del__(self):
+        """
+        Ensures this object's resources get cleaned up when it hits the GC
+        """
+        self.close()
+
 
 test_search = 0
 test_match = 1

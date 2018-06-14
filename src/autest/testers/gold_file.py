@@ -44,7 +44,8 @@ class GoldFile(tester.Tester):
         if tmp is None:
             pass
         try:
-            val_content = open(tmp).read()
+            with open(tmp) as val_file:
+                val_content = val_file.read()
         except (OSError, IOError) as e:
             self.Result = tester.ResultType.Failed
             self.Reason = str(e)
@@ -55,7 +56,8 @@ class GoldFile(tester.Tester):
         if tmp is None:
             pass
         try:
-            gf_content = open(tmp).read()
+            with open(tmp) as gf_file:
+                gf_content = gf_file.read()
         except KeyboardInterrupt:
             raise
         except:
