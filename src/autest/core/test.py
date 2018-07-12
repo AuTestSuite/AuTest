@@ -150,7 +150,6 @@ class Test(Runable, Order, Item):
     def ContinueOnFail(self, val):
         self.__continueonfail = val
 
-
 def loadTest(test):
     # load the test data.  this mean exec the data
     # create the locals we want to pass

@@ -41,6 +41,7 @@ class GoldFile(tester.Tester):
 
         # get the attribute file context
         tmp = self._GetContent(eventinfo)
+
         if tmp is None:
             pass
         try:
@@ -60,9 +61,12 @@ class GoldFile(tester.Tester):
                 gf_content = gf_file.read()
         except KeyboardInterrupt:
             raise
-        except:
+        except Exception as e:
             self.Result = tester.ResultType.Failed
-            self.Reason = "Can't open file {0}".format(tmp)
+            if tmp is None:
+                self.Reason = "Internal error: Invalid filename value of None. Filename must be of type string"
+            else:
+                self.Reason = "Can't open file {0} because:\n {1}".format(tmp, e)
             host.WriteVerbose(["testers.GoldFile", "testers"], "{0} - ".format(
                 tester.ResultType.to_color_string(self.Result)), self.Reason)
             return

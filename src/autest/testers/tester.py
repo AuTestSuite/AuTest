@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 import abc
 import traceback
 import colorama
+import os.path
 
 from autest.exceptions.killonfailure import KillOnFailureError
 
@@ -69,7 +70,8 @@ class Tester(object):
                  test_value,
                  kill_on_failure=False,
                  description_group=None,
-                 description=None):
+                 description=None,
+                 bind=None):
         self._description_group = description_group
         self._description = description
         self.__result = ResultType.Unknown
@@ -78,6 +80,7 @@ class Tester(object):
         self.__kill = kill_on_failure
         self.__value = value
         self.__ran = False
+        self._bind = bind
 
     @property
     def KillOnFailure(self):
@@ -90,6 +93,18 @@ class Tester(object):
     @KillOnFailure.setter
     def KillOnFailure(self, value):
         self.__kill = value
+
+    @property
+    def Bind(self):
+        '''
+        This is the Bind events function. Use this function to call
+        Test Directory. 
+        '''
+        return self._bind
+
+    @Bind.setter
+    def Bind(self, value):
+        self._bind = value
 
     @property
     def TestValue(self):
@@ -189,6 +204,7 @@ class Tester(object):
         # if test_value is None
         # we set it to the this testers object
         # test value.
+
         if test_value is None:
             test_value = self.TestValue
 
@@ -217,20 +233,24 @@ class Tester(object):
         except TypeError:
             pass
         # if that did not work see if this
-        # is a string.  If so we assume it an attibute of the event
+        # is a string.  If so we assume it an attribute of the event.
+        # It is filename of test file otherwise.
+        
         if isinstance(test_value, str):
-            if not hasattr(eventinfo, test_value):
-                self.Result = ResultType.Failed
-                self.Reason = "{0} does not have attibute {1}".format(
-                    type(eventinfo), test_value)
-                return None
-            return getattr(eventinfo, test_value)
+            if hasattr(eventinfo, test_value):
+                return getattr(eventinfo, test_value)
+            else:
+                return os.path.join(self._bind._Runable.TestDirectory, test_value)
+
         # if that failed, we see if this has a __call__ attribute
         # in this case we know we can call it as a function.
-        # we assume that it accepts no arguments as we woudl not know
+        # we assume that it accepts no arguments as we would not know
         # what to pass it.
-        elif hasattr(test_value, '__call__'):
-            return test_value()
+        try:
+            if hasattr(test_value, '__call__'):
+                return test_value()
+        except AttributeError:
+            pass
         # this is the else
         # we give up and assume it the value we want to pass in
         return test_value

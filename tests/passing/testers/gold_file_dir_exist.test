@@ -1,0 +1,7 @@
+# The result of this test shows if a Gold file is in the test directory
+
+Test.Summary="Test the existance of a gold file in a test directory"
+t=Test.AddTestRun("setup")
+t.Command=r'''python -c "print('hello\nworld')"'''
+t.Streams.stdout= Testers.GoldFile("gold/gold_file_dir_exist.gold", normalize_eol=True)
+t.ReturnCode=0

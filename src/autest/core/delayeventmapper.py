@@ -5,6 +5,7 @@ import autest.common as common
 import autest.common.is_a as is_a
 from autest.common.constructor import call_base, smart_init
 from autest.core.testerset import TesterSet
+from autest.testers import Tester
 
 # this is base class to add common logic for when I need to
 # delay adding the event mapping.  The reason or this would be cases
@@ -54,8 +55,12 @@ class DelayedEventMapper(object):
                 obj = self._GetRegisteredEvent(getattr(self, varname))
                 if is_a.List(value):
                     for v in value:
+                        if isinstance(value, Tester):
+                            value.Bind = self
                         obj.add(v)
                 else:
+                    if isinstance(value, Tester):
+                        value.Bind = self
                     obj.assign(value)
 
         property_name = common.make_list(property_name)
