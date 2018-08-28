@@ -91,6 +91,12 @@ class Any(_Container):
             t.test(eventinfo, **kw)
             if t.Result == tester.ResultType.Passed:
                 self.Result = tester.ResultType.Passed
+
+        # self.Result may be set to Unknown if none of the testers passed
+        if self.Result == tester.ResultType.Unknown:
+            self.Result = tester.ResultType.Failed
+            self.Reason = "None of the tests passed"
+
         if self.Result == tester.ResultType.Passed:
             self.Reason = "One or more tests passed"
         else:
