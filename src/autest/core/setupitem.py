@@ -123,11 +123,13 @@ class SetupItem(object):
 
         proc.wait()
 
-        output.Close()
+        
 
         # clean up redirectory objects for this run
         stdout.close()
         stderr.close()
+
+        output.Close()
 
         return proc.returncode
 

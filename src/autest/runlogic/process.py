@@ -215,15 +215,16 @@ class Process_RunLogic(RunLogic):
                     self.__output)
                 self.__proc = None
 
-            if self.__output:
-                self.__output.Close()
-                self.__output = None
+            
             if self.__stdout:
                 self.__stdout.close()
                 self.__stdout = None
             if self.__stderr:
                 self.__stderr.close()
                 self.__stderr = None
+            if self.__output:
+                self.__output.Close()
+                self.__output = None
 
             # call event
             host.WriteDebug(

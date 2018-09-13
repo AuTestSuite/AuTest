@@ -24,7 +24,7 @@ class PipeRedirector(object):
                 line = self.pipein.readline()
                 if line:
                     self.writer(line)
-                    host.WriteDebug(['process_output'], line.decode(), end='')
+                    host.WriteDebug(['process_output'], line.decode(), end='') 
         except:
             # There was an error... that shouldn't happen, but still it did. So we report it
             # to the caller and close our pipe end so that spawned program
@@ -220,6 +220,9 @@ class StreamWriter(object):
                 # there is data but it is of a different type
                 self.cache.append([StreamWriter.stdout, s])
 
+        # commented out because this makes a giant wall of text
+        # host.WriteDebugf(["StreamWriter.WriteStdOut"], "Caching output {0} to [{1}]", s, self.StdOutFile)
+
     def WriteStdErr(self, s):
         s = s.decode()
         with self.__lock:
@@ -234,18 +237,28 @@ class StreamWriter(object):
                 # there is data but it is of a different type
                 self.cache.append([StreamWriter.stderr, s])
 
+        # commented out because this makes a giant wall of text
+        # host.WriteDebugf(["StreamWriter.WriteStdErr"], "Caching output to {0} to {1}", s, self.StdErrFile)
+
     def Close(self):
         # write out files
+        host.WriteDebugf(["StreamWriter.Close"], "Emptying cache and closing streamwriter")
         self._empty_cache()
         # close file handles
         self.both.close()
+        self.both = None
         self.outfile.close()
+        self.outfile = None
         self.errfile.close()
-
+        self.errfile = None
         self.warningfile.close()
+        self.warningfile = None
         self.errorfile.close()
+        self.errorfile = None
         self.verbosefile.close()
+        self.verbosefile = None
         self.debugfile.close()
+        self.debugfile = None
 
     def _write(self, text, stream):
 
@@ -303,4 +316,4 @@ class StreamWriter(object):
                 self._write(text, self.errfile)
             else:
                 # we have some error or unknown code
-                pass
+                raise 
