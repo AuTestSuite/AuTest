@@ -3,8 +3,6 @@ import os
 import re
 import subprocess
 
-import pip
-
 import autest.api as api
 import autest.common.is_a as is_a
 import autest.common.ospath as ospath
