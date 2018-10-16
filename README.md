@@ -32,7 +32,7 @@ To install run the command to get latest published version:
 
 To install the latest development version, run the command:
 ~~~~
-pip install git+https://bitbucket.org/dragon512/reusable-gold-testing-system.git@develop
+pip install git+https://bitbucket.org/autestsuite/reusable-gold-testing-system.git
 ~~~~
 
 
@@ -46,8 +46,8 @@ autest
 ~~~~
 [Quick start for creating a test](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/quick-start)
 
-Read [documentation](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/Home) to learn how to use write and use AuTest in more detail
-[here.](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/Home)
+Read [documentation](https://autestsuite.bitbucket.io/) to learn how to use write and use AuTest in more detail ( docs are being rewritten )
+[here.](https://autestsuite.bitbucket.io/)
 
 Contribution guidelines
 ----------------------------------
