@@ -93,7 +93,8 @@ class SetupItem(object):
         output = streamwriter.StreamWriter(
             os.path.join(
                 self.__runable.RunDirectory,
-                "_setup_tmp_{0}_{1}".format(
+                "_output{0}setup-{1}-{2}".format(
+                    os.sep,
                     self.ItemName.replace(" ", "_"),
                     self.cnt)
             ),
@@ -123,7 +124,7 @@ class SetupItem(object):
 
         proc.wait()
 
-        
+
 
         # clean up redirectory objects for this run
         stdout.close()

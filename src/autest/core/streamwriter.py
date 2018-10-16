@@ -24,7 +24,7 @@ class PipeRedirector(object):
                 line = self.pipein.readline()
                 if line:
                     self.writer(line)
-                    host.WriteDebug(['process_output'], line.decode(), end='') 
+                    host.WriteDebug(['process_output'], line.decode(), end='')
         except:
             # There was an error... that shouldn't happen, but still it did. So we report it
             # to the caller and close our pipe end so that spawned program
@@ -316,4 +316,4 @@ class StreamWriter(object):
                 self._write(text, self.errfile)
             else:
                 # we have some error or unknown code
-                raise 
+                raise

@@ -20,6 +20,14 @@ class Process(Runable, Order, Item):
         self.__use_shell = use_shell
         self.__streams = object()
 
+        self.__output = os.path.join(
+            self._RootRunable.RunDirectory, "_output{0}{1}-{2}".format(
+                os.sep,
+                self._ParentRunable._ID,
+                self._ID
+            )
+        )
+
         # will want to refactor setup later
         self.__setup = setup.Setup(self)
 
@@ -33,9 +41,7 @@ class Process(Runable, Order, Item):
 
     @property
     def StreamOutputDirectory(self):
-        return os.path.join(self._RootRunable.RunDirectory, "_tmp_{0}_{1}_{2}".format(self._RootRunable._ID,
-                                                                                      self._ParentRunable._ID,
-                                                                                      self._ID))
+        return self.__output
 
     @property
     def Command(self):

@@ -14,6 +14,7 @@ import hosts.output as host
 def HasPythonPackage(self, package, msg):
 
     def _check(output):
+        output= output.split("\n")[0]
         lst = json.loads(output)
         for i in lst:
             if i['name'] == package:

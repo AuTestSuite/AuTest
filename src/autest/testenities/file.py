@@ -11,7 +11,7 @@ import autest.testers as testers
 @smart_init
 class File(TestEnity):
     '''
-    Allows us to test for a file. We can test for size, existance and content
+    Allows us to test for a file. We can test for size, existence and content
     '''
 
     @call_base(TestEnity=("runable", ))

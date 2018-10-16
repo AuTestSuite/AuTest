@@ -122,7 +122,7 @@ class Test(Runable, Order, Item):
         return self.__run_dir
 
     # public methods
-    def AddTestRun(self, name='general', displaystr=None):
+    def AddTestRun(self, displaystr=None, name='tr',):
         tmp = testrun.TestRun(self, "%s-%s" %
                               (len(self._TestRuns), name), displaystr)
         self._TestRuns.append(tmp)
