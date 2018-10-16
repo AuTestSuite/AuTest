@@ -1,7 +1,7 @@
 Reusable Gold Testing System
 ===================================
 
-Resuable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
+Reusable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
 
 Goals
 ----------------------------------
@@ -11,15 +11,15 @@ Goals
  * Adding new functionality for testing your application
  * Batch commands as a new function to make it easier to write tests
  * Define custom report outputs
-* Percise as possible error messages to make it easy to see what is wrong fast
+* Precise as possible error messages to make it easy to see what is wrong fast
 * Sandbox to make it easy to see what failed and reproduce out of test system
-* Flexibale gold file synatx to make it easier to ignore text that is not important
+* Flexible gold file synatx to make it easier to ignore text that is not important
 * Run on python 2 or 3
 
 Non-Goals
 ----------------------------------
 
-The Resuable Gold testing system is not about making another unit testing framework.
+The Reusable Gold testing system is not about making another unit testing framework.
 
 How do I get set up?
 ----------------------------------

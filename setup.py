@@ -8,8 +8,8 @@ import autest
 
 setup(name="autest",
         version=autest.__version__,
-        description="Resuable gold file testing system",
-        long_description='''Resuable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
+        description="Reusable gold file testing system",
+        long_description='''Reusable Gold testing system, or autest for short, is a testing system targeted toward gold file, command line process testing.
 
 Goals
 ----------------------------------
@@ -19,15 +19,15 @@ Goals
  * Adding new functionality for testing your application
  * Batch commands as a new function to make it easier to write tests
  * Define custom report outputs
-* Percise as possible error messages to make it easy to see what is wrong fast
+* Precise as possible error messages to make it easy to see what is wrong fast
 * Sandbox to make it easy to see what failed and reproduce out of test system
-* Flexibale gold file synatx to make it easier to ignore text that is not important
+* Flexible gold file syntax to make it easier to ignore text that is not important
 * Run on python 2 or 3
 
 Non-Goals
 ----------------------------------
 
-The Resuable Gold testing system is not about making another unit testing framework.
+The Reusable Gold testing system is not about making another unit testing framework.
         ''',
         author="Jason Kenny",
         author_email="dragon512@live.com",
