@@ -1,11 +1,13 @@
 from __future__ import absolute_import, division, print_function
+
 import os
 
-from autest.common.constructor import call_base, smart_init
 import autest.common.is_a as is_a
+import autest.testers as testers
+import hosts.output as host
+from autest.common.constructor import call_base, smart_init
 from autest.core.testenity import TestEnity
 from autest.core.testerset import TesterSet
-import autest.testers as testers
 
 
 @smart_init
@@ -193,3 +195,7 @@ class File(TestEnity):
             testers.Lambda(
                 action,
                 description_group="Appending File {0}".format(self.__name)))
+
+    def __iadd__(self, value):
+        self.Content += value
+        return self.Content

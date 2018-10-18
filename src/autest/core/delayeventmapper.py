@@ -1,8 +1,11 @@
 from __future__ import absolute_import, division, print_function
-import autest.glb as glb
-import hosts.output as host
+
+import pprint
+
 import autest.common as common
 import autest.common.is_a as is_a
+import autest.glb as glb
+import hosts.output as host
 from autest.common.constructor import call_base, smart_init
 from autest.core.testerset import TesterSet
 from autest.testers import Tester
@@ -33,7 +36,7 @@ class DelayedEventMapper(object):
         self.__addevent = {}
 
     def _RegisterTestSet(self, event_name, event_callbacks):
-        ''' 
+        '''
         differs from _Register as it on adds the callback
         it does not make a property
         '''
@@ -106,7 +109,7 @@ class DelayedEventMapper(object):
         return ret
 
     def _GetRegisteredEvent(self, key):
-        ''' 
+        '''
         return a given event mapping so we can add on to it
         '''
         try:
