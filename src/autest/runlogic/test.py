@@ -48,7 +48,7 @@ class Test_RunLogic(RunLogic):
             return False
         return True
 
-    def doStart(self, ev):
+    def doStart(self, ev, tester):
         '''
         Start up any processes we might have based on the Deafult being defined
         at the Test level there may not be any processes.
@@ -65,11 +65,11 @@ class Test_RunLogic(RunLogic):
             host.WriteVerbosef("test_logic",
                                "Test {0}: Starting of processes Failed!",
                                self.__test.Name)
-            return (True, tmp[0], tmp[1])
+            return (False, tmp[0], tmp[1])
         self.__running_processes = tmp
         host.WriteVerbosef("test_logic", "Test {0} Started!", self.__test.Name)
 
-        return (False, "No issues found", "Started!")
+        return (True, "No issues found", "Started!")
 
     def Start(self, test):
         if self.__running:

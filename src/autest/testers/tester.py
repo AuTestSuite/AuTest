@@ -21,7 +21,7 @@ class ResultType(object):
     Failed = 4
     Exception = 5
 
-    # TODO dynamically generate this? 
+    # TODO dynamically generate this?
     # @classmethod
     # def to_list():
     #     return ["Unknown", "Skipped", "Passed", "Warning", "Failed", "Exception"]
@@ -98,7 +98,7 @@ class Tester(object):
     def Bind(self):
         '''
         This is the Bind events function. Use this function to call
-        Test Directory. 
+        Test Directory.
         '''
         return self._bind
 
@@ -200,6 +200,9 @@ class Tester(object):
         '''
         return
 
+    def GetContent(self, eventinfo, test_value=None):
+        return self._GetContent(eventinfo,test_value)
+
     def _GetContent(self, eventinfo, test_value=None):
         # if test_value is None
         # we set it to the this testers object
@@ -235,7 +238,7 @@ class Tester(object):
         # if that did not work see if this
         # is a string.  If so we assume it an attribute of the event.
         # It is filename of test file otherwise.
-        
+
         if isinstance(test_value, str):
             if hasattr(eventinfo, test_value):
                 return getattr(eventinfo, test_value)

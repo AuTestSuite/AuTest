@@ -1,11 +1,11 @@
 from __future__ import absolute_import, division, print_function
+
 import traceback
+
 import hosts.output as host
-from . import tester
 from autest.exceptions.killonfailure import KillOnFailureError
 
-
-
+from . import tester
 
 
 class Lambda(tester.Tester):
@@ -19,16 +19,19 @@ class Lambda(tester.Tester):
     def test(self, eventinfo, **kw):
         # run the test function
         try:
-            result, desc, message = self.Value(eventinfo)
+            try:
+                result, desc, message = self.Value(eventinfo,self)
+            except TypeError:
+                result, desc, message = self.Value(eventinfo)
         except:
-            result, desc, message = (True, "Exception was caught!",
+            result, desc, message = (False, "Exception was caught!",
                                      traceback.format_exc())
             self.KillOnFailure = True
         self.Description = desc
         self.Reason = message
 
         # process results
-        if result:
+        if result == False:
             self.Result = tester.ResultType.Failed
             host.WriteVerbose(["testers.Lambda", "testers"], "{0} - ".format(
                 tester.ResultType.to_color_string(self.Result)), self.Reason)

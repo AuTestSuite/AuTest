@@ -31,14 +31,14 @@ class TestRun_RunLogic(RunLogic):
     def isRunning(self):
         return self.__running
 
-    def doStart(self, ev):
+    def doStart(self, ev, tester):
         # get default process
         self._default = self.__tr.Processes.Default
         # order processes
         proc_list = GenerateStartOrderedList(self._default)
         if len(proc_list) == 0:
             return (
-                True, "Generating Process list of processes to start",
+                False, "Generating Process list of processes to start",
                 'List came back empty.\n Did you define a process for test run "{0}"'.
                 format(self.__tr.DisplayString))
         idx = 0
@@ -54,7 +54,7 @@ class TestRun_RunLogic(RunLogic):
             host.WriteVerbosef("testrun_logic",
                                "TestRun {0}: Starting of processes Failed!",
                                self.__tr.Name)
-            return (True, tmp[0], tmp[1])
+            return (False, tmp[0], tmp[1])
         # get processes that are own by test object and add them to its list of
         # running processes
         self.__test_processes = [
@@ -62,7 +62,7 @@ class TestRun_RunLogic(RunLogic):
         ]
         self.__running_processes = tmp
         self.__running_default = self.__running_processes[idx]
-        return (False, "No Issues found", "Started!")
+        return (True, "No Issues found", "Started!")
 
     def Start(self, testrun):
         if self.__running:
@@ -134,7 +134,7 @@ class TestRun_RunLogic(RunLogic):
         if len(tr_processes):
             host.WriteVerbosef(['testrun_logic'],
                                "Stoping processes owned by TestRun")
-            self.StopItems(tr_processes, 
+            self.StopItems(tr_processes,
             self.__tr.ComposeVariables().Autest.StopProcessLongDelaySeconds,
             self.__tr.ComposeVariables().Autest.StopProcessShortDelaySeconds)
 

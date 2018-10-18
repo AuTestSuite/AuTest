@@ -140,7 +140,7 @@ class File(TestEnity):
                     outfile.writelines(content)
                 else:
                     content(outfile)
-            return (False, "Writing file {0}".format(self.Name), "Success")
+            return (True, "Writing file {0}".format(self.Name), "Success")
 
         if event is None:
             event = self._Runable.StartingEvent
@@ -163,7 +163,7 @@ class File(TestEnity):
                     outfile.writelines(content)
                 else:
                     content(outfile)
-            return (False, "Appending file {0}".format(self.Name), "Success")
+            return (True, "Appending file {0}".format(self.Name), "Success")
 
         if event is None:
             event = self._Runable.StartingEvent
