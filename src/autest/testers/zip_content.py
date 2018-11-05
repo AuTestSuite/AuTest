@@ -10,7 +10,7 @@ import zipfile
 
 
 class ZipContent(tester.Tester):
-    ZIP_MAGIC = '\x50\x4B\x05\x06'
+    ZIP_MAGIC = b'\x50\x4B\x05\x06'
 
     def __init__(self,
                  includes=None,
@@ -64,13 +64,9 @@ class ZipContent(tester.Tester):
                 with open(zfile, 'rb') as f:
                     content = f.read()
                 if not content.startswith(self.ZIP_MAGIC):
-                    raise zipfile.BadZipfile(
-                        ('"%s" seems to be not a zip file: ' +
-                         'it doesn\'t start with ZIP magic') % zfile)
-                if content[len(self.ZIP_MAGIC):].replace('\x00', ''):
-                    raise zipfile.BadZipfile(
-                        ('"%s" seems to be not a zip file: ' +
-                         'it\s too small but isn\'t empty inside') % zfile)
+                    raise zipfile.BadZipfile('"{0}" seems to be not a zip file: it doesn\'t start with ZIP magic'.forat(zfile))
+                if content[len(self.ZIP_MAGIC):].replace(b'\x00', b''):
+                    raise zipfile.BadZipfile('"{0}" seems to be not a zip file: it\s too small but isn\'t empty inside'.format(zfile))
                 names = ()
             else:
                 # this seems to be normal zipfile, try python zipfile now

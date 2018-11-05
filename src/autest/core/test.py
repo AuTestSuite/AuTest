@@ -123,8 +123,7 @@ class Test(Runable, Order, Item):
 
     # public methods
     def AddTestRun(self, displaystr=None, name='tr',):
-        tmp = testrun.TestRun(self, "%s-%s" %
-                              (len(self._TestRuns), name), displaystr)
+        tmp = testrun.TestRun(self, "{0}-{1}".format(len(self._TestRuns), name), displaystr)
         self._TestRuns.append(tmp)
         return tmp
 
