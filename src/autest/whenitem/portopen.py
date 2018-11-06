@@ -20,11 +20,13 @@ def PortOpen(port, address=None, timeout=None, address_family="inet4"):
     # if no port are being read.. we probally have some system issue with the library
     # and should fall back to older logic
     if netstate:
-        connections = [i.laddr for i in netstate]
+        # Address/port only ready to use if it is in LISTEN or NONE state
+        connections = [i.laddr for i in netstate if i.status == 'LISTEN' or i.status == 'NONE']
         ports = [i.port for i in connections if i.ip == address or address is None]
         if port in ports:
             ret = True
-
+        else:
+          ret = PortReady(port, address=address, timeout=timeout)
     else:
         ret = PortReady(port, address=address, timeout=timeout)
 
