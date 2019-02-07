@@ -3,6 +3,22 @@ from autest.api import AddWhenFunction
 import hosts.output as host
 import psutil
 
+def PortsOpen(ports):
+    portlst = []
+
+    for port in ports:
+        portlst.append(PortOpen(port))
+
+    return all(portlst)
+
+def PortsReady(ports):
+    portlst = []
+
+    for port in ports:
+        portlst.append(PortReady(port))
+
+    return all(portlst)
+
 
 def PortOpen(port, address=None, timeout=None, address_family="inet4"):
     '''
@@ -71,7 +87,8 @@ def PortReady(port, address=None, timeout=None):
 
     return ret
 
-
+AddWhenFunction(PortsOpen)
+AddWhenFunction(PortsReady)
 AddWhenFunction(PortOpen)
 AddWhenFunction(PortOpenv4)
 AddWhenFunction(PortOpenv6)
