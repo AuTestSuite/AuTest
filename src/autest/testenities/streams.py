@@ -70,7 +70,7 @@ class Streams(TestEnity):
 
     @property
     def stderr(self):
-        return self.__stdout
+        return self.__stderr
 
     @stderr.setter
     def stderr(self, tester):
