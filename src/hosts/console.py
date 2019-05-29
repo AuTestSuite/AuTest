@@ -24,12 +24,12 @@ class ConsoleHost(interfaces.UIHost):
 
         if os.name == 'nt':
             colorama.init(wrap=False)
-            self.__stdout__ = colorama.AnsiToWin32(sys.__stdout__).stream
-            self.__stderr__ = colorama.AnsiToWin32(sys.__stderr__).stream
+            self.__stdout__ = colorama.AnsiToWin32(sys.stdout).stream
+            self.__stderr__ = colorama.AnsiToWin32(sys.stderr).stream
         else:
             colorama.init()
-            self.__stdout__ = sys.__stdout__
-            self.__stderr__ = sys.__stderr__
+            self.__stdout__ = sys.stdout
+            self.__stderr__ = sys.stderr
 
     # our overrides
     def formatStack(self, stack):
