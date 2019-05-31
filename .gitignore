@@ -169,3 +169,4 @@ autest/_sandbox/
 _sandbox/
 .tox/
 src/env3.4/
+.mypy_cache/
