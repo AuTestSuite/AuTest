@@ -54,6 +54,8 @@ def setDefaultArgs(argparser):
     defaults = argparser.add_argument_group(
         'Console options', 'Arguments unique to console')
     defaults.add_argument(["--show-color"],
+                          dest='show_color',
+                          default=True,
                           action='store_true',
                           help="Show colored output")
 

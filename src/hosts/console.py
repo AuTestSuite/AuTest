@@ -21,17 +21,13 @@ class ConsoleHost(interfaces.UIHost):
 
         self.__verbose = [] if args.verbose is None else args.verbose
         self.__debug = [] if args.debug is None else args.debug
+        strip = not args.show_color
+        colorama.init(wrap=False)
 
-        if os.name == 'nt':
-            colorama.init(wrap=False)
-            self.__stdout__ = colorama.AnsiToWin32(sys.stdout).stream
-            self.__stderr__ = colorama.AnsiToWin32(sys.stderr).stream
-        else:
-            colorama.init()
-            self.__stdout__ = sys.stdout
-            self.__stderr__ = sys.stderr
+        # our overrides
+        self.__stdout__ = sys.stdout = colorama.AnsiToWin32(sys.stdout, strip=strip, convert=False).stream
+        self.__stderr__ = sys.stderr = colorama.AnsiToWin32(sys.stderr, strip=strip, convert=False).stream
 
-    # our overrides
     def formatStack(self, stack):
 
         if stack is None:
@@ -90,6 +86,7 @@ class ConsoleHost(interfaces.UIHost):
 
 
 # class C io streams
+
 
     def writeStdOut(self, msg):
         self.__stdout__.write(msg.replace(reset_stream, ""))
