@@ -199,6 +199,8 @@ class Process_RunLogic(RunLogic):
 
     def Cleanup(self):
         if self.__call_cleanup:
+            host.WriteVerbosef(['process'], 'Cleanup process {0}',
+                               self._process.Name)
             self._process._isRunning(False)
             self.__call_cleanup = False
             if self.__proc is None:
@@ -207,9 +209,11 @@ class Process_RunLogic(RunLogic):
                         self._process.StreamOutputDirectory,
                         self._process.RawCommand, self._process.ComposeEnv())
 
+                self._process.CleanupEvent(eventinfo.CleanupInfo())
                 event_info = eventinfo.ProcessFinishedInfo(0, None,
                                                            self.__output)
             else:
+                self._process.CleanupEvent(eventinfo.CleanupInfo())
                 event_info = eventinfo.ProcessFinishedInfo(
                     time.time() - self.__start_time, self.__proc.returncode,
                     self.__output)
