@@ -7,10 +7,11 @@ def RegisterFileType(cls, typename, ext=[]):
     '''
     Registers a file class to be use instead of the default file class
     based on a type field or file ext of the file being created.
-    This allow for more functional file classes to be defined allowing for 
+    This allow for more functional file classes to be defined allowing for
     better testing or and logic to deal with various set of needs
     '''
-
+    if not glb.running_main:
+        return
     # imported here to break import cycle
     from autest.testenities.file import File
 

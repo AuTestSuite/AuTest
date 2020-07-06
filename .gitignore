@@ -164,9 +164,13 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
 autest/browse.VC.db
 autest/_sandbox/
 _sandbox/
 .tox/
 src/env3.4/
 .mypy_cache/
+docsrc/source/_build/
+
+Pipfile.lock

@@ -2,18 +2,18 @@ from __future__ import absolute_import, division, print_function
 import os
 
 from autest.common.constructor import call_base, smart_init
-from autest.core.testenity import TestEnity
+from autest.core.testentity import TestEntity
 import autest.testers as testers
 from autest.core.testerset import TesterSet
 
 
 @smart_init
-class Directory(TestEnity):
+class Directory(TestEntity):
     '''
-    Allows us to test for a file. We can test for existance
+    Allows us to test for a file. We can test for existence
     '''
 
-    @call_base(TestEnity=("runable", ))
+    @call_base(TestEntity=("runable", ))
     def __init__(self, runable, name, exists=True, runtime=True):
         self.__name = name
         self.__runtime = runtime
@@ -41,7 +41,8 @@ class Directory(TestEnity):
     @property
     def AbsPath(self):
         '''
-        The absolute path of the file, runtime value
+        Absolute path of the file based on the default runtime behavior.
+        This is normally the runtime path which maps to the sandbox directory.
         '''
         if self.__runtime:
             return self.AbsRunTimePath
@@ -50,7 +51,7 @@ class Directory(TestEnity):
     @property
     def AbsRunTimePath(self):
         '''
-        The absolute path of the file, based on Runtime sandbox location
+        Absolute path of the file based on the runtime path which maps to the sandbox directory.
         '''
         return os.path.normpath(
             os.path.join(self._RootRunable.RunDirectory, self.Name))
@@ -58,11 +59,19 @@ class Directory(TestEnity):
     @property
     def AbsTestPath(self):
         '''
-        The absolute path of the file, based on directory relative form the test file location
+        Absolute path of the file based on the test path or the location in which the original test file exists.
+
         '''
         return os.path.normpath(
             os.path.join(self._RootRunable.TestDirectory, self.Name))
 
     @property
     def Name(self):
+        '''
+        The name of the file.
+        This is general the path to the file relative to the testing or runtime root.
+        It can be an absolute path as well given the file was defined that way
+
+        :getter: returns the name
+        '''
         return self.__name

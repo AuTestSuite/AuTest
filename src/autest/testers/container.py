@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+from typing import Optional
 import hosts.output as host
 from . import tester
 from autest.exceptions.killonfailure import KillOnFailureError
@@ -81,6 +81,30 @@ class _Container(tester.Tester):
 
 
 class Any(_Container):
+    '''
+    Passes if any of the provided Tester passes.
+    Provided in as a Global to help with ease of use.
+
+    Args:
+        *lst:
+            The function list of all Testers provided
+
+    Example:
+
+        Test is the return code is 0 or 5
+
+        .. code:: python3
+
+            tr.Processes.Default.ReturnCode = Any(0,5)
+
+
+        Test that the stdout stream of process match one of two possible gold files
+
+        .. code:: python3
+
+            tr.Processes.Default.Streams.stdin = All("gold/hello1.gold", "gold/hello2.gold")
+
+    '''
 
     def __init__(self, *lst):
         super(Any, self).__init__(
@@ -104,6 +128,42 @@ class Any(_Container):
 
 
 class All(_Container):
+    '''
+    Passes if all of the provided Tester pass.
+    This can also be achieved in many cases by just using the `+=` operator on the testable property.
+    Provided in as a Global to help with ease of use.
+
+    Args:
+        *lst:
+            The function list of all Testers provided
+
+    Example:
+
+        Test is the File object
+
+        .. code:: python3
+
+            f = Test.Disk.File("foo.txt")
+            f.Content = All(
+                            Testers.ContainsExpression("value1", 'Has value1')
+                            Testers.ContainsExpression("value2", 'Has value2')
+                            )
+            # this is the same as saying...
+            f.Content = Testers.ContainsExpression("value1", 'Has value1')
+            f.Content += Testers.ContainsExpression("value2", 'Has value2')
+
+
+        Test that the stdout stream of process match a gold files and does not contain an expression.
+        In this case the gold file might have a wild card for a data section, which normally can be ignored,
+        unless it contains a certain values.
+
+        .. code:: python3
+
+            tr.Processes.Default.Streams.stdin = All(
+                "gold/hello1.gold",
+                Testers.ExcludesExpression("bad value", "Does not contain 'bad value'")
+                )
+    '''
 
     def __init__(self, *lst):
         super(All, self).__init__(
@@ -124,13 +184,28 @@ class All(_Container):
 
 
 class Not(_Container):
+    '''
+    Results in the negation of the Test as passing.
+    The Python not operator `!` cannot be used as it results in immediate result.
+    This allows for a delay result needed for composing more complex tester logic.
+    Provided in as a Global to help with ease of use.
+
+    Example:
+
+        Test is the return code is a non-zero value
+
+        .. code:: python3
+
+            tr.Processes.Default.ReturnCode = Not(0)
+
+    '''
 
     def __init__(self, tester):
         super(Not, self).__init__(
             tester, description="Checking that negation of the test")
 
     def test(self, eventinfo, **kw):
-        t = self._testers[0]        
+        t = self._testers[0]
         try:
             t.test(eventinfo, **kw)
         except KillOnFailureError:

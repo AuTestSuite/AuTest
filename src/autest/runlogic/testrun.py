@@ -13,7 +13,6 @@ from autest.core.eventinfo import *
 from autest.exceptions.killonfailure import KillOnFailureError
 
 
-
 @smart_init
 class TestRun_RunLogic(RunLogic):
     # runs a given test
@@ -113,12 +112,21 @@ class TestRun_RunLogic(RunLogic):
     def Poll(self):
         if not self.__running:
             return False
-        # wait for default process stop
-        if self.__running_default.isRunning():
-            self.PollItems(self.__running_processes)
+
+        try:
             # call running event
-            self.__tr.RunningEvent(RunningInfo(self.__start_time, time.time(),RunlogicWrapper(self)))
-            return True
+            self.__tr.RunningEvent(RunningInfo(self.__start_time, time.time(), RunlogicWrapper(self)))
+
+            # wait for default process stop
+            if self.__running_default.isRunning():
+                # poll cany process
+                self.PollItems(self.__running_processes)
+                return True
+
+        except KillOnFailureError:
+            # if we catch this here .. whole test has to stop
+            # stop current run
+            self.Stop()
 
         # call poll to allow all event to go off
         self.__running_default.Poll()
@@ -133,10 +141,10 @@ class TestRun_RunLogic(RunLogic):
         # check for all processes to end within a time frame
         if len(tr_processes):
             host.WriteVerbosef(['testrun_logic'],
-                               "Stoping processes owned by TestRun")
+                               "Stopping processes owned by TestRun")
             self.StopItems(tr_processes,
-            self.__tr.ComposeVariables().Autest.StopProcessLongDelaySeconds,
-            self.__tr.ComposeVariables().Autest.StopProcessShortDelaySeconds)
+                           self.__tr.ComposeVariables().Autest.StopProcessLongDelaySeconds,
+                           self.__tr.ComposeVariables().Autest.StopProcessShortDelaySeconds)
 
         # call finished event
         if self.__start_time:

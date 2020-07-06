@@ -1,15 +1,15 @@
 from __future__ import absolute_import, division, print_function
 import hosts.output as host
 from autest.common.constructor import call_base, smart_init
-from autest.core.testenity import TestEnity
+from autest.core.testentity import TestEntity
 import autest.testers as testers
 from .process import Process
 
 
 @smart_init
-class Processes(TestEnity):
+class Processes(TestEntity):
 
-    @call_base(TestEnity=("runable", ))
+    @call_base(TestEntity=("runable", ))
     def __init__(self, runable):
 
         self.__processes = {}
@@ -26,6 +26,10 @@ class Processes(TestEnity):
     def _Items(self):
         return self.__processes.values()
 
+    @property
+    def _has_default(self):
+        return self.__default != None
+
     def Process(
             self,
             name,
@@ -33,7 +37,17 @@ class Processes(TestEnity):
             returncode=None,
             startup_timeout=10,  # default to 10 second as most things should be ready by this time
     ):
-        # todo ... add check to make sure id a varaible safe
+        '''
+        Define a new process for the test handle.
+
+        Args:
+            name: The name of the process to run. This is just an identifier to use to refer to the process object
+            cmdstr: Optional command to run for this process. This can be define latter via the Command property
+            returncode: Optional value to test the process return code value with
+            startup_timeout: Optional amount of time in seconds for autest to wait for the process to start and be considered ready before erroring out.
+
+        '''
+        # todo ... add check to make sure id a variable safe
 
         # create Process object
         tmp = Process(self._Runable, name, cmdstr)
@@ -62,13 +76,27 @@ class Processes(TestEnity):
 
     @property
     def Default(self):
+        '''
+        The process that would be run by default.
+
+        .. note::
+
+            Only the default process will be run by default.
+            Processes defined at a test level don't have to define a default process.
+            Processes define as part of the TestRun object must define a default process.
+            Other process will not start by default and have to be define to StartBefore or StartAfter the default process
+            or a process the is connected to the default process.
+        '''
         if self.__default is None:
             self.__default = self.Process("Default")
-            self.__processes["default"] = self.__default
         return self.__default
+
+
+    def __getitem__(self,key):
+        return self.__dict__[key]
 
 
 import autest.api
 from autest.core.test import Test
 from autest.core.testrun import TestRun
-autest.api.AddTestEnityMember(Processes, classes=[Test, TestRun])
+autest.api.AddTestEntityMember(Processes, classes=[Test, TestRun])

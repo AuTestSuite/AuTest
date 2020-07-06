@@ -7,19 +7,19 @@ import hosts.output as host
 # helper functions
 
 
-def indentStr(str, indent, preindent=None):
+def indentStr(strobj, indent, preindent=None):
     indentstr = " " * indent
     if preindent is None:
         preindent = indentstr
     else:
         preindent = " " * preindent
-    if str:
+    if strobj:
         # add to indent to beginning and replace all \n with \n and extra spaces
         # to prevent \n propagation remove all \n at end and add only one \n
         tmp = preindent + \
-            str.replace("\n", "\n" + indentstr).rstrip(" ").rstrip("\n") + "\n"
+            strobj.replace("\n", "\n" + indentstr).rstrip(" ").rstrip("\n") + "\n"
         return tmp
-    return str
+    return strobj
 
 
 ###########################################
@@ -257,3 +257,4 @@ import autest.api as api
 
 api.RegisterReporter(GenerateReport, name="default")
 api.RegisterReporter(GenerateReport, name="color-console")
+

@@ -12,10 +12,10 @@ from autest.testers import Tester
 
 # this is base class to add common logic for when I need to
 # delay adding the event mapping.  The reason or this would be cases
-# in which more than one value coudl be mapped in a file, but only on can exist in the event
+# in which more than one value could be mapped in a file, but only on can exist in the event
 # in cases like this we can make sure the correct logic exists for mapping the first
 # or last value only.  Likewise handling cases in which I would want to make more than one
-# event can be handled correctly as well.  The second factor this adds is some debug ablity
+# event can be handled correctly as well.  The second factor this adds is some debug ability
 # on what is being mapped to the event
 
 # this class defines an interface for registering events to the Runable object
@@ -60,11 +60,11 @@ class DelayedEventMapper(object):
                     for v in value:
                         if isinstance(value, Tester):
                             value.Bind = self
-                        obj.add(v)
+                        obj.Add(v)
                 else:
                     if isinstance(value, Tester):
                         value.Bind = self
-                    obj.assign(value)
+                    obj.Assign(value)
 
         property_name = common.make_list(property_name)
         for p in property_name:

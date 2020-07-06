@@ -1,10 +1,14 @@
 from __future__ import absolute_import, division, print_function
 
+import autest.glb as glb
 import hosts.output as host
 from autest.core.conditions import ConditionFactory
 
 
 def ExtendCondition(func, name=None):
+    if not glb.running_main:
+        return
+
     if name is None:
         name = func.__name__
 

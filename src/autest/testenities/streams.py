@@ -6,7 +6,7 @@ import autest.api
 import autest.core.streamwriter as streamwriter
 import autest.testers as testers
 from autest.common.constructor import call_base, smart_init
-from autest.core.testenity import TestEnity
+from autest.core.testentity import TestEntity
 from autest.core.testerset import TesterSet
 
 from .file import File
@@ -14,8 +14,8 @@ from .process import Process
 
 
 @smart_init
-class Streams(TestEnity):
-    @call_base(TestEnity=("runable", ))
+class Streams(TestEntity):
+    @call_base(TestEntity=("runable", ))
     def __init__(self, runable):
 
         self.__all = File(
@@ -117,4 +117,4 @@ class Streams(TestEnity):
         self.__verbose.Content = tester
 
 
-autest.api.AddTestEnityMember(Streams, classes=[Process])
+autest.api.AddTestEntityMember(Streams, classes=[Process])

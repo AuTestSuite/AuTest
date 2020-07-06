@@ -2,18 +2,20 @@ from __future__ import absolute_import, division, print_function
 
 import hosts.output as host
 import autest.glb as glb
-from autest.core.testenity import TestEnity
+from autest.core.testentity import TestEntity
 from autest.core.test import Test
 from autest.core.testrun import TestRun
 
 
-def AddTestEnityMember(clsobj, name=None, classes=None):
+def AddTestEntityMember(clsobj, name=None, classes=None):
+    if not glb.running_main:
+        return
     # imported here to break import cycle
     from autest.testenities.process import Process
 
-    if not issubclass(clsobj, TestEnity):
+    if not issubclass(clsobj, TestEntity):
         host.WriteError(
-            "Object must be subclass of autest.core.testenity.TestEnity")
+            "Object must be subclass of autest.core.testentity.TestEntity")
 
     # get name of task if user did not provide a value
     if name is None:

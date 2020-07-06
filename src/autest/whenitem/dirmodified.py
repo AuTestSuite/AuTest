@@ -1,26 +1,29 @@
-from os.path import getmtime
-from os import getcwd
-from os.path import realpath
-import os
 
+import os
+from typing import Union
 from autest.api import AddWhenFunction
 from autest.testenities.directory import Directory
 import hosts.output as host
 
 
-def DirectoryExists(directory_input):
-    if isinstance(directory_input, Directory):    # directory object
-        directory_input = directory_input.AbsPath
+def DirectoryExists(directory_path: Union[str, Directory]):
+    '''
+    Tests to see if the directory has exists.
+
+    Args:
+        directory_path: The path to the directory to test
+
+    '''
+    if isinstance(directory_path, Directory):    # directory object
+        directory_path = directory_path.AbsPath
 
     def directory_exists(process, **kw):
-
-        if os.path.isabs(directory_input):    # absolute path
-            directory_path = directory_input
-        else:                            # relative path
+        #pylint: disable=unused-argument
+        if not os.path.isabs(directory_path):
             directory_path = os.path.normpath(
                 os.path.join(
                     process.RunDirectory,
-                    directory_input
+                    directory_path
                 )
             )
 
@@ -34,19 +37,25 @@ def DirectoryExists(directory_input):
     return directory_exists
 
 
-def DirectoryNotExists(directory_input):
-    if isinstance(directory_input, Directory):    # directory object
-        directory_input = directory_input.AbsPath
+def DirectoryNotExists(directory_path: Union[str, Directory]):
+    '''
+    Tests to see if the directory does not exist.
+
+    Args:
+        directory_path: The path to the directory to test
+
+    '''
+    if isinstance(directory_path, Directory):    # directory object
+        directory_path = directory_path.AbsPath
 
     def directory_not_exists(process, **kw):
+        #pylint: disable=unused-argument
 
-        if os.path.isabs(directory_input):    # absolute path
-            directory_path = directory_input
-        else:                            # relative path
+        if not os.path.isabs(directory_path):
             directory_path = os.path.normpath(
                 os.path.join(
                     process.RunDirectory,
-                    directory_input
+                    directory_path
                 )
             )
 
@@ -60,26 +69,37 @@ def DirectoryNotExists(directory_input):
     return directory_not_exists
 
 
-def DirectoryModified(directory_input):
-    if isinstance(directory_input, Directory):    # directory object
-        directory_input = directory_input.AbsPath
+# todo add tests for removal
+# todo add logic to do a recursive check?
+def DirectoryModified(directory_path: Union[str, Directory]):
+    '''
+    Tests to see if the directory has been modified.
+    The change is done via checking for a time stamp difference.
+    On most operating systems this only changes when a file or directory was added,
+    or removed in that directory, not and subdirectories below it.
+    If the directory does not exist, then it will test for existence of the directory
+
+    Args:
+        file_path: The path to the file to test
+
+    '''
+    if isinstance(directory_path, Directory):    # directory object
+        directory_path = directory_path.AbsPath
 
     state = {}
 
     def directory_is_modified(process, **kw):
-
-        if os.path.isabs(directory_input):    # absolute path
-            directory_path = directory_input
-        else:                            # relative path
+        #pylint: disable=unused-argument
+        if not os.path.isabs(directory_path):
             directory_path = os.path.normpath(
                 os.path.join(
                     process.RunDirectory,
-                    directory_input
+                    directory_path
                 )
             )
 
         if os.path.isdir(directory_path):
-            current_mtime = getmtime(directory_path)
+            current_mtime = os.path.getmtime(directory_path)
         else:
             host.WriteDebug(["DirectoryModified", "when"],
                             "directory '{0}' does not exist yet".format(directory_path))

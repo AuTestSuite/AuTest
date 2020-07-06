@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 from autest.common.constructor import call_base, smart_init
-from autest.core.testenity import TestEnity
+from autest.core.testentity import TestEntity
 from autest.core.testerset import TesterSet
 import autest.testers as testers
 import autest.core.process as process
@@ -14,8 +14,8 @@ except NameError:
 
 
 @smart_init
-class Process(process.Process, TestEnity):
-    @call_base(TestEnity=(), Process=("runable", "name", "cmdstr"))
+class Process(process.Process, TestEntity):
+    @call_base(TestEntity=(), Process=("runable", "name", "cmdstr"))
     def __init__(self, runable, name, cmdstr=None):
         self.__streams = object()
         self.__is_running = False
@@ -37,8 +37,16 @@ class Process(process.Process, TestEnity):
                 "TotalRunTime",
                 self.RunningEvent,
                 converter=float,
-                kill_on_failure=True),
+                kill_on_failure=True,
+                description_group="Time-Out",
+                description="Process finishes within expected time"),
             "TimeOut")
+
+        timeout = self.Variables.Autest.Process.TimeOut
+
+        if timeout is not None:
+            self.TimeOut = timeout
+
         # Time
         self._Register(
             "Process.{0}.Time".format(self.Name),
@@ -65,7 +73,7 @@ class Process(process.Process, TestEnity):
 
 
 # some forwarding functions...
-# for backward compatiblity
+# for backward compatibility
 def Command(self, cmdstr):
     self.Processes.Default.Command = cmdstr
 
@@ -82,14 +90,14 @@ def Time(self, val):
     self.Processes.Default.Time = val
 
 
-def TimeOut(self, val):
-    self.Processes.Default.TimeOut = val
+#def TimeOut(self, val):
+    #self.Processes.Default.TimeOut = val
 
 
-# for backward compatiblity
+# for backward compatibility
 
 
-class Streams(TestEnity):
+class Streams(TestEntity):
     def __init__(self, testrun):
         super(Streams, self).__init__(testrun)
 
@@ -152,9 +160,9 @@ class Streams(TestEnity):
 
 import autest.api
 from autest.core.testrun import TestRun
-autest.api.AddTestEnityMember(Streams, classes=[TestRun])
+autest.api.AddTestEntityMember(Streams, classes=[TestRun])
 autest.api.ExtendTestRun(Command, setproperty=True)
 autest.api.ExtendTestRun(RawCommand, setproperty=True)
 autest.api.ExtendTestRun(ReturnCode, setproperty=True)
 autest.api.ExtendTestRun(Time, setproperty=True)
-autest.api.ExtendTestRun(TimeOut, setproperty=True)
+#autest.api.ExtendTestRun(TimeOut, setproperty=True)

@@ -1,5 +1,5 @@
 
-from __future__ import absolute_import, division, print_function
+import autest.glb as glb
 
 import sys
 import os
@@ -19,6 +19,7 @@ import autest.api as api
 
 
 def main():
+    glb.running_main = True
     # set default subcommand to run if there are none present
     if len(sys.argv) >= 2:
         if '-' in sys.argv[1] and sys.argv[1] not in ['-h', '--help']:
@@ -30,7 +31,7 @@ def main():
     setup = Settings()
 
     run = setup.add_command("run", help='(Default Option) Runs tests')
-    list = setup.add_command("list", help='Lists all the test available to Autest')
+    list_cmd = setup.add_command("list", help='Lists all the test available to Autest')
 
     setup.path_argument(
         ["-D", "--directory"],
@@ -88,7 +89,7 @@ def main():
         help='Normalizes the exit code when a process is given SIGKILL'
     )
 
-    list.add_argument(
+    list_cmd.add_argument(
         ['--json'],
         action='store_true',
         help="outputs the list of available tests in JSON format"
@@ -109,6 +110,21 @@ def main():
             'StopProcessShortDelaySeconds': 1,
             #  delay after control-c before kill
             'KillDelaySecond': 10,  # most programs should finish in tens second
+
+            'Process' : Variables({
+                # time each test process is allowed to run before we stop it.
+                'TimeOut': 600 # default to 600 seconds 10 minutes.
+            }),
+
+            'TestRun' : Variables({
+                # time each test is allowed to run before we stop it.
+                'TimeOut': None # default run forever
+            }),
+
+            'Test' : Variables({
+                # time each test is allowed to run before we stop it.
+                'TimeOut': None # default run forever
+            }),
 
             ########################
             # Process Spawning
@@ -207,7 +223,7 @@ def main():
             }
             execfile.execFile(options_file, _locals, _locals)
 
-    # reset sys.path to orginal value
+    # reset sys.path to original value
     sys.path = old_path
 
     # setup command specific arguments
@@ -265,4 +281,5 @@ def main():
 
 
 if __name__ == '__main__':
+    #print("calling main")
     main()

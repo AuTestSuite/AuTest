@@ -9,7 +9,7 @@ from .metaclass import _test_enity__metaclass__
 # This is the base class for any item that defines some set of tests
 # on some runable object
 @smart_init
-class TestEnity((with_metaclass(_test_enity__metaclass__, object))):
+class TestEntity((with_metaclass(_test_enity__metaclass__, object))):
 
     @call_base()
     def __init__(self, runable=None):

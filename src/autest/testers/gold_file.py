@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+from typing import Optional
 import difflib
 import json
 
@@ -16,13 +16,47 @@ def equalToEscape(val):
 
 
 class GoldFile(tester.Tester):
+    '''
+    Tests if a file matches expected results via comparing a file or stream output with the content of the gold file.
+    The gold file can contain wild card statement of `{}` or `\`\`` to tell the testing logic that differences
+    in the area are to be ignored.
+
+    Args:
+        goldfile: the gold file to be used for the test. Assumed to relative to the location of the test file.
+        test_value:
+            The runtime value we will test.
+            This is normally a string that is used to reference the eventinfo object for a runtime value.
+            However it might be a user defined value, such as a path to a file.
+            It can also be a function that will be called to return the expected content to test against.
+        kill_on_failure:
+            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            This should only be used in cases when a failure mean we really need to do a hard stop.
+            For example need to stop because the test ran to long.
+        normalize_eol:
+            If True will normalize the `\\\\r\\\\n` sequences to `\\\\n` to help with common differences between different operating system such as Unix or Windows systems. If False no normalizing will happen.
+        description_group:
+            This is extra information about the file, process, etc that might be useful to give the test more context, should be in form of 'Type: name', ie 'Process: proc1'
+        description:
+            This is what we are testing such as "Testing return code is 5" or "Checking file file X exists"
+
+
+    Examples:
+
+        Test a gold file with new normalization of new line of /r/n to /n
+
+        .. code:: python
+
+            tr.Processes.Default.stdout= Testers.GoldFile("gold/exists.gold", normalize_eol=True)
+
+    '''
+
     def __init__(self,
-                 goldfile,
-                 test_value=None,
-                 kill_on_failure=False,
-                 normalize_eol=True,
-                 description_group=None,
-                 description=None):
+                 goldfile:str,
+                 test_value:Optional[str]=None,
+                 kill_on_failure:bool=False,
+                 normalize_eol:bool=True,
+                 description_group:str=None,
+                 description:Optional[str]=None):
         if description is None:
             description = "Checking that {0} matches {1}".format(test_value,
                                                                  goldfile)

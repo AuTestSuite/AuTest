@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+sphinx = "*"
+pylint = "*"
+mypy = "*"
+autopep8 = "*"
+sphinx-autodoc-typehints = "*"
+doc8 = "*"
+
+[packages]
+autest = {editable = true,path = "."}
+
+[requires]
+python_version = "3"

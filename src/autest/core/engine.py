@@ -100,8 +100,8 @@ class Engine(object):
                 'AddTester': api.AddTester,
                 'SetupTask': setupitem.SetupItem,  # backward compat
                 'SetupItem': setupitem.SetupItem,
-                'AddTestRunMember': api.AddTestEnityMember,  # backward compat
-                'AddTestEnityMember': api.AddTestEnityMember,
+                'AddTestRunMember': api.AddTestEntityMember,  # backward compat
+                'AddTestEntityMember': api.AddTestEntityMember,
                 'ExtendCondition': api.ExtendCondition,
                 'AddWhenFunction': api.AddWhenFunction,
                 'AddMethodToInstance': api.AddMethodToInstance,
@@ -190,13 +190,13 @@ class Engine(object):
     def _make_report(self):
         info = report.ReportInfo(self.__tests.values())
         host.WriteMessage("\nGenerating Report: --------------")
-
+        
         for r in self.__reporters:
             func = glb.reporters.get(r)
             if func:
                 func(info)
             else:
-                host.WriteWarningf("Reported {0} not registered", r)
+                host.WriteWarningf("Reporter {0} not registered", r)
 
         # test to see if we have some failures or all failures
         if info.TotalPassCount == 0 and info.TotalTestCount:

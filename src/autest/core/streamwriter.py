@@ -13,7 +13,7 @@ class PipeRedirector(object):
     '''
     This class redirects and output stream to stream handler that can then process the data on
     the different streams provided by the uihost. In the case of the command that this is used
-    for this primarly lets us sort the data into different stream files for testing purposes
+    for this primarily lets us sort the data into different stream files for testing purposes
     '''
 
     def _readerthread(self):

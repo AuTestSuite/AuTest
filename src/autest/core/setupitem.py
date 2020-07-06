@@ -124,8 +124,6 @@ class SetupItem(object):
 
         proc.wait()
 
-
-
         # clean up redirectory objects for this run
         stdout.close()
         stderr.close()
@@ -176,7 +174,7 @@ class SetupItem(object):
             raise SetupError("Cannot copy {0} to {1} because {2}".format(
                 source, targetdir, str(e)))
 
-    def MakeDir(self, path, mode=None):
+    def MakeDir(self, path, mode: int = None):
         # check if the path given is in the sandbox if abs
         self._in_sandbox(path)
         # if abs path isn't specified then put it in the sandbox

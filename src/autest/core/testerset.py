@@ -12,7 +12,7 @@ class TesterSet(object):
     hold the set of items to be bound for a given named object
     '''
     @call_base()
-    def __init__(self, default_tester, testvalue, event, converter=None, kill_on_failure=False, description_group=None, description=None,):
+    def __init__(self, default_tester, testvalue, event, converter=None, kill_on_failure=False, description_group=None, description=None):
         self._event = event
         self._kill_on_failure = kill_on_failure
         self._description = description
@@ -44,12 +44,16 @@ class TesterSet(object):
             tester.KillOnFailure = self._kill_on_failure
         return tester
 
-    def assign(self, value):
+    def Assign(self, value):
         self._testers = [self._create_tester(value)]
         return self
 
-    def add(self, value):
+    def Add(self, value):
         self._testers += [self._create_tester(value)]
+        return self
+
+    def Clear(self):
+        self._testers= []
         return self
 
     def _bind(self):
@@ -58,4 +62,4 @@ class TesterSet(object):
 
     # operators
     def __iadd__(self, value):
-        return self.add(value)
+        return self.Add(value)

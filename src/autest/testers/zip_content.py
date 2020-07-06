@@ -1,22 +1,70 @@
-from . import tester
-import hosts.output as host
-from autest.exceptions.killonfailure import KillOnFailureError
-
 import os
 import tarfile
 import zipfile
+from typing import List, Optional
+
+import hosts.output as host
+from autest.exceptions.killonfailure import KillOnFailureError
+
+from . import tester
 
 # update this to allow for basic file wildcard patterns with * and ?
 
 
 class ZipContent(tester.Tester):
+    '''
+    Tests that a compressed archived contains or excludes a give entry. Supported archive types are:
+     * .bz2
+     * .tar.gz
+     * .tgz
+     * .tar.bz2
+     * .tbz
+     * .tb2
+     * .zip
+
+    Args:
+        includes:
+            A list of one more path relative of from the archive root of the entity to test to exist.
+        excludes:
+            A list of one more path relative of from the archive root of the entity to test to not exist.
+        kill_on_failure:
+            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            This should only be used in cases when a failure mean we really need to do a hard stop.
+            For example need to stop because the test ran to long.
+        description_group:
+            Optional value used to help provide better context in the test message.
+
+    Examples:
+
+        Test if a zip file contains a certain files.
+
+        .. code:: python3
+
+            contains = ['lorem.txt', 'lorem3/lorem.txt', 'lorem2.txt']
+            content_tester = Testers.ZipContent(includes=contains)
+            t.Disk.File("lorem.zip", exists=True, content=content_tester)
+
+        Another example of the above using the File object directly
+
+        .. code:: python3
+
+            tar = t.Disk.File("lorem.tar.gz")
+            contains = ['lorem.txt', 'lorem3/lorem.txt', 'lorem2.txt']
+            tar.content = Testers.ZipContent(includes=contains)
+
+
+    '''
+
     ZIP_MAGIC = b'\x50\x4B\x05\x06'
 
-    def __init__(self,
-                 includes=None,
-                 excludes=None,
-                 kill_on_failure=False,
-                 description_group=None):
+    def __init__(
+        self,
+        includes: Optional[List[str]] = None,
+        excludes: Optional[List[str]] = None,
+        kill_on_failure: bool = False,
+        description_group: Optional[str] = None
+    ):
+
         self.__include = includes or ()
         self.__exclude = excludes or ()
         super(ZipContent, self).__init__(
@@ -64,9 +112,10 @@ class ZipContent(tester.Tester):
                 with open(zfile, 'rb') as f:
                     content = f.read()
                 if not content.startswith(self.ZIP_MAGIC):
-                    raise zipfile.BadZipfile('"{0}" seems to be not a zip file: it doesn\'t start with ZIP magic'.forat(zfile))
+                    raise zipfile.BadZipfile('"{0}" seems to be not a zip file: it doesn\'t start with ZIP magic'.format(zfile))
                 if content[len(self.ZIP_MAGIC):].replace(b'\x00', b''):
-                    raise zipfile.BadZipfile('"{0}" seems to be not a zip file: it\s too small but isn\'t empty inside'.format(zfile))
+                    raise zipfile.BadZipfile(
+                        '"{0}" seems to be not a zip file: it\'s too small but isn\'t empty inside'.format(zfile))
                 names = ()
             else:
                 # this seems to be normal zipfile, try python zipfile now

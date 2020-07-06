@@ -6,17 +6,18 @@ import autest.common.is_a as is_a
 import autest.testers as testers
 import hosts.output as host
 from autest.common.constructor import call_base, smart_init
-from autest.core.testenity import TestEnity
+from autest.core.testentity import TestEntity
 from autest.core.testerset import TesterSet
 
+'''
+    Allows us to test for a file. We can test for size, existence and content
+'''
 
 @smart_init
-class File(TestEnity):
-    '''
-    Allows us to test for a file. We can test for size, existence and content
-    '''
+class File(TestEntity):
 
-    @call_base(TestEnity=("runable", ))
+
+    @call_base(TestEntity=("runable", ))
     def __init__(self,
                  runable,
                  name,
@@ -94,7 +95,8 @@ class File(TestEnity):
     @property
     def AbsPath(self):
         '''
-        The absolute path of the file, runtime value
+        Absolute path of the file based on the default runtime behavior.
+        This is normally the runtime path which maps to the sandbox directory.
         '''
         if self.__runtime:
             return self.AbsRunTimePath
@@ -103,7 +105,7 @@ class File(TestEnity):
     @property
     def AbsRunTimePath(self):
         '''
-        The absolute path of the file, based on Runtime sandbox location
+        Absolute path of the file based on the runtime path which maps to the sandbox directory.
         '''
         return os.path.normpath(
             os.path.join(self._RootRunable.RunDirectory, self.Name))
@@ -111,13 +113,21 @@ class File(TestEnity):
     @property
     def AbsTestPath(self):
         '''
-        The absolute path of the file, based on directory relative from the test file location
+        Absolute path of the file based on the test path or the location in which the original test file exists.
         '''
         return os.path.normpath(
             os.path.join(self._RootRunable.TestDirectory, self.Name))
 
     @property
-    def Name(self):
+    def Name(self) -> str:
+        '''
+        The name of the file.
+        This is general the path to the file relative to the testing or runtime root.
+        It can be an absolute path as well given the file was defined that way.
+
+        :getter: Returns name of file
+
+        '''
         return self.__name
 
     @Name.setter
@@ -125,6 +135,12 @@ class File(TestEnity):
         self.__name = val
 
     def GetSize(self):
+        '''
+        The size of the file items in bytes.
+
+        returns:
+            The size in bytes or None if it does not exist.
+        '''
         try:
             statinfo = os.stat(self.AbsPath)
             return statinfo.st_size
@@ -132,7 +148,32 @@ class File(TestEnity):
             return None
 
     def WriteOn(self, content, event=None):
-        # content is a string or function taking a file handle
+        '''
+        Writes out content to a replacing any existing content in the file.
+
+        Args:
+            content:
+                A string containing the content to write
+                A function can be provided that will write the data itself.
+                This function takes accepts one argument of the file object
+                to use to write to the file.
+
+
+            event:
+                The event that the write should be trigger with.
+                By default, this is the Starting event.
+
+
+        Examples:
+
+            Write new data in a file
+
+            .. code:: python
+
+                f = tr.Disk.File("data.json")
+                d.WriteOn("{data=1}")
+        '''
+
         def action(ev):
             path = os.path.split(self.AbsRunTimePath)[0]
             if not os.path.exists(path):
@@ -155,6 +196,30 @@ class File(TestEnity):
                 description_group="Writing File {0}".format(self.__name)))
 
     def WriteAppendOn(self, content, event=None):
+        '''
+        Append content to a file.
+        If the file does not exist, it will create a new file.
+
+        Args:
+            content:
+                A string containing the content to write
+                A function can be provided that will write the data itself.
+                This function takes accepts one argument of the file object
+                to use to write to the file.
+
+            event:
+                The event it should write on.
+                By default, this is the Starting event.
+
+        Examples:
+
+            Write new data in a file, causing it to be different on different event
+
+            .. code:: python
+
+                f = tr.Disk.File("foo.c")
+                d.WriteAppendOn("//changed file",tr.FinishedEvent)
+        '''
         # content is a string or function taking a file handle
         def action(ev):
             path = os.path.split(self.AbsRunTimePath)[0]
@@ -180,6 +245,21 @@ class File(TestEnity):
                 description_group="Appending File {0}".format(self.__name)))
 
     def WriteCustomOn(self, func, event=None):
+        '''
+        Takes a function that will write data to a file when a certain event goes off.
+        The functions will be passed a string for the filename to write to.
+        The function is responsible for opening and closing the file.
+        It should return values based on what testers.Lambda accepts to report the issue to the user.
+
+        Args:
+            func:
+                A function that takes a file name.
+                This function that will open and write data.
+
+            event:
+                The event it should write on.
+                By default, this is the Starting event.
+        '''
         # content is a string or function taking a file handle
         def action(ev):
             return func(self.Name)

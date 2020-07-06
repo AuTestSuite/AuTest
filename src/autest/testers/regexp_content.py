@@ -1,18 +1,32 @@
-import hosts.output as host
 import re
+from typing import Optional, Pattern
+
+import hosts.output as host
+from autest.exceptions.killonfailure import KillOnFailureError
 
 from . import tester
 from .file_callback import FileContentCallback
-from autest.exceptions.killonfailure import KillOnFailureError
 
-# this is around for backwards compatiblity. Ideally this is not needed
+# this is around for backwards compatibility. Ideally this is not needed
 # given the better ExcludeExpression and ContainExpression
 # see if we can weed this one out....
 
 
 class RegexpContent(FileContentCallback):
+    '''
+    Tests the content contains the provided regular expression.
+    Uses re.search to test if an object exists or not.
 
-    def __init__(self, regexp, description, killOnFailure=False, description_group=None):
+    Args:
+        regexp:
+            a string or compiler regular expression object
+        description:
+            description of what is being tested for
+
+
+    '''
+
+    def __init__(self, regexp: Pattern, description: str, killOnFailure: bool = False, description_group: Optional[str] = None):
         if isinstance(regexp, str):
             regexp = re.compile(regexp)
         self.__regexp = regexp

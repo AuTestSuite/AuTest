@@ -53,20 +53,21 @@ class Test_RunLogic(RunLogic):
         Start up any processes we might have based on the Deafult being defined
         at the Test level there may not be any processes.
         '''
-
-        # get default process
-        self._default = self.__test.Processes.Default
-        # order processes
-        proc_list = GenerateStartOrderedList(self._default)
-        # start processes
-        tmp = self.StartOrderedItemsAync(proc_list, Process_RunLogic)
-        if len(tmp) and is_a.String(tmp[0]):
-            # we had a startup failure
-            host.WriteVerbosef("test_logic",
-                               "Test {0}: Starting of processes Failed!",
-                               self.__test.Name)
-            return (False, tmp[0], tmp[1])
-        self.__running_processes = tmp
+        # run and processes given a default process is defined
+        if self.__test.Processes._has_default:
+            # get default process
+            self._default = self.__test.Processes.Default
+            # order processes
+            proc_list = GenerateStartOrderedList(self._default)
+            # start processes
+            tmp = self.StartOrderedItemsAync(proc_list, Process_RunLogic)
+            if len(tmp) and is_a.String(tmp[0]):
+                # we had a startup failure
+                host.WriteVerbosef("test_logic",
+                                   "Test {0}: Starting of processes Failed!",
+                                   self.__test.Name)
+                return (False, tmp[0], tmp[1])
+            self.__running_processes = tmp
         host.WriteVerbosef("test_logic", "Test {0} Started!", self.__test.Name)
 
         return (True, "No issues found", "Started!")
@@ -159,6 +160,7 @@ class Test_RunLogic(RunLogic):
         self.__delay_time = None
 
     def Poll(self):
+
         while not self.__running:
             return False
 
@@ -169,32 +171,46 @@ class Test_RunLogic(RunLogic):
         stack_len = len(self.__task_stack)
 
         if self.__delay_time:
-            if time.time() - self.__delay_time > self.__task_stack[
-                    0].DelayStart:
+            if time.time() - self.__delay_time > self.__task_stack[0].DelayStart:
                 self.startTestRun()
             ret = True
         elif self.__current_run is None and stack_len:
             # we don't have a anything running start up first item on list
             # check for DelayStart
-            if self.__task_stack[0].DelayStart and self.__delay_time is None:
-                host.WriteVerbosef(["test_logic"],
-                                   "Delaying start of test run {0} by {1} sec",
-                                   self.__task_stack[0].Name,
-                                   self.__task_stack[0].DelayStart)
-                self.__delay_time = time.time()
-            else:
-                self.startTestRun()
-            ret = True
-        elif self.__current_run and self.__current_run.Poll(
-        ):  # are we still running
-            # poll running processes
             try:
+                if self.__task_stack[0].DelayStart and self.__delay_time is None:
+                    host.WriteVerbosef(["test_logic"],
+                                       "Delaying start of test run {0} by {1} sec",
+                                       self.__task_stack[0].Name,
+                                       self.__task_stack[0].DelayStart)
+                    self.__delay_time = time.time()
+                else:
+                    self.startTestRun()
+                # call running event here as the process might already be finished
+                self.__test.RunningEvent(
+                    RunningInfo(self.__start_time, time.time(), RunlogicWrapper(self))
+                )
+            except KillOnFailureError:
+                # if we catch this here .. whole test has to stop
+                # stop current run
+                self.__current_run.Stop()
+                skip = True
+                hard_stop = True
+
+            ret = True
+
+        elif self.__current_run and self.__current_run.Poll():  # are we still running
+            # current test run is running..
+            # Check all items at this level and push needed events
+            try:
+
+                # call running event here
+                self.__test.RunningEvent(
+                    RunningInfo(self.__start_time, time.time(), RunlogicWrapper(self))
+                )
                 # we don't care is the processes are running or not
                 # we just need to trigger the run event on these objects
                 self.PollItems(self.__running_processes)
-                # call running event on this test object
-                self.__test.RunningEvent(
-                    RunningInfo(self.__start_time, time.time(),RunlogicWrapper(self)))
             except KillOnFailureError:
                 # if we catch this here .. whole test has to stop
                 # stop current run

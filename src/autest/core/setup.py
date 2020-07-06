@@ -97,4 +97,4 @@ class Setup(with_metaclass(_setup__metaclass__, object)):
 
 
 #import autest.api
-# autest.api.AddTestEnityMember(Setup)
+# autest.api.AddTestEntityMember(Setup)

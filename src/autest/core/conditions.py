@@ -29,7 +29,7 @@ class Condition(object):
 
     # this is to help with cases like SkipIf(isPlatform(..))
     # where isPlatform would normal give a message that we
-    # need to be platform X and we on platfom X to a different
+    # need to be platform X and we on platform X to a different
     # message that we should not be platform X
     @property
     def NegitiveMessage(self):

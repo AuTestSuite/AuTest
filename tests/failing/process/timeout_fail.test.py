@@ -1,4 +1,4 @@
-Test.Summary = "Test the we fail when a timeout is set"
+Test.Summary = "Test the we fail when a timeout is set at the Process"
 
 Setup.Copy("server.py", "server")
 

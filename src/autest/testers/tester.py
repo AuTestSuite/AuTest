@@ -1,9 +1,14 @@
 from __future__ import absolute_import, division, print_function
-import abc
-import traceback
-import colorama
-import os.path
 
+import abc
+import os.path
+import traceback
+from enum import IntEnum
+from typing import Any, Optional
+
+import colorama
+
+import autest.core.eventinfo
 from autest.exceptions.killonfailure import KillOnFailureError
 
 
@@ -13,7 +18,7 @@ def get_name(obj):
     return obj
 
 
-class ResultType(object):
+class ResultType(IntEnum):
     Unknown = 0
     Skipped = 1
     Passed = 2
@@ -27,63 +32,93 @@ class ResultType(object):
     #     return ["Unknown", "Skipped", "Passed", "Warning", "Failed", "Exception"]
 
     @classmethod
-    def to_string(cls, v):
+    def to_string(cls, result: int):
         for name, value in vars(cls).items():
-            if value == v:
+            if value == result:
                 return name
         return "Unknown"
 
     @classmethod
-    def to_color_string(cls, v):
+    def to_color_string(cls, result: int):
+        '''
+        Turns a the provided ResultType in to a string with color codes.
+
+        Args:
+            result: the result type value
+
+        '''
         c = colorama.Style.BRIGHT
-        if ResultType.Unknown == v:
+        if ResultType.Unknown == result:
             c = colorama.Style.BRIGHT
-        elif ResultType.Passed == v:
+        elif ResultType.Passed == result:
             c = colorama.Fore.GREEN
-        elif ResultType.Skipped == v:
+        elif ResultType.Skipped == result:
             c = colorama.Style.BRIGHT
-        elif ResultType.Warning == v:
+        elif ResultType.Warning == result:
             c = colorama.Fore.YELLOW
-        elif ResultType.Failed == v:
+        elif ResultType.Failed == result:
             c = colorama.Fore.RED
-        elif ResultType.Exception == v:
+        elif ResultType.Exception == result:
             c = colorama.Fore.RED
 
-        ResultType.to_string(v)
-        return colorama.Style.RESET_ALL + c + ResultType.to_string(
-            v) + "{{host.reset-stream}}"
+        ResultType.to_string(result)
+
+        return colorama.Style.RESET_ALL + c + ResultType.to_string(result) + "{{host.reset-stream}}"
 
 
 class Tester(object):
     '''
     The base tester object contains the basic properties all testers should fill in
-    Description - this is what we are testing such as "Tesing return code is 5" or "Checking file file X exists"
-    Result - this returns a ResultType object telling us how to process the result of the test
-    Reason - this is a string (possibly multiline) with information about why the result happened. This maybe as
-    simple as "Return code equal to 5" or it might be more complex with diffs of what was different in a text file
-    DescriptionGroup - this is extra information about the file, process, etc that might be useful to give the
-    test more context, sould be in form of Type: name, ie Process: proc1
+
+    Args:
+        value:
+            The value we are testing for
+
+        test_value:
+            The runtime value we will test.
+            This is normally a string that is used to reference the eventinfo object for a runtime value.
+            However it might be a user defined value, such as a path to a file.
+            It can also be a function that will be called to return the expected content to test against.
+
+        kill_on_failure:
+            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            This should only be used in cases when a failure mean we really need to do a hard stop.
+            For example need to stop because the test ran to long.
+
+        description_group:
+            This is extra information about the file, process, etc that might be useful to give the test more context, should be in form of 'Type: name', ie 'Process: proc1'
+
+        description:
+            This is what we are testing such as "Testing return code is 5" or "Checking file file X exists"
+
+        result:
+            This returns a ResultType object telling us how to process the result of the test
+
+        bind:
+            Internal argument used pass the internal Runable object being tested.
+
     '''
 
     def __init__(self,
-                 value,
-                 test_value,
-                 kill_on_failure=False,
-                 description_group=None,
-                 description=None,
+                 value: Any,
+                 test_value: Any,
+                 kill_on_failure: bool = False,
+                 description_group: Optional[str] = None,
+                 description: Optional[str] = None,
                  bind=None):
-        self._description_group = description_group
-        self._description = description
+
+        self._description_group: str = description_group
+        self._description: str = description
         self.__result = ResultType.Unknown
         self.__reason = "Test was not run"
         self._test_value = test_value
-        self.__kill = kill_on_failure
+        self.__kill: bool = kill_on_failure
         self.__value = value
         self.__ran = False
         self._bind = bind
 
     @property
-    def KillOnFailure(self):
+    def KillOnFailure(self) -> bool:
         '''
         If this is set to True we want to stop that main process
         from running
@@ -91,7 +126,7 @@ class Tester(object):
         return self.__kill
 
     @KillOnFailure.setter
-    def KillOnFailure(self, value):
+    def KillOnFailure(self, value: bool) -> None:
         self.__kill = value
 
     @property
@@ -103,11 +138,11 @@ class Tester(object):
         return self._bind
 
     @Bind.setter
-    def Bind(self, value):
+    def Bind(self, value) -> None:
         self._bind = value
 
     @property
-    def TestValue(self):
+    def TestValue(self) -> Any:
         '''
         This is the runtime value we want to test against. This
         attribute will return the value in question or a function
@@ -116,11 +151,11 @@ class Tester(object):
         return self._test_value
 
     @TestValue.setter
-    def TestValue(self, value):
+    def TestValue(self, value: Any):
         self._test_value = value
 
     @property
-    def Value(self):
+    def Value(self) -> Any:
         '''
         This is the "static" value to test for based on what was set
         in the test file.
@@ -128,57 +163,61 @@ class Tester(object):
         return self.__value
 
     @Value.setter
-    def Value(self, val):
+    def Value(self, val: Value) -> None:
         self.__value = val
 
     @property
-    def Description(self):
+    def Description(self) -> str:
         '''
-        decription of what is being tested
+        description of what is being tested
         '''
         return self._description
 
     @Description.setter
-    def Description(self, val):
+    def Description(self, val: str) -> None:
         self._description = val
 
     @property
-    def DescriptionGroup(self):
+    def DescriptionGroup(self) -> str:
         '''
-        decription of what is being tested
+        description of what is being tested
         '''
         return self._description_group
 
     @DescriptionGroup.setter
-    def DescriptionGroup(self, val):
+    def DescriptionGroup(self, val: str):
         self._description_group = val
 
     @property
-    def Reason(self):
+    def Reason(self) -> str:
         '''
-        information on why something failed
+        This is a string (possibly multiline) with information about why the result happened.
+        This maybe as simple as "Return code equal to 5" or it might be more complex with diffs of what was different in a text file
         '''
         return self.__reason
 
     @Reason.setter
-    def Reason(self, val):
+    def Reason(self, val: str) -> None:
         self.__reason = val
 
     @property
-    def Result(self):
+    def Result(self) -> ResultType:
         '''
-        Should return True or False based on if the test passed
+        The result of the test
         '''
         return self.__result
 
     @Result.setter
-    def Result(self, val):
+    def Result(self, val: ResultType) -> None:
         '''
         Sets the result of a test
         '''
         self.__result = val
 
     def __call__(self, eventinfo, **kw):
+        '''
+        Calls the test function and handles the common error cases
+        '''
         try:
             self.__ran = True
             self.test(eventinfo, **kw)
@@ -201,9 +240,13 @@ class Tester(object):
         return
 
     def GetContent(self, eventinfo, test_value=None):
-        return self._GetContent(eventinfo,test_value)
+        return self._GetContent(eventinfo, test_value)
 
     def _GetContent(self, eventinfo, test_value=None):
+        '''
+        This is the magic function that makes goal is to provide the
+        content needed for the test to happen in a generic way.
+        '''
         # if test_value is None
         # we set it to the this testers object
         # test value.
@@ -259,13 +302,13 @@ class Tester(object):
         return test_value
 
     @property
-    def UseInReport(self):
+    def UseInReport(self) -> bool:
         return True
 
     @property
-    def RanOnce(self):
+    def RanOnce(self) -> bool:
         return self.__ran
 
     @property
-    def isContainer(self):
+    def isContainer(self) -> bool:
         return False

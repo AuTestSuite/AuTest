@@ -16,6 +16,8 @@ from autest.core.setup import Setup
 
 
 def AddSetupItem(item, name=None, ns=None):
+    if not glb.running_main:
+        return
     # helper function
     def wrapper(self, *lst, **kw):
         self._add_item(item(*lst, **kw))

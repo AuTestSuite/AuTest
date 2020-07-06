@@ -4,6 +4,8 @@ import hosts.output as host
 
 
 def AddWhenFunction(func, name=None, generator=False):
+    if not glb.running_main:
+        return
     if name is None:
         name = func.__name__
 

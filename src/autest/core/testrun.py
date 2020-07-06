@@ -20,7 +20,7 @@ class TestRun(Order, Item, Runable):
     def __init__(self, testobj, name, displaystr):
 
         self.__test = testobj  # this is the parent test object
-        self.__exceptionMessage = ''  # this is a error message given an unknown exeception
+        self.__exceptionMessage = ''  # this is a error message given an unknown exception
 
         # will want to refactor setup later
         self.__setup = setup.Setup(self)
@@ -88,17 +88,47 @@ class TestRun(Order, Item, Runable):
             ), "NotRunningAfter"
         )
 
+        # TimeOut
+        self._Register(
+            "Test.{0}.TimeOut".format(self.Name),
+            TesterSet(
+                testers.LessThan,
+                "TotalRunTime",
+                self.RunningEvent,
+                converter=float,
+                kill_on_failure=True,
+                description_group="Time-Out",
+                description="TestRun finishes within expected time"),
+            "TimeOut")
+
+        timeout = self.Variables.Autest.TestRun.TimeOut
+
+        if timeout is not None:
+            self.TimeOut = timeout
+
     @property
     def Setup(self):
+        '''
+        The setup object for this given process.
+        See Setup for more information.
+        '''
         return self.__setup
 
     # attributes of this given test run
     @property
     def Name(self):
+        '''
+        The name of the TestRun
+
+        :getter: returns the name
+        '''
         return self._ID
 
     @property
     def DisplayString(self):
+        '''
+        The display string used to describe the test run in the finial report
+        '''
         if self._Description:
             return self._Description
         return self.Name
@@ -120,7 +150,10 @@ class TestRun(Order, Item, Runable):
         return self.Setup._Items + list(self.Processes._Items)
 
     @property
-    def ContinueOnFail(self):
+    def ContinueOnFail(self) -> bool:
+        '''
+        Controls if the test should continue running if this test run does not pass.
+        '''
         return self.__continueonfail
 
     @ContinueOnFail.setter
@@ -129,16 +162,29 @@ class TestRun(Order, Item, Runable):
 
     @property
     def TestDirectory(self):
+        '''
+        Returns the directory where the test file exists
+        '''
         return self._RootRunable.TestDirectory
 
     @property
     def TestFile(self):
+        '''
+        Returns the name of the test file that defines this test
+        '''
         return self._RootRunable.TestFile
 
     @property
     def TestRoot(self):
+        '''
+        Returns the root directory in which autest start scanning for tests
+        '''
         return self._RootRunable.TestRoot
 
     @property
     def RunDirectory(self):
+        '''
+        Returns the directory this test will run in.
+        This maps to a directory under the sandbox root directory.
+        '''
         return self._RootRunable.RunDirectory

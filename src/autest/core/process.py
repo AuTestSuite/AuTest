@@ -8,14 +8,16 @@ from .item import Item
 from . import setup
 
 import os
+from typing import List, Optional
 
 
 @smart_init
 class Process(Runable, Order, Item):
-    __slots__ = []
+    __slots__: List[str] = []
 
     @call_base(Runable=("runable",), Order=(), Item=(None, "name"))
     def __init__(self, runable, name, cmdstr=None, use_shell=None):
+
         self.__cmdstr = cmdstr
         self.__use_shell = use_shell
         self.__streams = object()
@@ -33,22 +35,38 @@ class Process(Runable, Order, Item):
 
     @property
     def Setup(self):
+        '''
+        The setup object for this given process.
+        See Setup for more information.
+        '''
         return self.__setup
 
     @property
-    def Name(self):
+    def Name(self) -> str:
+        '''
+        The name or ID of the process
+
+        :getter: returns the name
+        '''
         return self._ID
 
     @property
-    def StreamOutputDirectory(self):
+    def StreamOutputDirectory(self) -> str:
+        '''
+        The path to the where all stream files will be written to
+
+        '''
         return self.__output
 
     @property
-    def Command(self):
+    def Command(self) -> Optional[str]:
+        '''
+        The command used to start the process
+        '''
         return self.__cmdstr
 
     @Command.setter
-    def Command(self, value):
+    def Command(self, value: str) -> None:
         value = value.replace('/', os.sep)
         self.__cmdstr = value
 
@@ -64,7 +82,13 @@ class Process(Runable, Order, Item):
     # ////////////////////////
 
     @property
-    def ForceUseShell(self):
+    def ForceUseShell(self) -> bool:
+        '''
+        Forces the use of a shell when running the command.
+        Normally AuTest will try to detect if there shell related commands or syntax in the command
+        and will only spawn a shell in those cases.
+        However in certain cases it fails to get this correct and need to be explicitly told to use the shell
+        '''
         return self.__use_shell
 
     @ForceUseShell.setter
@@ -72,11 +96,16 @@ class Process(Runable, Order, Item):
         self.__use_shell = bool(val)
 
     @property
-    def StartupTimeout(self):
+    def StartupTimeout(self) -> float:
+        '''
+        This is the value of how long AuTest will wait for the given process to start
+        and be considered ready before it will stop the process and report an error.
+        Set this value to allow for more or less time.
+        '''
         return self.__startup_timeout
 
     @StartupTimeout.setter
-    def StartupTimeout(self, val):
+    def StartupTimeout(self, val: float):
         self.__startup_timeout = float(val)
 
     @property
@@ -84,17 +113,30 @@ class Process(Runable, Order, Item):
         return self.Setup._Items
 
     @property
-    def TestDirectory(self):
+    def TestDirectory(self) -> str:
+        '''
+        Returns the directory where the test file exists
+        '''
         return self._RootRunable.TestDirectory
 
     @property
-    def TestFile(self):
+    def TestFile(self) -> str:
+        '''
+        Returns the name of the test file that defines this test
+        '''
         return self._RootRunable.TestFile
 
     @property
-    def TestRoot(self):
+    def TestRoot(self) -> str:
+        '''
+        Returns the root directory in which autest start scanning for tests
+        '''
         return self._RootRunable.TestRoot
 
     @property
-    def RunDirectory(self):
+    def RunDirectory(self) -> str:
+        '''
+        Returns the directory this test will run in.
+        This maps to a directory under the sandbox root directory.
+        '''
         return self._RootRunable.RunDirectory

@@ -40,7 +40,7 @@ class Order(object):
             pass
         value = readyfunc
         if is_a.Number(value):
-            readyfunc = lambda hasRunFor: hasRunFor(value)
+            def readyfunc(hasRunFor): return hasRunFor(value)
         elif hasattr(readyfunc, "when_wrapper"):
             readyfunc = readyfunc(**args)
         return readyfunc, args
@@ -58,12 +58,74 @@ class Order(object):
             pass
         value = readyfunc
         if is_a.Number(value):
-            readyfunc = lambda hasRunFor: hasRunFor(value)
+            def readyfunc(hasRunFor): return hasRunFor(value)
         elif hasattr(readyfunc, "when_wrapper"):
             readyfunc = readyfunc(**args)
         return readyfunc, args
 
     def StartBefore(self, *lst, **kw):
+        '''
+        States that you want to start the provided Process object before the called object.
+        The optional ready argument can be a number or function to tell when
+        these objects should be ready before starting the next process.
+        This is useful when certain states or time delays are needed before the next process can start.
+        This function has to be added via named arguments.
+        Likewise, arguments can be provided to the ready function via named arguments to help control behavior.
+
+        Args:
+            lst:
+                These are the Process object{s) to start before this Process object.
+            ready:
+                Named argument that can be provided to tell when the next process should start.
+                The value can be a number, which will tell in second how long to wait.
+                If the value is a function, the function needs to return True when the state is ready,
+                and False when it is not.
+                This function should do a quick test and not block the system from running.
+
+            args:
+                Extra named arguments that will be pass to the ready function.
+
+        **Example**
+
+            Simple start A before B with no delay
+
+            .. sourcecode:: python
+
+                A=tr.Processes.Process('a', ...)
+                B=tr.Processes.Process('b',...)
+                B.StartBefore(A)
+
+            Simple start A before B with 1.5 second delay by setting ready logic
+
+            .. sourcecode:: python
+
+                A=tr.Processes.Process('a', ...)
+                A.ready=1.5
+                B=tr.Processes.Process('b',..)
+                B.StartBefore(A)
+
+            Simple start A before B with 1.5 second delay via setting it on the StartBefore
+
+            .. sourcecode:: python
+
+                A=tr.Processes.Process('a', ...)
+                B=tr.Processes.Process('b',...)
+                B.StartBefore(A,ready=1.5)
+
+            Simple start A and A1 before B with custom function via setting it on the StartBefore
+
+            .. sourcecode:: python
+
+                def custom_delay(file,size):
+                    # ...
+
+                A=tr.Processes.Process('a', ...)
+                A1=tr.Processes.Process('a1', ...)
+
+                B=tr.Processes.Process('b',...)
+                B.StartBefore(A,A1,ready=custom_delay,file="startup.log",size=1024)
+
+        '''
         if lst == () and kw == {}:
             return self.__startbefore
         if lst == () and kw != {}:
@@ -78,6 +140,25 @@ class Order(object):
             self.__startbefore[obj] = (readyfunc, args)
 
     def StartAfter(self, *lst, **kw):
+        '''
+        The same as StartBefore(), but in this case will start the provided
+        processes after starting this process.
+        See StartBefore() for details on arguments and examples.
+
+        Args:
+            lst:
+                These are the Process object{s) to start before this Process object.
+            ready:
+                Named argument that can be provided to tell when the next process should start.
+                The value can be a number, which will tell in second how long to wait.
+                If the value is a function, the function needs to return True when the state is ready,
+                and False when it is not.
+                This function should do a quick test and not block the system from running.
+
+            args:
+                Extra named arguments that will be pass to the ready function.
+
+        '''
         if lst == () and kw == {}:
             return self.__startafter
         if lst == () and kw != {}:
@@ -91,6 +172,16 @@ class Order(object):
             self.__startafter[obj] = (readyfunc, args)
 
     def EndBefore(self, *lst, **kw):
+        '''
+        Helps control the order in which Processes should be shut down when the system
+        has to stop the running processes.
+        Useful when processes might have nanny processes that might restart other processes,
+        or when certain state outputs are dependent on how processes are killed.
+
+        Args:
+            lst:
+                These are the Process object{s) to start before this Process object.
+        '''
         if lst == () and kw == {}:
             return self.__endbefore
         if lst == () and kw != {}:
@@ -104,6 +195,16 @@ class Order(object):
             self.__endbefore[obj] = (readyfunc, args)
 
     def EndAfter(self, *lst, **kw):
+        '''
+        Helps control the order in which Processes should be shut down when the system
+        has to stop the running processes.
+        Useful when processes might have nanny processes that might restart other processes,
+        or when certain state outputs are dependent on how processes are killed.
+
+        Args:
+            lst:
+                These are the Process object{s) to start before this Process object.
+        '''
         if lst == () and kw == {}:
             return self.__endafter
         if lst == () and kw != {}:
@@ -117,15 +218,62 @@ class Order(object):
             self.__endafter[obj] = (readyfunc, args)
 
     @property
-    def DelayStart(self):
+    def DelayStart(self) -> float:
+        '''
+        Defines a number of seconds to delay the start of the object after it has become ready to start.
+        This allows a different way to delay starting a Process or TestRun.
+        Useful as a way to effectively "sleep" for a time period before the process or a TestRun starts
+
+        Example:
+
+            Sets a delay in the of 2.5 second for a process to reload data
+
+            .. sourcecode:: python
+
+                Test.Processes.Process("server",cmd="…")
+                Tr1=Test.AddTestRun()
+
+                # set some value for the server, Server takes at least two second to
+                # reload data
+                Tr1.Processes.Default="server_cfg -set value=2"
+                Tr1.StartBefore(Test.Processes.server)
+
+                # test that the value was loaded
+                Tr2=Test.AddTestRun()
+
+                # delay little over two second to give server time to load data
+                Tr1.Processes.Default.DelayStart=2.5
+                Tr1.Processes.Default="server_cfg -get value"
+                Tr1.Processes.Default.Streams..stdout.Content=testers.ContainsExpression("2","test that value = 2")
+
+            Sets a delay in the of 2.5 second for a TestRun to allow steps from the
+            previous TestRun time to go through the system
+
+            .. sourcecode:: python
+
+                tr = Test.AddTestRun()
+                tr.DelayStart=5 # delay 5 seconds before start the test run
+                tr.Processes.Default.Command = 'python diff.py'
+                tr.Processes.Default.ReturnCode=0
+
+        '''
         return self.__delay_start
 
     @DelayStart.setter
-    def DelayStart(self, time):
+    def DelayStart(self, time: float):
         self.__delay_start = time
 
     @property
     def Ready(self):
+        '''
+        Option number or function that defines when the Process is considered to be ready.
+        To be ready means that we can start another process that should start after this process.
+        If the value is a number, it will be used as a number of seconds to wait before starting the process.
+        Otherwise this is normally a function defined in the When space.
+
+        This is exist on TestRun and Test objects however at the moment is does not have any affect.
+
+        '''
         return self.__ready
 
     @Ready.setter
@@ -281,9 +429,9 @@ def GenerateStartOrderedList(item):
     # flatten the list by taking the last item
     ret = []
     fat_lst.reverse()
-    for i in fat_lst:        
+    for i in fat_lst:
         if i not in ret:
-            ret=[i]+ret
+            ret = [i]+ret
     return ret
 
 
@@ -325,8 +473,8 @@ def GenerateEndOrderedList(item):
     # flatten the list by taking the last item
     ret = []
     fat_lst.reverse()
-    for i in fat_lst:        
+    for i in fat_lst:
         if i not in ret:
-            ret=[i]+ret
+            ret = [i]+ret
 
     return ret
