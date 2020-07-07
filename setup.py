@@ -31,7 +31,7 @@ The Reusable Gold testing system is not about making another unit testing framew
         ''',
         author="Jason Kenny",
         author_email="dragon512@live.com",
-        url="https://bitbucket.org/dragon512/reusable-gold-testing-system",
+        url="https://bitbucket.org/autestsuite/reusable-gold-testing-system",
         license="MIT",
         package_dir = {'': 'src'},
         packages=find_packages('src',exclude=('test')),
