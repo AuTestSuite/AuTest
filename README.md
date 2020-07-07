@@ -14,7 +14,6 @@ Goals
 * Precise as possible error messages to make it easy to see what is wrong fast
 * Sandbox to make it easy to see what failed and reproduce out of test system
 * Flexible gold file synatx to make it easier to ignore text that is not important
-* Run on python 2 or 3
 
 Non-Goals
 ----------------------------------
@@ -44,7 +43,6 @@ In the directory containing the tests run:
 ~~~~
 autest
 ~~~~
-[Quick start for creating a test](https://bitbucket.org/dragon512/reusable-gold-testing-system/wiki/quick-start)
 
 Read [documentation](https://autestsuite.bitbucket.io/) to learn how to use write and use AuTest in more detail ( docs are being rewritten )
 [here.](https://autestsuite.bitbucket.io/)
