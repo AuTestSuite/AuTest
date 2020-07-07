@@ -16,9 +16,9 @@ Goals
 
 * Easy to write and add tests
 * Extensible system to allow: 
- * Adding new functionality for testing your application
- * Batch commands as a new function to make it easier to write tests
- * Define custom report outputs
+  * Adding new functionality for testing your application
+  * Batch commands as a new function to make it easier to write tests
+  * Define custom report outputs
 * Precise as possible error messages to make it easy to see what is wrong fast
 * Sandbox to make it easy to see what failed and reproduce out of test system
 * Flexible gold file syntax to make it easier to ignore text that is not important
