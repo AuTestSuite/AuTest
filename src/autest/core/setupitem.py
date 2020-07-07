@@ -254,8 +254,9 @@ class SetupItem(object):
                 host.WriteVerbose("setup", "Hardlinking {0} to {1}".format(source, target))
                 self.HardLink(source, target)
                 return
-            except:
-                host.WriteVerbose("setup", "Hardlinking - Failed! Trying..")
+            except Exception as e:
+                host.WriteVerbose("setup", "Hardlinking - Failed!")
+                host.WriteVerbose("setup", "Hardlinking -",e)
                 if link_policy == CopyLogic.HardSoft:
                     copy_func(source, target, CopyLogic.Soft)
                 else:
@@ -264,8 +265,9 @@ class SetupItem(object):
             try:
                 host.WriteVerbose("setup", "Symlinking {0} to {1}".format(source, target))
                 self.SymLink(source, target)
-            except:
-                host.WriteVerbose("setup", "Symlinking - Failed! Trying..")
+            except Exception as e:                
+                host.WriteVerbose("setup", "Symlinking - Failed!")
+                host.WriteVerbose("setup", "Symlinking -",e)
                 copy_func(source, target, CopyLogic.Copy)
 
         elif link_policy == CopyLogic.HardSoftFiles or link_policy == CopyLogic.HardFiles:

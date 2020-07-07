@@ -169,6 +169,7 @@ autest/browse.VC.db
 autest/_sandbox/
 _sandbox/
 .tox/
+.nox/
 src/env3.4/
 .mypy_cache/
 docsrc/source/_build/

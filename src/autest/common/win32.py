@@ -79,6 +79,8 @@ if os.name == 'nt':
     PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
     PROCESS_SET_LIMITED_INFORMATION = 0x2000
 
+    # CreateFile flags
+
     FILE_SHARE_READ = 1
     FILE_SHARE_WRITE = 2
     FILE_SHARE_DELETE = 4
@@ -93,6 +95,12 @@ if os.name == 'nt':
     TRUNCATE_EXISTING = 5
 
     MAX_PATH = 260
+
+    # create CreateSymbolicLink flags
+    
+    SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1
+    SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x2
+
 
     SmallProcessInfo = collections.namedtuple(
         'SmallProcessInfo', 'name pid ppid')
@@ -420,7 +428,7 @@ if os.name == 'nt':
     def win32_symlink(source, link_name):
         source = _long_path(source)
         link_name = _long_path(link_name)
-        if not CreateSymbolicLink(link_name, source, 0):
+        if not CreateSymbolicLink(link_name, source, SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE):
             raise WindowsError(ctypes.GetLastError(), ctypes.FormatError(
                 ctypes.GetLastError()), link_name)
 
