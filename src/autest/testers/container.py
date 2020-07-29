@@ -1,14 +1,16 @@
 from typing import Optional
+
 import hosts.output as host
-from . import tester
 from autest.exceptions.killonfailure import KillOnFailureError
+
+from . import tester
 
 
 class _Container(tester.Tester):
 
     def __init__(self, *lst, **kw):
         self.__testers = lst
-        return super(_Container, self).__init__(None, None, **kw)
+        super(_Container, self).__init__(None, None, **kw)
 
     def _verify(self, converter):
         tmp = []
@@ -56,7 +58,7 @@ class _Container(tester.Tester):
     @property
     def Description(self):
         '''
-        decription of what is being tested
+        description of what is being tested
         '''
         return self._description
 
@@ -69,7 +71,7 @@ class _Container(tester.Tester):
     @property
     def DescriptionGroup(self):
         '''
-        decription of what is being tested
+        description of what is being tested
         '''
         return self._description_group
 
@@ -200,9 +202,9 @@ class Not(_Container):
 
     '''
 
-    def __init__(self, tester):
+    def __init__(self, testobj):
         super(Not, self).__init__(
-            tester, description="Checking that negation of the test")
+            testobj, description="Checking that negation of the test")
 
     def test(self, eventinfo, **kw):
         t = self._testers[0]

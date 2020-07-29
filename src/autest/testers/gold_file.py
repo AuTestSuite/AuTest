@@ -1,10 +1,10 @@
-from typing import Optional
 import difflib
-import json
+from typing import Optional
 
-from . import tester
 import hosts.output as host
 from autest.exceptions.killonfailure import KillOnFailureError
+
+from . import tester
 
 g_escape = ['{}', '``']
 
@@ -16,7 +16,7 @@ def equalToEscape(val):
 
 
 class GoldFile(tester.Tester):
-    '''
+    r'''
     Tests if a file matches expected results via comparing a file or stream output with the content of the gold file.
     The gold file can contain wild card statement of `{}` or `\`\`` to tell the testing logic that differences
     in the area are to be ignored.
@@ -29,13 +29,16 @@ class GoldFile(tester.Tester):
             However it might be a user defined value, such as a path to a file.
             It can also be a function that will be called to return the expected content to test against.
         kill_on_failure:
-            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            Setting this to True will kill the test from processing the rest of the test run and any existing item
+            in the event queue for the current scope.
             This should only be used in cases when a failure mean we really need to do a hard stop.
             For example need to stop because the test ran to long.
         normalize_eol:
-            If True will normalize the `\\\\r\\\\n` sequences to `\\\\n` to help with common differences between different operating system such as Unix or Windows systems. If False no normalizing will happen.
+            If True will normalize the `\\\\r\\\\n` sequences to `\\\\n` to help with common differences between different
+            operating system such as Unix or Windows systems. If False no normalizing will happen.
         description_group:
-            This is extra information about the file, process, etc that might be useful to give the test more context, should be in form of 'Type: name', ie 'Process: proc1'
+            This is extra information about the file, process, etc that might be useful to give the test more context,
+            should be in form of 'Type: name', ie 'Process: proc1'
         description:
             This is what we are testing such as "Testing return code is 5" or "Checking file file X exists"
 
@@ -51,12 +54,12 @@ class GoldFile(tester.Tester):
     '''
 
     def __init__(self,
-                 goldfile:str,
-                 test_value:Optional[str]=None,
-                 kill_on_failure:bool=False,
-                 normalize_eol:bool=True,
-                 description_group:str=None,
-                 description:Optional[str]=None):
+                 goldfile: str,
+                 test_value: Optional[str] = None,
+                 kill_on_failure: bool = False,
+                 normalize_eol: bool = True,
+                 description_group: str = None,
+                 description: Optional[str] = None):
         if description is None:
             description = "Checking that {0} matches {1}".format(test_value,
                                                                  goldfile)
@@ -184,7 +187,7 @@ class GoldFile(tester.Tester):
 
         # todo Change this logic to
         # replace gold file text token with special values
-        # special value is key, while orginial text is the "action"
+        # special value is key, while original text is the "action"
         # on first diff we see if replace text matches key, if so we do action
         # note unique key need to be a safe, ideally control character that
         # would not be typed

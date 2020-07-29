@@ -28,7 +28,8 @@ class ZipContent(tester.Tester):
         excludes:
             A list of one more path relative of from the archive root of the entity to test to not exist.
         kill_on_failure:
-            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            Setting this to True will kill the test from processing the rest of the test run and any existing item
+            in the event queue for the current scope.
             This should only be used in cases when a failure mean we really need to do a hard stop.
             For example need to stop because the test ran to long.
         description_group:
@@ -58,12 +59,12 @@ class ZipContent(tester.Tester):
     ZIP_MAGIC = b'\x50\x4B\x05\x06'
 
     def __init__(
-        self,
-        includes: Optional[List[str]] = None,
-        excludes: Optional[List[str]] = None,
-        kill_on_failure: bool = False,
-        description_group: Optional[str] = None
-    ):
+            self,
+            includes: Optional[List[str]] = None,
+            excludes: Optional[List[str]] = None,
+            kill_on_failure: bool = False,
+            description_group: Optional[str] = None
+        ):
 
         self.__include = includes or ()
         self.__exclude = excludes or ()

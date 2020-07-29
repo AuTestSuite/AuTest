@@ -1,9 +1,10 @@
+import os
 from typing import Optional
+
 import hosts.output as host
-from . import tester
 from autest.exceptions.killonfailure import KillOnFailureError
 
-import os
+from . import tester
 
 
 class DirectoryExists(tester.Tester):
@@ -21,12 +22,14 @@ class DirectoryExists(tester.Tester):
             It can also be a function that will be called to return the expected content to test against.
 
         kill_on_failure:
-            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            Setting this to True will kill the test from processing the rest of the test run and any existing
+            item in the event queue for the current scope.
             This should only be used in cases when a failure mean we really need to do a hard stop.
             For example need to stop because the test ran to long.
 
         description_group:
-            This is extra information about the file, process, etc that might be useful to give the test more context, should be in form of 'Type: name', ie 'Process: proc1'
+            This is extra information about the file, process, etc that might be useful to give the test more context,
+            should be in form of 'Type: name', ie 'Process: proc1'
 
         description:
             This is what we are testing such as "Testing return code is 5" or "Checking file file X exists"

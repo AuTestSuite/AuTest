@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function
 
 import abc
 import os.path
@@ -81,12 +80,14 @@ class Tester(object):
             It can also be a function that will be called to return the expected content to test against.
 
         kill_on_failure:
-            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            Setting this to True will kill the test from processing the rest of the test run and any existing item
+            in the event queue for the current scope.
             This should only be used in cases when a failure mean we really need to do a hard stop.
             For example need to stop because the test ran to long.
 
         description_group:
-            This is extra information about the file, process, etc that might be useful to give the test more context, should be in form of 'Type: name', ie 'Process: proc1'
+            This is extra information about the file, process, etc that might be useful to give the test more context,
+            should be in form of 'Type: name', ie 'Process: proc1'
 
         description:
             This is what we are testing such as "Testing return code is 5" or "Checking file file X exists"
@@ -107,8 +108,8 @@ class Tester(object):
                  description: Optional[str] = None,
                  bind=None):
 
-        self._description_group: str = description_group
-        self._description: str = description
+        self._description_group: Optional[str] = description_group
+        self._description: Optional[str] = description
         self.__result = ResultType.Unknown
         self.__reason = "Test was not run"
         self._test_value = test_value
@@ -163,7 +164,7 @@ class Tester(object):
         return self.__value
 
     @Value.setter
-    def Value(self, val: Value) -> None:
+    def Value(self, val: Any) -> None:
         self.__value = val
 
     @property
@@ -225,7 +226,7 @@ class Tester(object):
             raise
         except KillOnFailureError:
             raise
-        except:
+        except Exception:
             self.Result = ResultType.Exception
             self.Reason = traceback.format_exc()
 

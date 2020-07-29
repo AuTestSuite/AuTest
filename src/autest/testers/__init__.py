@@ -15,6 +15,5 @@ from .contains_expression import ContainsExpression
 # map for easy of use
 from .contains_expression import ContainsExpression as IncludesExpression
 from .excludes_expression import ExcludesExpression
-from .file_callback import FileContentCallback
 from .lambda_tester import Lambda
 from .container import Any, All, Not, _Container

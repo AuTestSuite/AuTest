@@ -17,12 +17,14 @@ class Lambda(tester.Tester):
     Args:
         func: The callback function to call
         kill_on_failure:
-            Setting this to True will kill the test from processing the rest of the test run and any existing item in the event queue for the current scope.
+            Setting this to True will kill the test from processing the rest of the test run and any existing
+            item in the event queue for the current scope.
             This should only be used in cases when a failure mean we really need to do a hard stop.
             For example need to stop because the test ran to long.
 
         description_group:
-            This is extra information about the file, process, etc that might be useful to give the test more context, should be in form of 'Type: name', ie 'Process: proc1'
+            This is extra information about the file, process, etc that might be useful to give the test more context,
+            should be in form of 'Type: name', ie 'Process: proc1'
 
 
 
@@ -108,10 +110,10 @@ class Lambda(tester.Tester):
         # run the test function
         try:
             try:
-                result, desc, message = self.Value(eventinfo,self)
+                result, desc, message = self.Value(eventinfo, self)
             except TypeError:
                 result, desc, message = self.Value(eventinfo)
-        except:
+        except Exception:
             result, desc, message = (False, "Exception was caught!",
                                      traceback.format_exc())
             self.KillOnFailure = True
@@ -119,7 +121,7 @@ class Lambda(tester.Tester):
         self.Reason = message
 
         # process results
-        if result == False:
+        if not result:
             self.Result = tester.ResultType.Failed
             host.WriteVerbose(["testers.Lambda", "testers"], "{0} - ".format(
                 tester.ResultType.to_color_string(self.Result)), self.Reason)
