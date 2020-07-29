@@ -1,9 +1,14 @@
-This notes will be moved under the documenation.... need a place to store stuff in the mean time
+This notes will be moved under the documentation.... need a place to store stuff in the mean time
 
+1.8.1
+
+ - fix regression in tester code.
+ - update setup.py to fix correct homepage url for site on pypi
+ - some code clean up
 
 1.8.0 
 
- - Add in start of redo of documenation with sphinx
+ - Add in start of redo of documentation with sphinx
  - Add timeout logic to TestRun and Test objects
  - Fix issues with Variable not accessing values from Parents as expected
  - Fix issue with Clean up event not being called
