@@ -19,15 +19,16 @@ def DirectoryExists(directory_path: Union[str, Directory]):
 
     def directory_exists(process, **kw):
         #pylint: disable=unused-argument
+        dpath = directory_path
         if not os.path.isabs(directory_path):
-            directory_path = os.path.normpath(
+            dpath = os.path.normpath(
                 os.path.join(
                     process.RunDirectory,
                     directory_path
                 )
             )
 
-        result = os.path.isdir(directory_path)
+        result = os.path.isdir(dpath)
         host.WriteDebug(
             ['DirectoryExists', 'when'],
             "Testing for directory to exist '{0}' : {1}".format(directory_path, result)
@@ -50,16 +51,16 @@ def DirectoryNotExists(directory_path: Union[str, Directory]):
 
     def directory_not_exists(process, **kw):
         #pylint: disable=unused-argument
-
+        dpath = directory_path
         if not os.path.isabs(directory_path):
-            directory_path = os.path.normpath(
+            dpath = os.path.normpath(
                 os.path.join(
                     process.RunDirectory,
                     directory_path
                 )
             )
 
-        result = not os.path.isdir(directory_path)
+        result = not os.path.isdir(dpath)
         host.WriteDebug(
             ['DirectoryNotExists', 'when'],
             "Test for directory to not exist '{0}' : {1}".format(directory_path, result)
@@ -90,19 +91,20 @@ def DirectoryModified(directory_path: Union[str, Directory]):
 
     def directory_is_modified(process, **kw):
         #pylint: disable=unused-argument
-        if not os.path.isabs(directory_path):
-            directory_path = os.path.normpath(
+        dpath = directory_path
+        if not os.path.isabs(dpath):
+            dpath = os.path.normpath(
                 os.path.join(
                     process.RunDirectory,
                     directory_path
                 )
             )
 
-        if os.path.isdir(directory_path):
-            current_mtime = os.path.getmtime(directory_path)
+        if os.path.isdir(dpath):
+            current_mtime = os.path.getmtime(dpath)
         else:
             host.WriteDebug(["DirectoryModified", "when"],
-                            "directory '{0}' does not exist yet".format(directory_path))
+                            "directory '{0}' does not exist yet".format(dpath))
             state["modify_time"] = 0
             return False
 
@@ -121,6 +123,7 @@ AddWhenFunction(DirectoryExists, generator=True)
 AddWhenFunction(DirectoryNotExists, generator=True)
 AddWhenFunction(DirectoryModified, generator=True)
 
+# Add Dir* shortcuts for Directory* versions.
 AddWhenFunction(DirectoryExists, name='DirExists', generator=True)
 AddWhenFunction(DirectoryNotExists, name='DirNotExists', generator=True)
 AddWhenFunction(DirectoryModified, name='DirModified', generator=True)

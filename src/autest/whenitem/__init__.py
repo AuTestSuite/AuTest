@@ -1,1 +1,1 @@
-from . import portopen, counter, filemodified
+from . import portopen, counter, filemodified, dirmodified

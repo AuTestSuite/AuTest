@@ -3,6 +3,7 @@ from time import sleep
 import sys
 import argparse
 
+
 def main(name, filename, wait_time):
     print('Waiting {time} second to open {file}'.format(time=wait_time, file=filename))
     sleep(wait_time)

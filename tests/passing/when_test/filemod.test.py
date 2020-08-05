@@ -1,5 +1,3 @@
-import os
-
 Test.Summary = "Test file modification logic"
 
 f1 = Test.Disk.File('file-mod-1', exists=True)
@@ -18,6 +16,7 @@ Setup.Copy("utils/filecat.py", "read")
 tr = Test.AddTestRun()
 tr.Processes.Process("writer", "python filemod {0} 2 ".format(fpath1))
 tr.Command = "python read {}".format(fpath1)
+# Note that f1 is a Test.Disk.File object
 tr.Processes.Default.StartBefore(
     tr.Processes.writer, ready=When.FileModified(f1))
 tr.Processes.Default.Streams.stdout = Testers.ContainsExpression(

@@ -3,16 +3,17 @@ import sys
 from time import sleep
 import argparse
 import os
+import shutil
 
 
-def main(name, filename, wait_time):
-    if not os.path.isfile(filename):
-        print("Error: File {0} does not exist".format(filename))
+def main(name, directory, wait_time):
+    if not os.path.isfile(directory):
+        print("Error: Directory {0} does not exist".format(directory))
         sys.exit(1)
-    print('Waiting {time} second before removing {file}'.format(time=wait_time, file=filename))
+    print('Waiting {time} second before removing {dir}'.format(time=wait_time, dir=directory))
     sleep(wait_time)
-    os.remove(filename)
-    print('file has been removed')
+    shutil.rmtree(directory)
+    print('directory has been removed')
     print(name, "Done")
 
 
@@ -20,9 +21,9 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("filename",
+    parser.add_argument("directory",
                         type=str,
-                        help="Name of the file to modify.")
+                        help="Name of the directory to modify.")
 
     parser.add_argument("time",
                         type=float,
@@ -33,4 +34,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(sys.argv[0], args.filename, args.time)
+    main(sys.argv[0], args.directory, args.time)

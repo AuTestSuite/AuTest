@@ -1,5 +1,3 @@
-import os
-
 Test.Summary = "Test file modification logic"
 
 f1 = Test.Disk.File('file-mod-1', exists=True)
