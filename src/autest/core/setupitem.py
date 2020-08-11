@@ -99,7 +99,7 @@ class SetupItem(object):
                     self.cnt)
             ),
             cmd,
-            self.__runable.Env
+            self.ComposeEnv()
         )
         self.cnt += 1
         # the command line we will run. We add the RunDirectory to the start of the command
@@ -108,14 +108,15 @@ class SetupItem(object):
         # subsitute the value of the string via the template engine
         # as this provide a safe cross platform $subst model.
         template = string.Template(command_line)
-        command_line = template.substitute(self.__runable.Env)
+        command_line = template.substitute(self.ComposeEnv())
 
         proc = autest.common.process.Popen(
             command_line,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=self.__runable.Env)
+            env=self.ComposeEnv()
+            )
 
         # get the output stream from the process we created and redirect to
         # files
