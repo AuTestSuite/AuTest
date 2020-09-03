@@ -127,7 +127,8 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
             output = subprocess.check_output(
                 command, universal_newlines=True,
                 stderr=subprocess.STDOUT,
-                shell=shell
+                shell=shell,
+                env=self.Env,
             )
         except (subprocess.CalledProcessError, OSError):
             host.WriteVerbose(["setup"], "Command Failed")

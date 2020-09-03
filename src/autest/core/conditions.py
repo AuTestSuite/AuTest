@@ -32,7 +32,7 @@ class Condition(object):
     # need to be platform X and we on platform X to a different
     # message that we should not be platform X
     @property
-    def NegitiveMessage(self):
+    def NegativeMessage(self):
         if self.__neg_msg is not None:
             return self.__neg_msg
         else:
@@ -101,7 +101,7 @@ class Conditions(object):
         for cond in self.__condition_if:
             if cond:
                 # we had a failure
-                self.__reason = cond.NegitiveMessage
+                self.__reason = cond.NegativeMessage
                 return False
 
         return True
