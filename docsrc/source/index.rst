@@ -18,6 +18,9 @@ Welcome to AuTest's documentation!
 
     usage/cli
 
+    changelog
+   
+
 Indices and tables
 ==================
 
