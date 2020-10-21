@@ -55,6 +55,7 @@ class RunTestTask(Task):
                               onerror=disk.remove_read_only)
             return
         except Exception as e:
+            host.WriteMessagef("E")
             self.__test._Result = testers.ResultType.Exception
             self.__test._Reason = traceback.format_exc()
             host.WriteVerbose("test_logic", "Test {0} failed with Exception\n {1}".format(

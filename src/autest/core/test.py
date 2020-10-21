@@ -273,7 +273,7 @@ def loadTest(test):
         'test': test,  # backwards compat
         'Test': test,
         'Setup': test.Setup,
-        'Condition': conditions.ConditionFactory(test.ComposeVariables(), test.ComposeEnv()),
+        'Condition': conditions.ConditionFactory(test.ComposeVariables(), test.ComposeEnv(), test.RunDirectory),
         'Testers': testers,
         # break these out of tester space
         # to make it easier to right a test

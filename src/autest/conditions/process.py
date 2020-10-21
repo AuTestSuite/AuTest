@@ -1,14 +1,75 @@
+import hashlib
 import json
 import os
 import re
+import string
 import subprocess
-from typing import Union, List, Callable, Any, Optional
+from pathlib import Path
+from typing import Any, Callable, List, Optional, Union
+
 import autest.api as api
 import autest.common.is_a as is_a
 import autest.common.ospath as ospath
+import autest.common.process
 import autest.common.version as verlib
 import autest.common.win32 as win32
+import autest.core.streamwriter as streamwriter
 import hosts.output as host
+
+
+def _RunCommand(self, cmd, name:str, shell:bool):
+    
+    md5 = hashlib.md5()
+    if isinstance(cmd,(list,tuple)):
+        cmdstr = " ".join(cmd)
+    else:
+        cmdstr = cmd
+    host.WriteVerbose([f"condition.{name}","condition"], "Running Command {cmdstr}")
+    md5.update(cmdstr.encode())
+    sig = md5.hexdigest()[-4:]
+    # create a StreamWriter which will write out the stream data of the run
+    # to sorted files
+    output = streamwriter.StreamWriter(
+        os.path.join(
+            self._run_directory,
+            f"_output{os.sep}condition-{name}-{sig}"
+        ),
+        cmdstr,
+        self.Env
+    )
+
+    # the command line we will run. We add the RunDirectory to the start of the command
+    # to avoid having to deal with cwddir() issues
+    command_line = f"cd $AUTEST_RUN_DIR && {cmd}"
+    # subsitute the value of the string via the template engine
+    # as this provide a safe cross platform $subst model.
+    template = string.Template(command_line)
+    command_line = template.substitute(self.Env)
+
+    proc = autest.common.process.Popen(
+        command_line,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=self.Env
+    )
+
+    # get the output stream from the process we created and redirect to
+    # files
+    stdout = streamwriter.PipeRedirector(proc.stdout, output.WriteStdOut)
+    stderr = streamwriter.PipeRedirector(proc.stderr, output.WriteStdErr)
+
+    proc.wait()
+
+    # clean up directory objects for this run
+    stdout.close()
+    stderr.close()
+
+    output.Close()
+    out = Path(output.FullFile).read_bytes()
+    
+    host.WriteVerbose([f"condition.{name}","condition"], "Command {proc.returncode}")
+    return proc.returncode , out
 
 
 def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
@@ -41,7 +102,7 @@ def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
 
     '''
     def _check(output):
-        output= output.split("\n")[0]
+        output = output.split("\n")[0]
         lst = json.loads(output)
         for i in lst:
             if i['name'] == package:
@@ -56,7 +117,7 @@ def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
     )
 
 
-def IsElevated(self, msg: str, pass_value:int=0):    # default pass value of 0 == os.geteuid (which for root is 0)
+def IsElevated(self, msg: str, pass_value: int = 0):    # default pass value of 0 == os.geteuid (which for root is 0)
     '''
     Returns a condition that test AuTest is running as a privilege process.
     On Unix based systems this mean root permission
@@ -82,7 +143,7 @@ def IsElevated(self, msg: str, pass_value:int=0):    # default pass value of 0 =
         raise OSError("OS not identified. Can't check for elevated privilege.")
 
 
-def RunCommand(self, command: str, msg: str, pass_value: int=0, env=None, shell=False):
+def RunCommand(self, command: str, msg: str, pass_value: int = 0, shell=False):
     '''
     Returns a condition that will run a command and test that return code matches the expected value.
     Use this to run custom command to test for state or to build more custom condition when creating an extension.
@@ -91,21 +152,18 @@ def RunCommand(self, command: str, msg: str, pass_value: int=0, env=None, shell=
         command: The command string with anyarguments
         msg: The message to print the condition fails
         pass_value: value to test for the condition to pass
-        env: optional environment to use for running the command
         shell: run the command in a shell vs running it without a shell
 
     '''
 
-    # todo fix to support env arg
-
     return self.Condition(
-        lambda: subprocess.call(command, shell=shell),
+        lambda: _RunCommand(self, command, "runcommand",shell=shell)[0],
         msg,
-        pass_value
+        pass_value,
     )
 
 
-def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str, pass_value: Any=True, neg_msg:Optional[str]=None, shell:bool=False):
+def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str, pass_value: Any = True, neg_msg: Optional[str] = None, shell: bool = False):
     '''
     Returns a condition that will run a command and test the output via a callback function.
     The condition test will pass given that the command run without error
@@ -116,24 +174,19 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
         check_func: The callback function used to test the output of the command.
         msg: The message to print about the condition.
         pass_value: Value to test for the condition to pass.
-        env: Optional environment to use for running the command.
         neg_msg: Option message to print if the condition fails.
         shell: Run the command in a shell vs running it without a shell.
 
     '''
     def check_logic():
-        try:
-            host.WriteVerbose(["setup"], "Running command:\n", command)
-            output = subprocess.check_output(
-                command, universal_newlines=True,
-                stderr=subprocess.STDOUT,
-                shell=shell,
-                env=self.Env,
-            )
-        except (subprocess.CalledProcessError, OSError):
-            host.WriteVerbose(["setup"], "Command Failed")
+        host.WriteVerbose(["condition.check_logic","condition"], "Running Command {command}")
+        rcode, sbuff = _RunCommand(self, command, "CheckOutput", shell=shell)
+        if rcode:
+            host.WriteVerbose(["condition.check_logic","condition"], "Command Failed")
             return False
-        return check_func(output)
+        out = Path(sbuff.FullFile).read_bytes()        
+        host.WriteVerbose(["condition.check_logic","condition"], "Command Passed")
+        return check_func(out)
 
     return self.Condition(
         check_logic,
@@ -143,7 +196,7 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
     )
 
 
-def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, output_parser: Optional[Callable[[str], Union[str,None]]]=None, shell=False):
+def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, output_parser: Optional[Callable[[str], Union[str, None]]] = None, shell=False):
     '''
     Returns a condition that will run a command and test the output matches a predefined version match callback.
 
@@ -170,7 +223,6 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
             The function will be given a string of the out of the command to parse.
             It has to return back a string with the version value in it or None is it failed to parse the value.
         pass_value: Value to test for the condition to pass.
-        env: Optional environment to use for running the command.
         neg_msg: Option message to print if the condition fails.
         shell: Run the command in a shell vs running it without a shell.
 

@@ -1,12 +1,11 @@
-from __future__ import absolute_import, division, print_function
+import os
+import re
+import sys
+import threading
+import traceback
+from typing import Dict
 
 import hosts.output as host
-
-import threading
-import re
-import os
-import sys
-import traceback
 
 
 class PipeRedirector(object):
@@ -176,7 +175,7 @@ class StreamWriter(object):
     def gen_fish_script(self):
         pass
 
-    def gen_bash_script(self, cmd, env):
+    def gen_bash_script(self, cmd: str, env: Dict[str, str]):
         ret = "#!/bin/bash\n"
         ret += self.gen_set_env(env, "export {0}=\"{1}\"\n")
         ret += cmd + "\n"

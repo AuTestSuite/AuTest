@@ -41,9 +41,10 @@ class Condition(object):
 
 class ConditionFactory(object):
 
-    def __init__(self, variables, env):
+    def __init__(self, variables, env, RunDirectory):
         self.__variables = variables
         self.__env = StringDict(env)
+        self._run_directory=RunDirectory
 
     @property
     def Variables(self):
