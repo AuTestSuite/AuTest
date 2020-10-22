@@ -19,6 +19,7 @@ def AddSetupItem(item, name=None, ns=None):
     if not glb.running_main:
         return
     # helper function
+
     def wrapper(self, *lst, **kw):
         self._add_item(item(*lst, **kw))
 
@@ -27,7 +28,7 @@ def AddSetupItem(item, name=None, ns=None):
         host.WriteError(
             "Object must be subclass of autest.core.setupitem.SetupItem",
             stack=host.getCurrentStack(1)
-            )
+        )
 
     # get name of task if user did not provide a value
     if name is None:

@@ -11,12 +11,12 @@ For example, different version control tools may have commonly named actions.
 These items will be listed below in the form of **<namespace>.<method>** to help clarify grouping.
 
 
-.. py:method:: FromDirectory(path)
+.. py:method:: Copy.FromDirectory(path)
 
     This method copies items from a given directory to test sandbox directory.
     All paths are relative from the Test.TestRoot directory,
     unless if the path provided is an absolute path.
-    The same as:
+    The same as saying:
 
     .. sourcecode:: python
 
@@ -32,13 +32,13 @@ These items will be listed below in the form of **<namespace>.<method>** to help
 
     .. code:: python
 
-        Setup.Copy.FromDirectory("find_item1")
+        Setup.Copy.FromDirectory("example/case1")
 
 
 .. py:method:: Copy.FromTemplate(dir)
 
     This method copies data from a directory under the template directory under the Test.TestRoot directory.
-    The same as:
+    The same as saying:
 
     .. code:: python
 
@@ -57,20 +57,20 @@ These items will be listed below in the form of **<namespace>.<method>** to help
         Setup.Copy.FromTemplate("case1")
 
 
-.. py:method:: Copy(FromPath,ToPath=None)
+.. py:method:: Copy(source, target=None)
 
     This method copies a file or directory to a location under the Sandbox location for the test.
     This is the core function used to by FromTemplate() or FromDirectory().
-    The optional ToPath argument can be used to rename the item,
+    The optional target argument can be used to rename the item,
     or to copy the item to a different subdirectory under the sandbox directory.
 
-    :arg str FromPath: Path to copy
-    :arg str ToPath: Path to copy
+    :arg str source: Path to copy
+    :arg str target: Path to copy
 
     **Examples**
 
     Copy a contents of directory to be in the root of the sandbox.
-    This is the same as `Setup.FromDirectory("mytestcase")`
+    Using **Setup.FromDirectory("mytestcase")** may be more clear.
 
     .. code:: python
 
@@ -90,19 +90,36 @@ These items will be listed below in the form of **<namespace>.<method>** to help
         Setup.Copy("a.txt")
 
 
-.. py:method:: CopyAs(FromPath,ToPath,targetname)
+.. py:method:: CopyAs(source, target=None, name)
 
     Will copy the item to the new locations.
-    Differs from Copy as the ToPath argument is always viewed as a directory.
-    Use this function over the copy function to avoid system behavior hiccup that are common with the use of the OS copy function.
+    Differs from Copy as the target argument is always viewed as a directory.
+    Use this function over the copy function to avoid system behaviors where that target maybe be viewed as a file or directory depending on if the existence of the target on disk.
 
-    :arg str FromPath: Path to copy
-    :arg str ToPath: Directcory to copy to
-    :arg str targetname: name to rename item to under the ToPath
+    :arg str source: Path to copy
+    :arg str target: Directory to copy to. If set to None will be the sandbox directory
+    :arg str name: name to rename item to under the ToPath
 
     **Example**
 
-    TBD
+    This will copy a file to the root sandbox directory
+
+    .. code:: python
+
+        Setup.CopyAs("a.txt")
+
+    This will copy a file to the root sandbox directory and rename the file a1.txt
+
+    .. code:: python
+
+        Setup.CopyAs('a.txt',name='a1.txt')
+
+    This will copy a file to the directory sub1/sub2 and rename the file as a1.txt
+
+    .. code:: python
+
+        Setup.CopyAs("a.txt",'sub1/sub2', 'a1.txt')
+
 
 .. py:method:: MakeDir(path, mode=None)
 

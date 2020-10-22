@@ -72,7 +72,7 @@ def ProcessInfo(ps, indent=0):
 def SetupItemData(check, indent=0):
     ret = ""
     result = ResultType.to_color_string(check._Result)
-    ret = '{0} : {1} - {2}\n'.format("Setting up", check.ItemName, result)
+    ret = f'Setting up : {check.Description} - {result}\n'
 
     if check._Result != ResultType.Passed:
         ret += '   Reason: {0}\n'.format(indentStr(check._Reason, 4, 0))

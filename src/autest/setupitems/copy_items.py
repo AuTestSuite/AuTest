@@ -12,7 +12,7 @@ class Copy(setupitem.SetupItem):
         self.source = source
         self.target = target
         self.copy_logic = copy_logic
-        self.Description = "Copy {0} to {1}".format(self.source, self.target)
+        self.Description = f"Copying '{self.source}' to '{self.target}'"
 
     def setup(self):
         try:
@@ -28,7 +28,8 @@ class FromDirectory(setupitem.SetupItem):
             itemname="Setup test from Directory")
         self.source = source
         self.copy_logic = copy_logic
-        self.Description = "Copy {0} to sandbox directory".format(self.source)
+        self.Description = f"Copying '{self.source}' to sandbox directory"
+        print("called")
 
     def setup(self):
         try:
@@ -43,8 +44,8 @@ class FromTemplate(setupitem.SetupItem):
         super(FromTemplate, self).__init__(itemname="Setup test from Template")
         self.source = source
         self.copy_logic = copy_logic
-        self.Description = "Copy {0} to sandbox directory".format(
-            os.path.join("templates", self.source))
+        src = os.path.join('templates', self.source)
+        self.Description = f"Copying {src} to sandbox directory"
 
     def setup(self):
         try:

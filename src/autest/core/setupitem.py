@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+from pathlib import Path
 import autest.core.streamwriter as streamwriter
 from autest.core import CopyLogic
 import autest.common.process
@@ -116,7 +116,7 @@ class SetupItem(object):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=self.ComposeEnv()
-            )
+        )
 
         # get the output stream from the process we created and redirect to
         # files
@@ -163,17 +163,24 @@ class SetupItem(object):
         or not.
         '''
         source, targetdir = self._copy_setup(source, targetdir)
-        self.MakeDir(targetdir)
+        source = Path(source)
+        targetdir = Path(targetdir)
+        targetdir.mkdir(exist_ok=True)
+        if source.is_dir():
+            host.WriteError("Copyas() Source argument must be a file not directory", stack=self.stack)
+
         if targetname is None:
             target = targetdir
         else:
-            target = os.path.join(targetdir, targetname)
+            target = targetdir / targetname
+
         host.WriteVerbose("setup", "Copying {0} as {1}".format(source, target))
         try:
             shutil.copy2(source, target)
         except Exception as e:
-            raise SetupError("Cannot copy {0} to {1} because {2}".format(
-                source, targetdir, str(e)))
+            msg = f"Cannot copy {source} to {targetdir} because {e}"
+            host.WriteVerbose("setup", msg)
+            raise SetupError(msg)
 
     def MakeDir(self, path, mode: int = None):
         # check if the path given is in the sandbox if abs
@@ -245,7 +252,7 @@ class SetupItem(object):
     def _smartLink(self, source, target, link_policy, copy_func):
         '''
         Tires to make a Hard link then a SymLink then do a copy
-        ToDo: look at making this overidable in what logic is used
+        ToDo: look at making this overideable in what logic is used
         such as hard_copy or soft_copy as some tests might want to
         control how this smart logic is handled
         '''
@@ -257,7 +264,7 @@ class SetupItem(object):
                 return
             except Exception as e:
                 host.WriteVerbose("setup", "Hardlinking - Failed!")
-                host.WriteVerbose("setup", "Hardlinking -",e)
+                host.WriteVerbose("setup", "Hardlinking -", e)
                 if link_policy == CopyLogic.HardSoft:
                     copy_func(source, target, CopyLogic.Soft)
                 else:
@@ -266,9 +273,9 @@ class SetupItem(object):
             try:
                 host.WriteVerbose("setup", "Symlinking {0} to {1}".format(source, target))
                 self.SymLink(source, target)
-            except Exception as e:                
+            except Exception as e:
                 host.WriteVerbose("setup", "Symlinking - Failed!")
-                host.WriteVerbose("setup", "Symlinking -",e)
+                host.WriteVerbose("setup", "Symlinking -", e)
                 copy_func(source, target, CopyLogic.Copy)
 
         elif link_policy == CopyLogic.HardSoftFiles or link_policy == CopyLogic.HardFiles:

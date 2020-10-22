@@ -1,23 +1,28 @@
-from __future__ import absolute_import, division, print_function
-import autest.core.setupitem as setupitem
-from autest.exceptions.setuperror import SetupError
+from pathlib import Path
+
 import autest.api as api
+import autest.core.setupitem as setupitem
+import hosts.output as host
+from autest.exceptions.setuperror import SetupError
 
 
 class CopyAs(setupitem.SetupItem):
-    def __init__(self, source, targetdir, targetname=None):
+    def __init__(self, source, targetdir=None, name=None):
         super(CopyAs, self).__init__(itemname="CopyAs")
+        self.stack = host.getCurrentStack(2)
         self.source = source
         self.targetdir = targetdir
-        self.targetname = targetname
-        if targetname:
-            self.Description = "Copy {0} to {1} as {2}".format(
-                self.source, self.targetdir, self.targetname)
+        self.targetname = name
+        if not targetname:
+            self.targetname = Path(source).name
+        if targetdir:
+            self.Description = f"Copying '{self.source}' to directory '{self.targetdir}' as '{self.targetname}''"
         else:
-            self.Description = "Copy {0} to {1}".format(self.source,
-                                                        self.targetdir)
+            self.Description = f"Copying '{self.source}' as '{self.targetname}'"
 
     def setup(self):
+        if self.targetdir is None:
+            self.targetdir = self.SandBoxDir
         try:
             self.CopyAs(self.source, self.targetdir, self.targetname)
         except Exception as e:
