@@ -111,19 +111,19 @@ def main():
             #  delay after control-c before kill
             'KillDelaySecond': 10,  # most programs should finish in tens second
 
-            'Process' : Variables({
+            'Process': Variables({
                 # time each test process is allowed to run before we stop it.
-                'TimeOut': 600 # default to 600 seconds 10 minutes.
+                'TimeOut': 600  # default to 600 seconds 10 minutes.
             }),
 
-            'TestRun' : Variables({
+            'TestRun': Variables({
                 # time each test is allowed to run before we stop it.
-                'TimeOut': None # default run forever
+                'TimeOut': None  # default run forever
             }),
 
-            'Test' : Variables({
+            'Test': Variables({
                 # time each test is allowed to run before we stop it.
-                'TimeOut': None # default run forever
+                'TimeOut': None  # default run forever
             }),
 
             ########################

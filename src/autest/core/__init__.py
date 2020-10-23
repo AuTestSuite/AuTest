@@ -14,4 +14,3 @@ class CopyLogic:
         if logic == CopyLogic.Default:
             return CopyLogic.Copy
         return logic
-

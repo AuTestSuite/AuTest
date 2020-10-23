@@ -5,7 +5,8 @@ import autest.common.reg as reg
 
 # clean this up some mre ( key vs list of keys.. better example to clarify root and key forms)
 
-def HasRegKey(self, root:str, keys:List[str], msg:str):
+
+def HasRegKey(self, root: str, keys: List[str], msg: str):
     '''
     Returns a condition that will test if a given key are found in the registry on windows.
 
@@ -18,5 +19,6 @@ def HasRegKey(self, root:str, keys:List[str], msg:str):
 
 # def RegistryKeyEqual(self,key,value):
 # pass
+
 
 api.ExtendCondition(HasRegKey)

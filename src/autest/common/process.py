@@ -2,7 +2,6 @@
 Module overrides Popen and introduces killtree function
 '''
 
-from __future__ import absolute_import, division, print_function
 
 import ctypes
 import os

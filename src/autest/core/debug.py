@@ -11,5 +11,4 @@ def get_user_frame(start_depth=0):
             return True
         return False
 
-    return hosts.output.getCurrentStack(start_depth,is_user_frame)
-
+    return hosts.output.getCurrentStack(start_depth, is_user_frame)

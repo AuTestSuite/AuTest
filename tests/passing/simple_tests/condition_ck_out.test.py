@@ -1,8 +1,10 @@
 Test.Summary = "Test a condition that should fail because the check function failed"
 
+
 def out_test(output):
     if "foo" in output:
         return True
+
 
 Test.SkipUnless(
     Condition.CheckOutput(

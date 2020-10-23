@@ -19,7 +19,7 @@ def FileExists(file_path: Union[str, File]):
 
     def file_exists(process, **kw):
         #pylint: disable=unused-argument
-        fpath=file_path
+        fpath = file_path
         if not os.path.isabs(file_path):
             fpath = os.path.normpath(
                 os.path.join(
@@ -52,7 +52,7 @@ def FileNotExists(file_path: Union[str, File]):
 
     def file_not_exists(process, **kw):
         #pylint: disable=unused-argument
-        fpath=file_path
+        fpath = file_path
         if not os.path.isabs(file_path):
             fpath = os.path.normpath(
                 os.path.join(
@@ -88,7 +88,7 @@ def FileModified(file_path: Union[str, File]):
 
     def file_is_modified(process, **kw):
         #pylint: disable=unused-argument
-        fpath=file_path
+        fpath = file_path
         host.WriteDebug(
             ['FileModified', 'when'],
             "working out of directory {0}".format(os.getcwd())

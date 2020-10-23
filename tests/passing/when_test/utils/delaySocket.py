@@ -1,13 +1,15 @@
-import time 
+import time
 import argparse
 import threading
 import socket
+
 
 def delayed_listen(s, delay):
     print("Sleeping")
     time.sleep(delay)
     print("Awake, listening now")
     s.listen(500)   # it should be s.listen() but the argument only became optional in python3.5
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -43,5 +45,5 @@ if __name__ == '__main__':
 
             for t in threads:
                 t.join()
-            
+
             break

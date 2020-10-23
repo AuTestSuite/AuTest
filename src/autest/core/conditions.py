@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 
 from builtins import object
 
@@ -44,7 +44,7 @@ class ConditionFactory(object):
     def __init__(self, variables, env, RunDirectory):
         self.__variables = variables
         self.__env = StringDict(env)
-        self._run_directory=RunDirectory
+        self._run_directory = RunDirectory
 
     @property
     def Variables(self):

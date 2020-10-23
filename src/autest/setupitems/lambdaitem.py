@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import autest.core.setupitem as setupitem
 import autest.api as api
 
@@ -17,5 +17,6 @@ class Lambda(setupitem.SetupItem):
     def cleanup(self):
         if self.func_cleanup:
             self.func_cleanup()
+
 
 api.AddSetupItem(Lambda, "__call__", ns='Lambda')

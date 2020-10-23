@@ -1,5 +1,5 @@
 # pylint: disable=locally-disabled, protected-access
-from __future__ import absolute_import, division, print_function
+
 import os
 import sys
 import string
@@ -219,7 +219,6 @@ class Process_RunLogic(RunLogic):
                     self.__output)
                 self.__proc = None
 
-            
             if self.__stdout:
                 self.__stdout.close()
                 self.__stdout = None

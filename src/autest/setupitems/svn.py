@@ -5,7 +5,6 @@ from autest.exceptions.setuperror import SetupError
 import autest.api as api
 
 
-
 class CreateRepository(SetupItem):
     def __init__(self, name):  # ,dir_to_add):
         self._name = name

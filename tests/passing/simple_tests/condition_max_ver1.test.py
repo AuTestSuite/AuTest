@@ -1,8 +1,10 @@
 Test.Summary = "Test that we run because the max version is large enough"
 
+
 def out_test(output):
     if "python" in output.lower():
         return True
+
 
 Test.SkipUnless(
     Condition.EnsureVersion(

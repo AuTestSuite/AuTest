@@ -1,8 +1,10 @@
 Test.Summary = "Test that min version fails"
 
+
 def out_test(output):
     if "foo" in output:
         return True
+
 
 Test.SkipUnless(
     Condition.EnsureVersion(

@@ -1,7 +1,7 @@
 Test.Summary = "Test --env cli arguments"
 
 # Env for Test object scope
-Test.Env['MYLISTVALUE']="A:B"
+Test.Env['MYLISTVALUE'] = "A:B"
 
 Setup.Copy.FromDirectory('../../nested/cli/')
 

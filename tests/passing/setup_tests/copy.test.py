@@ -4,7 +4,7 @@ test.Summary = "Test the setup of Setup Copy logic"
 Setup.Copy.FromDirectory("data")
 Setup.Copy("data", "data")
 Setup.Copy("data", "data2")
-Setup.CopyAs("data/a.txt", targetname="a1.txt")
+Setup.CopyAs("data/a.txt", name="a1.txt")
 Setup.CopyAs("data/a.txt", "sub", "a.txt")
 
 t = Test.AddTestRun("Test file existence")

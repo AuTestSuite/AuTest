@@ -1,4 +1,7 @@
-from __future__ import absolute_import, division, print_function
+
+from autest.core.testrun import TestRun
+from autest.core.test import Test
+import autest.api
 import hosts.output as host
 from autest.common.constructor import call_base, smart_init
 from autest.core.testentity import TestEntity
@@ -91,12 +94,8 @@ class Processes(TestEntity):
             self.__default = self.Process("Default")
         return self.__default
 
-
-    def __getitem__(self,key):
+    def __getitem__(self, key):
         return self.__dict__[key]
 
 
-import autest.api
-from autest.core.test import Test
-from autest.core.testrun import TestRun
 autest.api.AddTestEntityMember(Processes, classes=[Test, TestRun])

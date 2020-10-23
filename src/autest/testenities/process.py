@@ -1,5 +1,7 @@
-from __future__ import absolute_import, division, print_function
 
+
+from autest.core.testrun import TestRun
+import autest.api
 from autest.common.constructor import call_base, smart_init
 from autest.core.testentity import TestEntity
 from autest.core.testerset import TesterSet
@@ -90,7 +92,7 @@ def Time(self, val):
     self.Processes.Default.Time = val
 
 
-#def TimeOut(self, val):
+# def TimeOut(self, val):
     #self.Processes.Default.TimeOut = val
 
 
@@ -158,8 +160,6 @@ class Streams(TestEntity):
         self._Runable.Processes.Default.Streams.Verbose = val
 
 
-import autest.api
-from autest.core.testrun import TestRun
 autest.api.AddTestEntityMember(Streams, classes=[TestRun])
 autest.api.ExtendTestRun(Command, setproperty=True)
 autest.api.ExtendTestRun(RawCommand, setproperty=True)

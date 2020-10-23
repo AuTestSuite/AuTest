@@ -47,11 +47,11 @@ class _Container(tester.Tester):
         for t in self._testers:
             t.TestValue = self._test_value
 
-    #@property
+    # @property
     # def KillOnFailure( self ):
     #    return self.__kill
 
-    #@KillOnFailure.setter
+    # @KillOnFailure.setter
     # def KillOnFailure( self, value ):
     #    self.__kill = value
 

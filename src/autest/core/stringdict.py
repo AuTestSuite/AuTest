@@ -1,8 +1,9 @@
-from __future__ import absolute_import, division, print_function
+
 from itertools import chain
 import autest.common.is_a as is_a
 import hosts.output as host
 from .debug import get_user_frame
+
 
 class StringDict(dict):
     def __init__(self, mapping=(), **kwargs):
@@ -36,4 +37,3 @@ class StringDict(dict):
 
     def update(self, mapping=(), **kwargs):
         super(StringDict, self).update(self._process_args(mapping, **kwargs))
-

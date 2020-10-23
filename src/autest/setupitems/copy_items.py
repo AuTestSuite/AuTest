@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import os
 import autest.core.setupitem as setupitem
 from autest.core import CopyLogic
@@ -29,7 +29,6 @@ class FromDirectory(setupitem.SetupItem):
         self.source = source
         self.copy_logic = copy_logic
         self.Description = f"Copying '{self.source}' to sandbox directory"
-        print("called")
 
     def setup(self):
         try:

@@ -59,12 +59,12 @@ class ZipContent(tester.Tester):
     ZIP_MAGIC = b'\x50\x4B\x05\x06'
 
     def __init__(
-            self,
-            includes: Optional[List[str]] = None,
-            excludes: Optional[List[str]] = None,
-            kill_on_failure: bool = False,
-            description_group: Optional[str] = None
-        ):
+        self,
+        includes: Optional[List[str]] = None,
+        excludes: Optional[List[str]] = None,
+        kill_on_failure: bool = False,
+        description_group: Optional[str] = None
+    ):
 
         self.__include = includes or ()
         self.__exclude = excludes or ()

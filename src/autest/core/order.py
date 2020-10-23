@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import time
 from collections import namedtuple
 
@@ -431,7 +431,7 @@ def GenerateStartOrderedList(item):
     fat_lst.reverse()
     for i in fat_lst:
         if i not in ret:
-            ret = [i]+ret
+            ret = [i] + ret
     return ret
 
 
@@ -475,6 +475,6 @@ def GenerateEndOrderedList(item):
     fat_lst.reverse()
     for i in fat_lst:
         if i not in ret:
-            ret = [i]+ret
+            ret = [i] + ret
 
     return ret

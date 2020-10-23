@@ -1,5 +1,6 @@
 # pylint: disable=locally-disabled, protected-access
-from __future__ import absolute_import, division, print_function
+
+import autest.api as api
 from autest.testers.tester import ResultType, Tester
 import hosts.output as host
 
@@ -253,8 +254,5 @@ def GenerateReport(info, ):  # args):
             ResultType.to_string(resType), amount))
 
 
-import autest.api as api
-
 api.RegisterReporter(GenerateReport, name="default")
 api.RegisterReporter(GenerateReport, name="color-console")
-

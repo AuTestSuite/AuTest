@@ -38,14 +38,14 @@ extensions = [
     'sphinx_autodoc_typehints',
 ]
 add_module_names = False
-autodoc_member_order='groupwise'
+autodoc_member_order = 'groupwise'
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns:List[Any] = []
+exclude_patterns: List[Any] = []
 
 
 # -- Options for HTML output -------------------------------------------------

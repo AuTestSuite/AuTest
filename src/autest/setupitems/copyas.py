@@ -13,7 +13,7 @@ class CopyAs(setupitem.SetupItem):
         self.source = source
         self.targetdir = targetdir
         self.targetname = name
-        if not targetname:
+        if not name:
             self.targetname = Path(source).name
         if targetdir:
             self.Description = f"Copying '{self.source}' to directory '{self.targetdir}' as '{self.targetname}''"

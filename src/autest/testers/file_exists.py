@@ -37,13 +37,13 @@ class FileExists(tester.Tester):
     '''
 
     def __init__(
-            self,
-            exists: bool,
-            test_value: Optional[str] = None,
-            kill_on_failure: bool = False,
-            description_group: Optional[str] = None,
-            description: Optional[str] = None
-        ):
+        self,
+        exists: bool,
+        test_value: Optional[str] = None,
+        kill_on_failure: bool = False,
+        description_group: Optional[str] = None,
+        description: Optional[str] = None
+    ):
 
         if description is None:
             if exists:

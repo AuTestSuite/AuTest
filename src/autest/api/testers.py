@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import hosts.output as host
 import autest.glb as glb
 import autest.testers
@@ -9,6 +9,7 @@ def AddTester(item, name=None):
     if not glb.running_main:
         return
     # helper function
+
     def wrapper(self, *lst, **kw):
         self._add_item(item(*lst, **kw))
 

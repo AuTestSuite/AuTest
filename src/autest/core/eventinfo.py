@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 from autest.common.event import EventInfo
 from autest.common.constructor import call_base, smart_init
 
@@ -18,9 +18,9 @@ class StartedInfo(EventInfo):
         pass
 
 
-#proxy object for runnable object to restrict what the user can call
+# proxy object for runnable object to restrict what the user can call
 class RunlogicWrapper(object):
-    def __init__(self,runlogic):
+    def __init__(self, runlogic):
         self.__runlogic = runlogic
 
     def isRunning(self):
@@ -94,8 +94,8 @@ class ProcessFinishedInfo(FinishedInfo):
     def StdErrFile(self):
         return self.__stderr_file
 
-    #@property
-    #def MessageFile(self):
+    # @property
+    # def MessageFile(self):
     #    return self.__message_file
 
     @property

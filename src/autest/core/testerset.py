@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import autest.testers as testers
 from collections import namedtuple
 from autest.common.constructor import call_base, smart_init
@@ -53,7 +53,7 @@ class TesterSet(object):
         return self
 
     def Clear(self):
-        self._testers= []
+        self._testers = []
         return self
 
     def _bind(self):

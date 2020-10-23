@@ -1,8 +1,10 @@
 Test.Summary = "Test we have a min version to run this test"
 
+
 def out_test(output):
     if "python" in output.lower():
         return True
+
 
 Test.SkipUnless(
     Condition.EnsureVersion(

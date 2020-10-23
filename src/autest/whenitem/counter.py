@@ -10,7 +10,7 @@ def Counter(count_to: int):
         count_to: number of times to call function before returning true.
 
     '''
-    initialState = {"counter" : 0}
+    initialState = {"counter": 0}
 
     def up_to_count():
         initialState["counter"] += 1

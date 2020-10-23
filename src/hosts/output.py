@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 from builtins import map
 import sys
 import inspect
@@ -96,4 +96,4 @@ def getCurrentStack(start_depth=0, matchfunc=None):
         for info in stack:
             if matchfunc(info):
                 return inspect.getframeinfo(info[0])
-    return inspect.getframeinfo(inspect.stack()[1+start_depth][0])
+    return inspect.getframeinfo(inspect.stack()[1 + start_depth][0])

@@ -5,7 +5,7 @@
 # copy and paste of code in different files.
 # this is a continous growing file...
 # Will probally break up into a module
-from __future__ import absolute_import, division, print_function
+
 import os
 
 if os.name == 'nt':
@@ -97,26 +97,25 @@ if os.name == 'nt':
     MAX_PATH = 260
 
     # create CreateSymbolicLink flags
-    
+
     SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1
     SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x2
-
 
     SmallProcessInfo = collections.namedtuple(
         'SmallProcessInfo', 'name pid ppid')
     SmallThreadInfo = collections.namedtuple('SmallThreadInfo', 'tid pid')
 
     class ProcessEntry32(ctypes.Structure):
-        _fields_ = [('dwSize',              DWORD),
-                    ('cntUsage',            DWORD),
-                    ('th32ProcessID',       DWORD),
-                    ('th32DefaultHeapID',   ctypes.POINTER(ctypes.c_ulong)),
-                    ('th32ModuleID',        DWORD),
-                    ('cntThreads',          DWORD),
+        _fields_ = [('dwSize', DWORD),
+                    ('cntUsage', DWORD),
+                    ('th32ProcessID', DWORD),
+                    ('th32DefaultHeapID', ctypes.POINTER(ctypes.c_ulong)),
+                    ('th32ModuleID', DWORD),
+                    ('cntThreads', DWORD),
                     ('th32ParentProcessID', DWORD),
-                    ('pcPriClassBase',      ctypes.c_long),
-                    ('dwFlags',             DWORD),
-                    ('szExeFile',           ctypes.c_char * MAX_PATH)]
+                    ('pcPriClassBase', ctypes.c_long),
+                    ('dwFlags', DWORD),
+                    ('szExeFile', ctypes.c_char * MAX_PATH)]
 
         def __init__(self):
             ctypes.Structure.__init__(self)
@@ -126,13 +125,13 @@ if os.name == 'nt':
             return SmallProcessInfo(self.szExeFile, self.th32ProcessID, self.th32ParentProcessID)
 
     class ThreadEntry32(ctypes.Structure):
-        _fields_ = [('dwSize',             DWORD),
-                    ('cntUsage',           DWORD),
-                    ('th32ThreadID',       DWORD),
+        _fields_ = [('dwSize', DWORD),
+                    ('cntUsage', DWORD),
+                    ('th32ThreadID', DWORD),
                     ('th32OwnerProcessID', DWORD),
-                    ('tpBasePri',          ctypes.c_long),
-                    ('tpDeltaPri',         ctypes.c_long),
-                    ('dwFlags',            DWORD)]
+                    ('tpBasePri', ctypes.c_long),
+                    ('tpDeltaPri', ctypes.c_long),
+                    ('dwFlags', DWORD)]
 
         def __init__(self):
             ctypes.Structure.__init__(self)

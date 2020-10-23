@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import os
 
 from autest.common.constructor import call_base, smart_init

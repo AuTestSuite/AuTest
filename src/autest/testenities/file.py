@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 
 import os
 
@@ -13,9 +13,9 @@ from autest.core.testerset import TesterSet
     Allows us to test for a file. We can test for size, existence and content
 '''
 
+
 @smart_init
 class File(TestEntity):
-
 
     @call_base(TestEntity=("runable", ))
     def __init__(self,

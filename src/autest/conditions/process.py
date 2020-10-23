@@ -17,14 +17,14 @@ import autest.core.streamwriter as streamwriter
 import hosts.output as host
 
 
-def _RunCommand(self, cmd, name:str, shell:bool):
-    
+def _RunCommand(self, cmd, name: str, shell: bool):
+
     md5 = hashlib.md5()
-    if isinstance(cmd,(list,tuple)):
+    if isinstance(cmd, (list, tuple)):
         cmdstr = " ".join(cmd)
     else:
         cmdstr = cmd
-    host.WriteVerbose([f"condition.{name}","condition"], "Running Command {cmdstr}")
+    host.WriteVerbose([f"condition.{name}", "condition"], "Running Command {cmdstr}")
     md5.update(cmdstr.encode())
     sig = md5.hexdigest()[-4:]
     # create a StreamWriter which will write out the stream data of the run
@@ -67,9 +67,9 @@ def _RunCommand(self, cmd, name:str, shell:bool):
 
     output.Close()
     out = Path(output.FullFile).read_bytes()
-    
-    host.WriteVerbose([f"condition.{name}","condition"], "Command {proc.returncode}")
-    return proc.returncode , out
+
+    host.WriteVerbose([f"condition.{name}", "condition"], "Command {proc.returncode}")
+    return proc.returncode, out
 
 
 def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
@@ -157,7 +157,7 @@ def RunCommand(self, command: str, msg: str, pass_value: int = 0, shell=False):
     '''
 
     return self.Condition(
-        lambda: _RunCommand(self, command, "runcommand",shell=shell)[0],
+        lambda: _RunCommand(self, command, "runcommand", shell=shell)[0],
         msg,
         pass_value,
     )
@@ -179,13 +179,13 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
 
     '''
     def check_logic():
-        host.WriteVerbose(["condition.check_logic","condition"], "Running Command {command}")
+        host.WriteVerbose(["condition.check_logic", "condition"], "Running Command {command}")
         rcode, sbuff = _RunCommand(self, command, "CheckOutput", shell=shell)
         if rcode:
-            host.WriteVerbose(["condition.check_logic","condition"], "Command Failed")
+            host.WriteVerbose(["condition.check_logic", "condition"], "Command Failed")
             return False
-        out = Path(sbuff.FullFile).read_bytes()        
-        host.WriteVerbose(["condition.check_logic","condition"], "Command Passed")
+        out = Path(sbuff.FullFile).read_bytes()
+        host.WriteVerbose(["condition.check_logic", "condition"], "Command Passed")
         return check_func(out)
 
     return self.Condition(

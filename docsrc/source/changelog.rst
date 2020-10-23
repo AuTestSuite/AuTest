@@ -2,10 +2,13 @@ Release Notes
 =============
 
 
-**Release  1.8.1**
+**Release  1.9.0**
 
+* [Fix][`PR #23 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/23>`_] Update documentation for Setup.Copy functions. 
+    * Add error message for Setup.CopyAs() when source is a directory
+    * Allow target directory for SetupCopyAs to be optional
+* [Fix][`PR #22 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/22>`_] Issue with condition and Setup.RunCommand from not processing **--env** argument values correctly
 * [Fix][`PR #20 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/20>`_] When.DirExists When.DirNotExists and When.DirModified functions not being imported as expected.
-* [Fix] Issue with condition and Setup.RunCommand from not processing `--env` values correctly
 
 **Release  1.8.1**
 

@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 
 import abc
 
@@ -32,7 +32,7 @@ class Runable(with_metaclass(_test_enity__metaclass__, DelayedEventMapper)):
 
     @call_base(DelayedEventMapper=())
     def __init__(self, parent=None):
-         # core events
+        # core events
         self.__SetupEvent = event.Event()
         self.__StartingEvent = event.Event()
         self.__StartedEvent = event.Event()
@@ -111,7 +111,7 @@ class Runable(with_metaclass(_test_enity__metaclass__, DelayedEventMapper)):
     def _do_run(self):
         self._Run()
 
-    def ComposeEnv(self) -> Dict[str,str]:
+    def ComposeEnv(self) -> Dict[str, str]:
         ret = {}
         if self.__parent:
             ret = self.__parent.ComposeEnv()

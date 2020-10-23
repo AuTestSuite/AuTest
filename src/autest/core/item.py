@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 from autest.common.constructor import call_base, smart_init
 
 
@@ -27,7 +27,6 @@ class Item(object):
         The name used to refer to this object
         '''
         return self.__ID
-
 
     @property
     def _Description(self):

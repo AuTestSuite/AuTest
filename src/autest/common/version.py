@@ -1,6 +1,6 @@
 # pulled from my Parts code in open source, removed some code that binds it to Parts
 # need to make this a general libary in python
-from __future__ import absolute_import, division, print_function
+
 
 '''
 version and version_range implementation to make life easier when dealing with
@@ -336,7 +336,7 @@ class Version(object):
             return ".".join(map(lambda x: isinstance(x, tuple) and "".join(map(str, x)) or str(x), self.parts[key]))
         else:
             tmp = self.parts[key]
-            return isinstance(tmp, tuple) and "".join(map(str, tmp))or str(tmp)
+            return isinstance(tmp, tuple) and "".join(map(str, tmp)) or str(tmp)
 
     def __len__(self):
         ''' Returns the length, or number of "dot" number that are contained in this version'''
@@ -540,5 +540,6 @@ class version_range(object):
         range string from construction.
         '''
         return str(self.range)
+
 
 VersionRange = version_range

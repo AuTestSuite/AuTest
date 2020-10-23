@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+
 import collections
 from . import is_a
 
@@ -40,5 +40,5 @@ class DelayVariable(object):
 class DelayFormat(DelayVariable):
 
     def __init__(self, sfmt, *lst, **kw):
-        tmp = lambda: sfmt.format(*lst, **kw)
+        def tmp(): return sfmt.format(*lst, **kw)
         super(DelayFormat, self).__init__(tmp)

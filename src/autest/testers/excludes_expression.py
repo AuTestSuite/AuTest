@@ -7,7 +7,6 @@ from autest.exceptions.killonfailure import KillOnFailureError
 from . import tester
 
 
-
 class ExcludesExpression(tester.Tester):
     '''
     Test that the content does not contain the provided expression.

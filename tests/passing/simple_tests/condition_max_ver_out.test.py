@@ -1,8 +1,10 @@
 Test.Summary = "Test that max version is to small and we fail"
 
+
 def out_test(output):
     if "foo" in output:
         return True
+
 
 Test.SkipUnless(
     Condition.EnsureVersion(

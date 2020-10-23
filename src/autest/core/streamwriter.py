@@ -265,7 +265,7 @@ class StreamWriter(object):
         grpstr = ''  # the string we will write out
 
         # number of items we have
-        break_size = len(brkup)-1
+        break_size = len(brkup) - 1
         for cnt, s in enumerate(brkup):
             if cnt < break_size:
                 # we did not assign anything yet
