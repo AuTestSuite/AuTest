@@ -6,6 +6,11 @@ Test.Summary = "Test that --env values are passed to different items that run sh
 # MYLISTVALUE = A:B  This is set value as --env as $MYLISTVALUE:C
 
 
+def env_test(env):
+    if "testvalue" in env:
+        return True
+
+
 Test.SkipIf(Condition.RunCommand('echo $MYVALUE $MYLISTVALUE> condition.txt', "a", "b", shell=True))
 Test.Disk.File("condition.txt", content='gold/env-cli.gold')
 

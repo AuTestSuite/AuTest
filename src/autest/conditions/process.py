@@ -184,9 +184,8 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
         if rcode:
             host.WriteVerbose(["condition.check_logic", "condition"], "Command Failed")
             return False
-        out = Path(sbuff.FullFile).read_bytes()
         host.WriteVerbose(["condition.check_logic", "condition"], "Command Passed")
-        return check_func(out)
+        return check_func(sbuff)
 
     return self.Condition(
         check_logic,
