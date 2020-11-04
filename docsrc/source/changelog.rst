@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**Release  1.9.1**
+
+* [Fix][`PR #24 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/24>`_] Adds tests for CheckOutput handling the --env values
+    * Fixes regression found in previous drop that could cause a crash with CheckOutput.
 
 **Release  1.9.0**
 
