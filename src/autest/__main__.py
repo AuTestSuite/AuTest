@@ -48,7 +48,7 @@ def main():
         exists=False,
         help="The root directory in which the tests will run")
 
-    setup.list_argument(
+    setup.env_list_argument(
         ["--env"],
         metavar="Key=Value",
         help="Set a variable to be used in the local test environment. Replaces value inherited from shell.")

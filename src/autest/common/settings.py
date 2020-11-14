@@ -86,6 +86,10 @@ class BaseSettings(object):
         self.add_argument(arguments, action=extendAction, nargs=nargs, choices=choices,
                           type=str, default=default, required=required, help=help, metavar=metavar, dest=dest, commands=commands)
 
+    def env_list_argument(self, arguments, nargs="*", choices=None, default=None, required=None, help=None, metavar=None, dest=None, commands=None):
+        self.add_argument(arguments, action="extend", nargs=nargs, choices=choices,
+                          type=str, default=default, required=required, help=help, metavar=metavar, dest=dest, commands=commands)
+
     def _bool(self, arg):
         opt_true_values = set(['y', 'yes', 'true', 't', '1', 'on', 'all'])
         opt_false_values = set(['n', 'no', 'false', 'f', '0', 'off', 'none'])
@@ -154,6 +158,9 @@ class RestrictedBase(BaseSettings):
         self.add_argument(arguments, action=extendAction, nargs=nargs, choices=choices,
                           type=str, default=default, required=required, help=help, metavar=metavar, dest=dest)
 
+    def env_list_argument(self, arguments, nargs="*", default=None, required=None, help=None, metavar=None, dest=None, exists=True):
+        self.add_argument(arguments, type=lambda x: self._path(
+            exists, x), action="extend", nargs=nargs, default=default, required=required, help=help, metavar=metavar, dest=dest)
 
 class Settings(BaseSettings):
     def __init__(self):
