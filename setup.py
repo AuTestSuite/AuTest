@@ -47,7 +47,6 @@ The Reusable Gold testing system is not about making another unit testing framew
       package_data={
           # If any package contains *.txt or *.rst files, include them:
           '': ['*.txt'],
-
       },
 
       # see classifiers
@@ -62,6 +61,7 @@ The Reusable Gold testing system is not about making another unit testing framew
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
           'Topic :: Software Development :: Testing',
           'Topic :: Terminals',
       ],

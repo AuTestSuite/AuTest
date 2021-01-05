@@ -6,7 +6,6 @@ import string
 import subprocess
 from pathlib import Path
 from typing import Any, Callable, List, Optional, Union
-
 import autest.api as api
 import autest.common.is_a as is_a
 import autest.common.ospath as ospath
@@ -18,13 +17,12 @@ import hosts.output as host
 
 
 def _RunCommand(self, cmd, name: str, shell: bool):
-
     md5 = hashlib.md5()
     if isinstance(cmd, (list, tuple)):
         cmdstr = " ".join(cmd)
     else:
         cmdstr = cmd
-    host.WriteVerbose([f"condition.{name}", "condition"], "Running Command {cmdstr}")
+    host.WriteVerbose([f"condition.{name}", "condition"], f"Running Command {cmdstr}")
     md5.update(cmdstr.encode())
     sig = md5.hexdigest()[-4:]
     # create a StreamWriter which will write out the stream data of the run
@@ -37,15 +35,13 @@ def _RunCommand(self, cmd, name: str, shell: bool):
         cmdstr,
         self.Env
     )
-
     # the command line we will run. We add the RunDirectory to the start of the command
     # to avoid having to deal with cwddir() issues
-    command_line = f"cd $AUTEST_RUN_DIR && {cmd}"
+    command_line = f"cd $AUTEST_RUN_DIR && {cmdstr}"
     # subsitute the value of the string via the template engine
     # as this provide a safe cross platform $subst model.
     template = string.Template(command_line)
     command_line = template.substitute(self.Env)
-
     proc = autest.common.process.Popen(
         command_line,
         shell=True,
@@ -53,53 +49,36 @@ def _RunCommand(self, cmd, name: str, shell: bool):
         stderr=subprocess.PIPE,
         env=self.Env
     )
-
     # get the output stream from the process we created and redirect to
     # files
     stdout = streamwriter.PipeRedirector(proc.stdout, output.WriteStdOut)
     stderr = streamwriter.PipeRedirector(proc.stderr, output.WriteStdErr)
-
     proc.wait()
-
     # clean up directory objects for this run
     stdout.close()
     stderr.close()
-
     output.Close()
     out = Path(output.FullFile).read_bytes()
-
-    host.WriteVerbose([f"condition.{name}", "condition"], "Command {proc.returncode}")
+    host.WriteVerbose([f"condition.{name}", "condition"], f"Command {proc.returncode}")
     return proc.returncode, out
 
 
 def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
     '''
     Returns a condition that test if a python package is installed by calling the current active pip.
-
     Args:
         package: One or more packages to test for. The input can be a space seperated string or a list.
         msg: The message to print if the packages are not found
-
     Examples:
-
         Test to see if requests is installed.
-
         .. code:: python3
-
             Test.SkipUnless(Condition.HasProgram.HasPythonPackage("requests"))
-
         Test to see if requests and microserver is installed.
-
         .. code:: python3
-
             Test.SkipUnless(Condition.HasProgram.HasPythonPackage("requests microserver"))
-
         or via a list.
-
         .. code:: python3
-
             Test.SkipUnless(Condition.HasProgram.HasPythonPackage(["requests","microserver"]))
-
     '''
     def _check(output):
         output = output.split("\n")[0]
@@ -108,7 +87,6 @@ def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
             if i['name'] == package:
                 return True
             return False
-
     return self.CheckOutput(
         ["pip", "list", "--format", "json"],
         _check,
@@ -122,7 +100,6 @@ def IsElevated(self, msg: str, pass_value: int = 0):    # default pass value of 
     Returns a condition that test AuTest is running as a privilege process.
     On Unix based systems this mean root permission
     On Window this mean running with admin rights
-
     Args:
         msg: The message to print the condition fails
         pass_value: advance value used to control what value is tested when checking the result of running privilege
@@ -147,15 +124,12 @@ def RunCommand(self, command: str, msg: str, pass_value: int = 0, shell=False):
     '''
     Returns a condition that will run a command and test that return code matches the expected value.
     Use this to run custom command to test for state or to build more custom condition when creating an extension.
-
     Args:
         command: The command string with anyarguments
         msg: The message to print the condition fails
         pass_value: value to test for the condition to pass
         shell: run the command in a shell vs running it without a shell
-
     '''
-
     return self.Condition(
         lambda: _RunCommand(self, command, "runcommand", shell=shell)[0],
         msg,
@@ -168,7 +142,6 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
     Returns a condition that will run a command and test the output via a callback function.
     The condition test will pass given that the command run without error
     and the return code of the function provided by the check_func argument matches the pass_value.
-
     Args:
         command: The command to run
         check_func: The callback function used to test the output of the command.
@@ -176,17 +149,18 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
         pass_value: Value to test for the condition to pass.
         neg_msg: Option message to print if the condition fails.
         shell: Run the command in a shell vs running it without a shell.
-
     '''
     def check_logic():
-        host.WriteVerbose(["condition.check_logic", "condition"], "Running Command {command}")
+        host.WriteVerbose(["condition.check_logic", "condition"], f"Running Command {command}")
         rcode, sbuff = _RunCommand(self, command, "CheckOutput", shell=shell)
         if rcode:
             host.WriteVerbose(["condition.check_logic", "condition"], "Command Failed")
             return False
         host.WriteVerbose(["condition.check_logic", "condition"], "Command Passed")
-        return check_func(sbuff)
-
+        try:
+            return check_func(sbuff.decode())
+        except TypeError:
+            return check_func(sbuff)
     return self.Condition(
         check_logic,
         msg,
@@ -198,7 +172,6 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
 def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, output_parser: Optional[Callable[[str], Union[str, None]]] = None, shell=False):
     '''
     Returns a condition that will run a command and test the output matches a predefined version match callback.
-
     Args:
         command:
             The command to run to get the version value
@@ -209,11 +182,9 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         max_version:
             Optional maximum version that we much match.
             If not provided and value greater or equal to the min version will be accepted
-
             Note:
                 One value for min_version or max_version has to be provided.
                 Both cannot be None.
-
         msg: The message to print about the condition.
         output_parser:
             Optional callback function that can be used retrieve the version.
@@ -224,27 +195,19 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         pass_value: Value to test for the condition to pass.
         neg_msg: Option message to print if the condition fails.
         shell: Run the command in a shell vs running it without a shell.
-
-
     .. code:: python3
-
         Test.SkipIf(Condition.EnsureVersion(['curl','--version']),"7.47.0')
-
     '''
-
     has_min = False
     has_max = False
-
     if min_version:
         has_min = True
     else:
         min_version = "*"
-
     if max_version:
         has_max = True
     else:
         max_version = "*"
-
     if not has_min and not has_max:
         host.WriteError(
             "Invalid arguments - min_version or max_version must be set", stack=host.getCurrentStack(1)
@@ -258,13 +221,11 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         if out:
             return out.groupdict()['ver']
         return None
-
     # set output parser
     if not output_parser:
         output_parser = default
 
     def version_check(output):
-
         # turn our version to an version object
         ver_rng = verlib.VersionRange(
             "[{min}-{max}]".format(min=min_version, max=max_version))
@@ -274,7 +235,6 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         if ver and ver in ver_rng:
             return True
         return False
-
     if not msg:
         msg = "{command} needs to be"
         if has_min and min_version != "*":
@@ -283,12 +243,10 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
             msg += " and"
         if has_max and max_version != "*":
             msg += " <= version {max_version}"
-
     if is_a.List(command):
         cmd = command[0]
     else:
         cmd = command.split()[0]
-
     return self.CheckOutput(
         command,
         version_check,
@@ -301,7 +259,6 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
 def HasProgram(self, program: str, msg, pass_value=True, path=None):
     '''
     Returns a condition that will test is a application can be found on the path.
-
     Args:
         program:
             The program to test for.
@@ -315,9 +272,6 @@ def HasProgram(self, program: str, msg, pass_value=True, path=None):
         path:
             optional string of extra paths to check for the application
             the path most be formatted as the local system PATH variable with the local use of ':' or ';'
-
-
-
     '''
     return self.Condition(lambda: ospath.has_program(program, path), msg, pass_value)
 
