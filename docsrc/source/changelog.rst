@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+**Release  1.9.2**
+
+* [Fix] regression in last release with handling conditions callback as strings or byte strings
+* [Fix] Some verbose message that did not format correctly
+* Add some tests to address failures founds
+
 **Release  1.9.1**
 
 * [Fix][`PR #24 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/24>`_] Adds tests for CheckOutput handling the --env values
