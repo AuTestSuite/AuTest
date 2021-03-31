@@ -10,6 +10,7 @@ mypy = "*"
 autopep8 = "*"
 sphinx-autodoc-typehints = "*"
 doc8 = "*"
+nox = "*"
 
 [packages]
 autest = {editable = true,path = "."}

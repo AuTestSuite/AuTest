@@ -36,6 +36,9 @@ class GoldFile(tester.Tester):
         normalize_eol:
             If True will normalize the `\\\\r\\\\n` sequences to `\\\\n` to help with common differences between different
             operating system such as Unix or Windows systems. If False no normalizing will happen.
+        case_insensitive:
+            If True, the content of both the gold file and the stream will be compared case-insensitively. If False,
+            gold comparison will be case-sensitive.
         description_group:
             This is extra information about the file, process, etc that might be useful to give the test more context,
             should be in form of 'Type: name', ie 'Process: proc1'
@@ -58,6 +61,7 @@ class GoldFile(tester.Tester):
                  test_value: Optional[str] = None,
                  kill_on_failure: bool = False,
                  normalize_eol: bool = True,
+                 case_insensitive: bool = False,
                  description_group: str = None,
                  description: Optional[str] = None):
         if description is None:
@@ -72,6 +76,7 @@ class GoldFile(tester.Tester):
 
         self._goldfile = self.Value
         self._normalize_eol = normalize_eol
+        self._case_insensitive = case_insensitive
         self.__test_value = None
 
     def test(self, eventinfo, **kw):
@@ -111,6 +116,10 @@ class GoldFile(tester.Tester):
         if self._normalize_eol:
             val_content = val_content.replace("\r\n", "\n")
             gf_content = gf_content.replace("\r\n", "\n")
+
+        if self._case_insensitive:
+            val_content = val_content.lower()
+            gf_content = gf_content.lower()
 
         # make seqerncer differ
         seq = difflib.SequenceMatcher(

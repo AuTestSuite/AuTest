@@ -21,3 +21,12 @@ else:
     t.Command='echo "Hello 7"'
 t.ReturnCode=0
 t.Streams.All="gold/hello.gold"
+
+Test.Summary="Test mismatched output from gold file with case_insensitive"
+t=Test.AddTestRun("case_insensitive")
+if Condition.IsPlatform('win32'):
+    t.Command='echo Hello World'
+else:
+    t.Command='echo "Hello World"'
+t.Streams.stdout= Testers.GoldFile("gold/hello.gold", case_insensitive=True)
+t.ReturnCode=0
