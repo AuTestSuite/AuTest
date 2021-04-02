@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**Release  1.10.0**
+
+* [Feature][`PR #26 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/26>`_] Allows users to do a case-insensitive compare for their gold files by passing case_insensitive=True to Testers.GoldFile.
+
 **Release  1.9.2**
 
 * [Fix] regression in last release with handling conditions callback as strings or byte strings
