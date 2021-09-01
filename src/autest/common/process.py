@@ -22,11 +22,11 @@ if os.name == 'nt':
         Kills a process with all its children
 
         Current issue... Windows is a message based system. Classic CLI programing generally does not use message pumps.
-        By design windows does not use interupts, but instead an event based system. This mean the way 
-        CTRL-C is handled is different from that of POSIX like OS systems. In this case Windows dispatched a CTRL-C to 
+        By design windows does not use interupts, but instead an event based system. This mean the way
+        CTRL-C is handled is different from that of POSIX like OS systems. In this case Windows dispatched a CTRL-C to
         all processes in a given console windows. It does not give it to given process. To work around this we can make
-        a stub program that can assign itself to a new console windows, dispatch the ctrl-c simutlated event to allow for 
-        the POSIX like sig.int logic. Otherwise, windows really was thinking you would send a quit messages and it 
+        a stub program that can assign itself to a new console windows, dispatch the ctrl-c simutlated event to allow for
+        the POSIX like sig.int logic. Otherwise, windows really was thinking you would send a quit messages and it
         would shut down before you did a terminate.
 
         '''

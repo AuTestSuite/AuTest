@@ -1,5 +1,6 @@
 
 import time
+from typing import List
 
 import hosts.output as host
 
@@ -21,7 +22,7 @@ class TestRun_RunLogic(RunLogic):
     def __init__(self):
         self.__running = False
         self.__running_processes = None
-        self.__test_processes = []
+        self.__test_processes:List[Process_RunLogic] = []
         self.__running_default = None
         self.__tr = None
         self._default = None
