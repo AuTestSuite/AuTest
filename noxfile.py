@@ -1,21 +1,21 @@
 import nox
 
 
-@nox.session(python=["3.6", "3.7", "3.8", "3.9",], name="passing")
+@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10"], name="passing")
 def passing_tests(session):
     '''Validate tests that should pass'''
     session.install("-e", ".")
     session.run("autest", "-D", "tests/passing")
 
 
-@nox.session(python=["3.6", "3.7", "3.8", "3.9",], name="failing")
+@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10"], name="failing")
 def failing_tests(session):
     '''Validate tests that should fail'''
     session.install("-e", ".")
     session.run("autest", "-D", "tests/failing", success_codes=[10])
 
 
-@nox.session(python=["3.6", "3.7", "3.8", "3.9",], name="site")
+@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10"], name="site")
 def site_passing_tests(session):
     '''Validate autest-site test cases'''
     session.install("-e", ".")

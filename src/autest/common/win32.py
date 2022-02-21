@@ -11,7 +11,7 @@ import os
 if os.name == 'nt':
 
     import ctypes
-    import collections
+    import collections.abc
     from ctypes.wintypes import *
 
     # utils functions
@@ -101,9 +101,9 @@ if os.name == 'nt':
     SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1
     SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x2
 
-    SmallProcessInfo = collections.namedtuple(
+    SmallProcessInfo = collections.abc.namedtuple(
         'SmallProcessInfo', 'name pid ppid')
-    SmallThreadInfo = collections.namedtuple('SmallThreadInfo', 'tid pid')
+    SmallThreadInfo = collections.abc.namedtuple('SmallThreadInfo', 'tid pid')
 
     class ProcessEntry32(ctypes.Structure):
         _fields_ = [('dwSize', DWORD),
