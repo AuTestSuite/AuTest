@@ -277,7 +277,7 @@ def main():
         #hosts.output.WriteError("Autest shutdown because of critical error!", exit=False, show_stack=True)
         #ret = 1
 
-    exit(ret)
+    sys.exit(ret)
 
 
 if __name__ == '__main__':

@@ -18,4 +18,4 @@ if __name__ == '__main__':
     except:
         print("Wasn't able to connect to port {0}.".format(port))
         print(sys.exc_info()[0])
-        exit(1)
+        sys.exit(1)
