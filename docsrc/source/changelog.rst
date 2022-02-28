@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+**Release  1.10.1**
+
+* [Fix][`PR #28 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/26>`_] Move collections -> collections.abc for linux cases for 3.10
+* [Fix] Use sys.exit() instead of exit()
+* Clean up testing logic to include 3.10 and pyston
+
 **Release  1.10.0**
 
 * [Feature][`PR #26 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/26>`_] Allows users to do a case-insensitive compare for their gold files by passing case_insensitive=True to Testers.GoldFile.

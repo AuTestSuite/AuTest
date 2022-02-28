@@ -11,6 +11,8 @@ autopep8 = "*"
 sphinx-autodoc-typehints = "*"
 doc8 = "*"
 nox = "*"
+rstcheck = "*"
+esbonio = "*"
 
 [packages]
 autest = {editable = true,path = "."}
