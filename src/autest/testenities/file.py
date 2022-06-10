@@ -77,7 +77,7 @@ class File(TestEntity):
 
         # Bind the tests based on values passed in
 
-        if exists:
+        if exists is not None:
             self.Exists = exists
         if size:
             self.Size = size

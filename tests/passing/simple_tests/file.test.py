@@ -5,6 +5,9 @@ Test.Summary = "Test the existance, size and content of a file"
 t = Test.AddTestRun("stdout")
 
 t.Disk.File("log.txt", exists=True, id="logfile")
+t.Disk.File("Fake.txt", exists=False, id="logfile")
+t.Disk.File("Fake.txt", id="logfile").Exists=False
+
 t.Disk.logfile.Content = "gold/hello.gold"
 if Condition.IsPlatform('win32'):
     t.Command = 'echo Hello >log.txt'
