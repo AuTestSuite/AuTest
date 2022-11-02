@@ -208,16 +208,7 @@ class StreamWriter(object):
         '''
         s = s.decode()
         with self.__lock:
-            if self.cache == []:
-                # cache is empty
-                self.cache.append([StreamWriter.stdout, s])
-            elif self.cache[-1][0] == StreamWriter.stdout:
-                # if last item in cache is the same as the current item, we add
-                # the data
-                self.cache[-1][1] += s
-            else:
-                # there is data but it is of a different type
-                self.cache.append([StreamWriter.stdout, s])
+            self.cache.append([StreamWriter.stdout, s])
 
         # commented out because this makes a giant wall of text
         # host.WriteDebugf(["StreamWriter.WriteStdOut"], "Caching output {0} to [{1}]", s, self.StdOutFile)
@@ -225,16 +216,7 @@ class StreamWriter(object):
     def WriteStdErr(self, s):
         s = s.decode()
         with self.__lock:
-            if self.cache == []:
-                # cache is empty
-                self.cache.append([StreamWriter.stderr, s])
-            elif self.cache[-1][0] == StreamWriter.stderr:
-                # if last item in cache is the same as the current item, we add
-                # the data
-                self.cache[-1][1] += s
-            else:
-                # there is data but it is of a different type
-                self.cache.append([StreamWriter.stderr, s])
+            self.cache.append([StreamWriter.stderr, s])
 
         # commented out because this makes a giant wall of text
         # host.WriteDebugf(["StreamWriter.WriteStdErr"], "Caching output to {0} to {1}", s, self.StdErrFile)
