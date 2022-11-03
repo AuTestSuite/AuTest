@@ -251,7 +251,7 @@ def GenerateReport(info, ):  # args):
                     ResultType.Passed):
         amount = info.stats[resType]
         host.WriteMessage('  {0}: {1}'.format(
-            ResultType.to_string(resType), amount))
+            resType.name, amount))
 
 
 api.RegisterReporter(GenerateReport, name="default")

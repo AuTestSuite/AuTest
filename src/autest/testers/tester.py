@@ -25,17 +25,7 @@ class ResultType(IntEnum):
     Failed = 4
     Exception = 5
 
-    # TODO dynamically generate this?
-    # @classmethod
-    # def to_list():
-    #     return ["Unknown", "Skipped", "Passed", "Warning", "Failed", "Exception"]
 
-    @classmethod
-    def to_string(cls, result: int):
-        for name, value in vars(cls).items():
-            if value == result:
-                return name
-        return "Unknown"
 
     @classmethod
     def to_color_string(cls, result: int):
@@ -60,9 +50,7 @@ class ResultType(IntEnum):
         elif ResultType.Exception == result:
             c = colorama.Fore.RED
 
-        ResultType.to_string(result)
-
-        return colorama.Style.RESET_ALL + c + ResultType.to_string(result) + "{{host.reset-stream}}"
+        return colorama.Style.RESET_ALL + c + result.name + "{{host.reset-stream}}"
 
 
 class Tester(object):

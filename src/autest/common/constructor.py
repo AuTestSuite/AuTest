@@ -32,7 +32,7 @@ def user_map(func_info, argmap, kw):
     to call the function based on what we have in KW
     '''
     ret = {}
-    if func_info.keywords:
+    if func_info.kwonlyargs:
         # we have a kw to pass
         for k, v in kw.items():
             if k != "__arg_map__" and k != "self":
@@ -61,7 +61,7 @@ def map_kw_init(clsname, func_info, kw):
     if arg_map:
         return user_map(func_info, arg_map, kw)
 
-    if func_info.keywords:
+    if func_info.kwonlyargs:
         # we have a kw to pass
         for k, v in kw.items():
             if k != arg_map:
@@ -124,7 +124,8 @@ def call_base(**kw):
             cls = init_wrapper.__cls__
 
             # map all argument to kw for easy passing
-            kw = map_kw(cls, inspect.getargspec(func), lst, kw)
+            #kw = map_kw(cls, inspect.getargspec(func), lst, kw)
+            kw = map_kw(cls, inspect.getfullargspec(func), lst, kw)
             try:
                 # map in the __init__ argments we want to pass based on class
                 # type
@@ -139,7 +140,7 @@ def call_base(**kw):
                 kw["__arg_map__"] = arg_map.copy()
             # get the arguments we need to get for the current class __init__
             # call
-            init_kw = map_kw_init(cls.__name__, inspect.getargspec(func), kw)
+            init_kw = map_kw_init(cls.__name__, inspect.getfullargspec(func), kw)
             # get next init function to make sure we can pass **kw to it
             # the python object does not allow for this
             tmp = _next_class(type(lst[0]), cls)
