@@ -62,6 +62,8 @@ The Reusable Gold testing system is not about making another unit testing framew
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: 3.11',
           'Topic :: Software Development :: Testing',
           'Topic :: Terminals',
       ],

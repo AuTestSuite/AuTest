@@ -1,9 +1,15 @@
 Release Notes
 =============
+**Release  1.10.2**
+
+* [Fix][`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/29>`_] Improve StreamWriter performance
+* [Fix] Exists test for file enities did not work correctly when setting False value in constructor
+* Clean up testing logic to include 3.11
+* [Fix] Change to using inspect.getfullargspec() api as older API has been removed from python core 
 
 **Release  1.10.1**
 
-* [Fix][`PR #28 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/26>`_] Move collections -> collections.abc for linux cases for 3.10
+* [Fix][`PR #28 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/28>`_] Move collections -> collections.abc for linux cases for 3.10
 * [Fix] Use sys.exit() instead of exit()
 * Clean up testing logic to include 3.10 and pyston
 
