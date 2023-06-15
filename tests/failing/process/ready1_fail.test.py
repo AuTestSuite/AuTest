@@ -6,7 +6,7 @@ tr = Test.AddTestRun()
 s = tr.Processes.Process("server", "python server --time=1 --port 8080", returncode=None)
 # set bad port so we will fail
 s.Ready = When.PortOpen(8090)
-# setting time explict to a smaller time value
+# setting time explicit to a smaller time value
 s.StartupTimeout = 1
 # should never run
 tr.Command = "curl 127.0.0.1:8080"

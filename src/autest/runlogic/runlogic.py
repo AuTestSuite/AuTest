@@ -171,14 +171,12 @@ class RunLogic(object):
                             typename, ready_item.object.
                             Name), 'Process finished before it was ready'
                     # test that the process started in the time needed
-                    if ready_item.object.StartupTimeout < ready_item.object._readyTime(
-                            time.time()):
+                    curr_temp=ready_item.object._readyTime(time.time())
+                    if ready_item.object.StartupTimeout < curr_temp:
                         self.StopItems(started_items)
                         return (
-                            "Checking that {0} is ready within {1} seconds so we can start process: {2}".
-                            format(typename, ready_item.object.StartupTimeout,
-                                   next_item.Name),
-                            "Process failed to become ready in time")
+                            f"Checking that {typename} is ready within {ready_item.object.StartupTimeout} seconds so we can start process: {next_item.Name}",
+                            f"Process failed to become ready in time: {ready_item.object.StartupTimeout} seconds. Waited {curr_temp} seconds")
                     # poll other items
                     for f in started_items:
                         if f.isRunning():
