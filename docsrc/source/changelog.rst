@@ -1,5 +1,10 @@
 Release Notes
 =============
+**Release  1.10.3**
+
+* [Fix][`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/30>`_] PortOpen: change default address_family to inet
+* [Fix][`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/31>`_] Add ip6-localhost to PortReady resolution
+
 **Release  1.10.2**
 
 * [Fix][`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/29>`_] Improve StreamWriter performance
