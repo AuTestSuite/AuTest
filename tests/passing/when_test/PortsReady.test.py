@@ -9,7 +9,7 @@ port2 = 8788
 tr = Test.AddTestRun("Curl to server")
 tr.Processes.Process("server", "python delaySocket -p {port} {port2}".format(port=port, port2=port2))
 tr.Processes.server.Ready = When.PortsReady([port, port2])
-tr.Processes.server.StartupTimeout = 30 # need more time in cases of dns issues.
+#tr.Processes.server.StartupTimeout = 30 # need more time in cases of dns issues.
 
 tr.Command = "python testport -p {0} {1}".format(port, port2)
 tr.Processes.Default.ReturnCode = 0

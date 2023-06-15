@@ -163,7 +163,7 @@ def PortReady(port: int, address: Optional[str] = None, timeout: Optional[float]
     is_ready = False
 
     if address is None:
-        addresses = ["localhost", "ip6-localhost"]
+        addresses = ["127.0.0.1", "[::1]"]
     else:
         addresses = [address]
 
