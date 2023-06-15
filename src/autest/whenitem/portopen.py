@@ -42,7 +42,7 @@ def PortsReady(ports: List[int]):
     return all(port_lst)
 
 
-def PortOpen(port: int, address: Optional[str] = None, timeout: Optional[int] = None, address_family: str = "inet4"):
+def PortOpen(port: int, address: Optional[str] = None, timeout: Optional[int] = None, address_family: str = 'inet'):
     '''
 
     Checks to see if a port is open. This function is more like a stat test in that no traffic happens.
@@ -59,7 +59,9 @@ def PortOpen(port: int, address: Optional[str] = None, timeout: Optional[int] = 
         timeout:
             How long to wait before timing out. Ignored unless code falls back to PortReady call.
         address_family:
-            The family of space to use. Checks the IPv4 space by default.
+            The family of space to use. Checks both IPv4 and Ipv6 spaces by default ('inet'). For
+            the possible values of this string, see the "kind" parameter to
+            psutil.net_connections().
 
     Examples:
 
