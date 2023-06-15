@@ -136,14 +136,14 @@ def PortOpenv6(port: int, address: Optional[str] = None, timeout: Optional[int] 
     return PortOpen(port=port, address=address, timeout=timeout, address_family='inet6')
 
 
-def PortReady(port: int, address: Optional[str] = None, timeout: Optional[float] = None):
+def PortReady(port: int, address: Optional[str] = None, timeout: Optional[float] = None) -> bool:
     '''
-    Detect that the port is open via trying to connect the address and port.
+    Detect whether the port is open via trying to connect the address and port.
     This causes some traffic on the host of the port, however this also means that the
     host is more likely to be ready to get traffic.
 
     Note:
-        This does not mean the host is "ready". In such cases a different test of state maybe
+        This does not mean the host is "ready". In such cases a different test of state may be
         needed, such as sending a test packet/message of some kind that the application understand
         and can send a response to
 
@@ -151,34 +151,44 @@ def PortReady(port: int, address: Optional[str] = None, timeout: Optional[float]
         port:
             The port to check.
         address:
-            The address to bind to.
+            The address to bind to. If not specified, both localhost and ip6-localhost will
+            be checked.
         timeout:
             How long to wait before timing out. Ignored unless code falls back to PortReady call.
 
     '''
 
-    ret = False
+    is_ready = False
 
     if address is None:
-        address = "localhost"
-    if timeout is None:
-        timeout = .5
-    iaddress = (address, port)
-    soc: Optional[socket.socket]
-    try:
-        soc = socket.create_connection(iaddress, timeout=timeout)
-        soc.close()
-        ret = True
-    except socket.error:
-        soc = None
+        addresses = ["localhost", "ip6-localhost"]
+    else:
+        addresses = [address]
+
+    # A helper function to check if a port is ready per address.
+    def _portready(port: int, address: str, timeout: Optional[float] = None) -> bool:
         ret = False
-    except socket.timeout:
-        soc = None
-    host.WriteDebug(["portReady", "when"],
-                    "checking port {0} = {1}".format(port, ret))
+        if timeout is None:
+            timeout = .5
+        iaddress = (address, port)
+        soc: Optional[socket.socket]
+        try:
+            soc = socket.create_connection(iaddress, timeout=timeout)
+            soc.close()
+            ret = True
+        except socket.error:
+            soc = None
+            ret = False
+        host.WriteDebug(["portReady", "when"],
+                        f"checking port is ready {address}:{port}: {ret}")
+        return ret
 
-    return ret
+    for address in addresses:
+        is_ready = _portready(port, address, timeout)
+        if is_ready:
+            break
 
+    return is_ready
 
 AddWhenFunction(PortsOpen)
 AddWhenFunction(PortsReady)
