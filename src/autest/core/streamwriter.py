@@ -1,9 +1,8 @@
 import os
 import re
-import sys
 import threading
 import traceback
-from typing import Dict
+from typing import Dict, IO
 
 import hosts.output as host
 
@@ -37,14 +36,14 @@ class PipeRedirector(object):
 #            self.writer(i)
 #            host.WriteDebug(['process_output'],i,end='')
 
-    def __init__(self, pipein, writer):
+    def __init__(self, pipein:IO[str], writer:'StreamWriter'):
         self.pipein = pipein
         self.writer = writer
         self.thread = threading.Thread(
             target=self._readerthread,
             args=()
         )
-        self.executing = True
+        self.executing:bool = True
         self.thread.start()
 
     def close(self):
@@ -175,19 +174,19 @@ class StreamWriter(object):
     def gen_fish_script(self):
         pass
 
-    def gen_bash_script(self, cmd: str, env: Dict[str, str]):
+    def gen_bash_script(self, cmd: str, env: Dict[str, str]) -> str:
         ret = "#!/bin/bash\n"
         ret += self.gen_set_env(env, "export {0}=\"{1}\"\n")
         ret += cmd + "\n"
         return ret
 
-    def gen_set_env(self, env, set_str):
+    def gen_set_env(self, env, set_str:str) -> str:
         ret = "\n"
         for k, v in env.items():
             ret += set_str.format(k, v)
         return ret
 
-    def _smart_match(self, str):
+    def _smart_match(self, str:str) -> bool:
         if is_error(str):
             self.errorfile.write(str.encode("utf-8"))
             return True
@@ -202,7 +201,7 @@ class StreamWriter(object):
             return True
         return False
 
-    def WriteStdOut(self, s):
+    def WriteStdOut(self, s:str) -> None:
         '''
         store the data in the cache of all outputted data
         '''
@@ -213,7 +212,7 @@ class StreamWriter(object):
         # commented out because this makes a giant wall of text
         # host.WriteDebugf(["StreamWriter.WriteStdOut"], "Caching output {0} to [{1}]", s, self.StdOutFile)
 
-    def WriteStdErr(self, s):
+    def WriteStdErr(self, s:str) -> None:
         s = s.decode()
         with self.__lock:
             self.cache.append([StreamWriter.stderr, s])
@@ -221,7 +220,7 @@ class StreamWriter(object):
         # commented out because this makes a giant wall of text
         # host.WriteDebugf(["StreamWriter.WriteStdErr"], "Caching output to {0} to {1}", s, self.StdErrFile)
 
-    def Close(self):
+    def Close(self) -> None:
         # write out files
         host.WriteDebugf(["StreamWriter.Close"], "Emptying cache and closing streamwriter")
         self._empty_cache()
