@@ -207,22 +207,34 @@ class StreamWriter(object):
         '''
         s = s.decode()
         with self.__lock:
-            self.cache.append([StreamWriter.stdout, s])
+            if self.cache and self.cache[-1][0] == StreamWriter.stdout:
+                # if last item in cache is the same as the current item, we add
+                # the data
+                self.cache[-1][1].append(s)
+            else:
+                # there is data but it is of a different type
+                self.cache.append([StreamWriter.stdout, [s]])
 
         # commented out because this makes a giant wall of text
-        # host.WriteDebugf(["StreamWriter.WriteStdOut"], "Caching output {0} to [{1}]", s, self.StdOutFile)
+        #host.WriteDebugf(["StreamWriter.WriteStdOut",'StreamWriter'], "Caching output {0} to [{1}]", s, self.StdOutFile)
 
     def WriteStdErr(self, s:str) -> None:
         s = s.decode()
         with self.__lock:
-            self.cache.append([StreamWriter.stderr, s])
+            if self.cache and self.cache[-1][0] == StreamWriter.stderr:
+                # if last item in cache is the same as the current item, we add
+                # the data
+                self.cache[-1][1].append(s)
+            else:
+                # there is data but it is of a different type
+                self.cache.append([StreamWriter.stderr, [s]])
 
         # commented out because this makes a giant wall of text
         # host.WriteDebugf(["StreamWriter.WriteStdErr"], "Caching output to {0} to {1}", s, self.StdErrFile)
 
     def Close(self) -> None:
         # write out files
-        host.WriteDebugf(["StreamWriter.Close"], "Emptying cache and closing streamwriter")
+        #host.WriteDebugf(["StreamWriter.Close","StreamWriter"], "Emptying cache and closing streamwriter")
         self._empty_cache()
         # close file handles
         self.both.close()
@@ -241,43 +253,27 @@ class StreamWriter(object):
         self.debugfile = None
 
     def _write(self, text, stream):
-
-        brkup = text[1].split('\n')
+        brkup = text[1]#.split('\n')
         grpstr = ''  # the string we will write out
 
         # number of items we have
         break_size = len(brkup) - 1
         for cnt, s in enumerate(brkup):
-            if cnt < break_size:
-                # we did not assign anything yet
-                if grpstr == '':
-                    # add a newline
-                    grpstr = s + '\n'
-                elif s and (s[0] == ' ' or s[0] == '\t'):  # group indented text
-                    grpstr += s + '\n'
-                else:
-                    # write out what we have
-                    self.both.write(grpstr.encode("utf-8"))
-                    self._smart_match(grpstr)
-                    stream.write(grpstr.encode("utf-8"))
-                    # reset string to new data
-                    grpstr = s + '\n'
-
+            
+            # we are at the end
+            # we did not assign anything yet
+            if grpstr == '':
+                # add a newline
+                grpstr = s
+            elif s and (s[0] == ' ' or s[0] == '\t'):  # group indented text
+                grpstr += s
             else:
-                # we are at the end
-                # we did not assign anything yet
-                if grpstr == '':
-                    # add a newline
-                    grpstr = s
-                elif s and (s[0] == ' ' or s[0] == '\t'):  # group indented text
-                    grpstr += s
-                else:
-                    # write out what we have
-                    self.both.write(grpstr.encode("utf-8"))
-                    self._smart_match(grpstr)
-                    stream.write(grpstr.encode("utf-8"))
-                    # reset string to new data
-                    grpstr = s
+                # write out what we have
+                self.both.write(grpstr.encode("utf-8"))
+                self._smart_match(grpstr)
+                stream.write(grpstr.encode("utf-8"))
+                # reset string to new data
+                grpstr = s
 
         # write out last piece of data
         if grpstr:
