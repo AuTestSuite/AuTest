@@ -105,7 +105,7 @@ class SetupItem(object):
         # the command line we will run. We add the RunDirectory to the start of the command
         # to avoid having to deal with cwddir() issues
         command_line = "cd {0} && {1}".format(self.SandBoxDir, cmd)
-        # subsitute the value of the string via the template engine
+        # substitute the value of the string via the template engine
         # as this provide a safe cross platform $subst model.
         template = string.Template(command_line)
         command_line = template.substitute(self.ComposeEnv())

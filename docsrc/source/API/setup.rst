@@ -180,3 +180,48 @@ These items will be listed below in the form of **<namespace>.<method>** to help
 
     :arg str sub_dir:
         A subdirectory under the repository to import data to, for example, "truck", or "branch"
+
+.. py:method:: Setup.Git.CreateRepository(name)
+
+    Create a Git repository within a directory with the value of "name".
+    
+    :arg str name:
+        The name of the Git repo to create.
+        This will be the name of the directory created under the sandbox directory.
+
+    **Example**
+
+    This will create a repo under the sandbox directory called "myrepo"
+
+    .. code:: python
+
+        Setup.CreateRepository("myrepo")
+
+.. py:method:: Setup.Git.ImportDirectory(name, dir_to_add, sub_dir='')
+
+    Import data to the named Git repo. The repo has to be created first.
+
+    :arg str name:
+        The name of the Git repo to import to.
+        Should be the same value used by CreateRepository()
+
+    :arg str dir_to_add:
+        The directory to import into the repository.
+
+    :arg str sub_dir:
+        A subdirectory under the repository to import data to
+
+    **Example**
+
+    This will import all files in a give directory to the root of the Git repo name "myrepo"
+
+    .. code:: python
+
+        Setup.ImportDirectory("myrepo", "mydir")
+
+    This will import all files in a give directory to the subdirectory "truck" of the Git repo name "myrepo"
+
+    .. code:: python
+
+        Setup.ImportDirectory("myrepo", "mydir", "truck")
+        

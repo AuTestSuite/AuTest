@@ -1,5 +1,6 @@
 
 from . import svn
+from . import git
 from . import copy_items
 from . import copyas
 from . import makedir
