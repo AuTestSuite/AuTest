@@ -1,5 +1,10 @@
 Release Notes
 =============
+**Release  1.10.5**
+
+* Add basic setup logic for git repos
+* Add documentation for git setup
+
 **Release  1.10.4**
 
 * [Fix] correct logic for stream redirection that resulted for [`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/29>`_] that prevented the stream from being redirected correctly
