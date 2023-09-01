@@ -11,8 +11,8 @@ Release Notes
 
 **Release  1.10.3**
 
-* [Fix][`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/30>`_] PortOpen: change default address_family to inet
-* [Fix][`PR #29 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/31>`_] Add ip6-localhost to PortReady resolution
+* [Fix][`PR #30 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/30>`_] PortOpen: change default address_family to inet
+* [Fix][`PR #31 <https://bitbucket.org/autestsuite/reusable-gold-testing-system/pull-requests/31>`_] Add ip6-localhost to PortReady resolution
 * updated a verbose message for timeout for a process to become ready when it fails to provide more detail
 
 **Release  1.10.2**
