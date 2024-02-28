@@ -153,7 +153,7 @@ class RunLogic(object):
                                         ready_item.object.Name
                                     ), "Test run stopped because Kill On Failure from {0}".format(
                                         f.Name)
-                        delay_time = time - time.time() - delay_start
+                        delay_time = time.time() - delay_start
 
                 while not isReady:
                     isReady = self.isReady(ready_item, hasRunFor)
