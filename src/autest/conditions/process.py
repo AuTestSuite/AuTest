@@ -188,7 +188,7 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         msg: The message to print about the condition.
         output_parser:
             Optional callback function that can be used retrieve the version.
-            The default function run a regular expression of "(?P<ver>\d+\.\d+(?:\.\d+)*)"
+            The default function run a regular expression of "(?P<ver>\\d+\\.\\d+(?:\\.\\d+)*)"
             If this does not work for the application being tested a custom function can be provided here.
             The function will be given a string of the out of the command to parse.
             It has to return back a string with the version value in it or None is it failed to parse the value.

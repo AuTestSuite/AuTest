@@ -119,7 +119,7 @@ class Version(object):
 
     __slots__ = ["ver", "parts", "matches", '__weakref__']
 
-    __re = re.compile("(\d*)(\D*)(.*)")
+    __re = re.compile(r"(\d*)(\D*)(.*)")
 
     def __init__(self, ver=None, *args):
         '''
