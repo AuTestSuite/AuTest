@@ -13,8 +13,7 @@ Testable properties:
 
 These are the testable properties of the file object.
 
-.. py:method:: Exists
-    :property:
+.. py:attribute:: Exists
 
     Test that the Directory exists or does not exist. If set to None no test will happen
 
@@ -35,8 +34,7 @@ These are the testable properties of the file object.
         f.Exists = True
 
 
-.. py:method:: Size
-    :property:
+.. py:attribute:: Size
 
     Test that the size is equal the value provided
 
@@ -64,8 +62,7 @@ These are the testable properties of the file object.
         f = tr.Disk.File("some.data")
         f.Size = Testers.LessThan(1096)
 
-.. py:method:: Content
-    :property:
+.. py:attribute:: Content
 
     Test that the content matches the provided gold file
 
@@ -84,4 +81,5 @@ These are the testable properties of the file object.
         tr = Test.AddTestRun()
         f = tr.Disk.File("out.data")
         f.Content = "gold/content.gold"
+
 

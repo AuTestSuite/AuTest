@@ -10,8 +10,7 @@ Defines a system process that can run as part of the test.
     :inherited-members:
 
 .. FIX ME!!
-.. py:method:: Streams
-    :property:
+.. py:attribute:: Streams
 
     An object that defines a number of streams and virtual streams of the process.
     See Streams for more information.
@@ -19,8 +18,7 @@ Defines a system process that can run as part of the test.
 Testable properties:
 --------------------
 
-.. py:method:: ReturnCode
-    :property:
+.. py:attribute:: ReturnCode
 
     Test that the return code equals to the expected value.
     If None, it is expected the process will be killed and will not be able to return a value.
@@ -32,8 +30,7 @@ Testable properties:
     : Integer
 
 
-.. py:method:: Time
-    :property:
+.. py:attribute:: Time
 
     Test that the process finished within the time in seconds provided by default.
     This does not kill the process.
@@ -46,8 +43,7 @@ Testable properties:
     : float
 
 
-.. py:method:: TimeOut
-    :property:
+.. py:attribute:: TimeOut
 
     Stops the process if the process is still running after the time provided in seconds by default.
 
@@ -56,6 +52,7 @@ Testable properties:
 
     **Default type**
     : float
+
 
 
 

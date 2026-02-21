@@ -1,5 +1,13 @@
 Release Notes
 =============
+**Release  1.10.6**
+
+* Migrate to modern pyproject.toml configuration (PEP 517/518)
+* Add uv support for dependency management
+* Update testing to Python 3.11-3.15
+* Move to using GitHub for hosting and development
+* Update documentation links to GitHub
+
 **Release  1.10.5**
 
 * Add basic setup logic for git repos

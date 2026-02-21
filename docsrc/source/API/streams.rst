@@ -24,8 +24,7 @@ By default each property will set a tester object or str to the File.Content tes
 Testable properties:
 --------------------
 
-.. py:method:: stdout
-    :property:
+.. py:attribute:: stdout
 
     Tests the output from stdout matches a gold file.
 
@@ -35,8 +34,7 @@ Testable properties:
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
 
-.. py:method:: stderr
-    :property:
+.. py:attribute:: stderr
 
     Tests the output from stderr matches a gold file.
 
@@ -46,8 +44,7 @@ Testable properties:
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
 
-.. py:method:: All
-    :property:
+.. py:attribute:: All
 
     Tests the mixed output of stdout and stderr matches a gold file.
     Should be what we see on the console.
@@ -59,8 +56,7 @@ Testable properties:
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
 
-.. py:method:: Debug
-    :property:
+.. py:attribute:: Debug
 
     A virtual stream that tests the output that is filtered to contain the Debug information.
     The stream will search for a pattern of `'^debug: '` or `'^debug: '`.
@@ -71,8 +67,7 @@ Testable properties:
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
 
-.. py:method:: Verbose
-    :property:
+.. py:attribute:: Verbose
 
     Tests the output that is filtered to contain the Verbose information.
     The stream will search for a pattern of `'^verbose: '`.
@@ -83,8 +78,7 @@ Testable properties:
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
 
-.. py:method:: Warning
-    :property:
+.. py:attribute:: Warning
 
     Tests the output that is filtered to contain the Warning information.
     The stream will search for a pattern of `'(\A|\s)warning?\s?(([?!: ])|(\.\s))\D'`.
@@ -95,8 +89,7 @@ Testable properties:
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
 
-.. py:method:: Error
-    :property:
+.. py:attribute:: Error
 
     Tests the output that is filtered to contain the Error information.
     The stream will search for a pattern of `'(\A|\s)error?\s?(([?!: ])|(\.\s))\D'` or `'fail$'`.
@@ -106,4 +99,5 @@ Testable properties:
 
     **Default type**
     : string - file name of the gold file. Path is relative from the location of the test file.
+
 

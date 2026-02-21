@@ -12,8 +12,7 @@ Testable properties:
 
 These are the testable properties of the directory object.
 
-.. py:method:: Exists
-    :property:
+.. py:attribute:: Exists
 
     Test that the Directory exists or does not exist. If set to None no test will happen
 
@@ -32,4 +31,5 @@ These are the testable properties of the directory object.
         tr = Test.AddTestRun()
         d = tr.Disk.Directory("logs/plugins")
         d.Exists = True
+
 
