@@ -13,8 +13,7 @@ It is created via calling the Test.AddTestRun() function.
 Testable properties:
 --------------------
 
-.. py:method:: StillRunningBefore
-    :property:
+.. py:attribute:: StillRunningBefore
 
     Tests that the process is still running before the test run start running
 
@@ -37,8 +36,7 @@ Testable properties:
         t2 = Test.AddTestRun("server started properly")
         t2.StillRunningBefore=p
 
-.. py:method:: StillRunningAfter
-    :property:
+.. py:attribute:: StillRunningAfter
 
     Tests that the process is still running before the test run start running
 
@@ -59,8 +57,7 @@ Testable properties:
         t1.StillRunningAfter=p
         # ...
 
-.. py:method:: NotRunningBefore
-    :property:
+.. py:attribute:: NotRunningBefore
 
     Tests that the process is not running before the test run start running
 
@@ -70,8 +67,7 @@ Testable properties:
     **Default type**
     : Process object
 
-.. py:method:: NotRunningAfter
-    :property:
+.. py:attribute:: NotRunningAfter
 
     Tests that the process is still running before the test run start running
 
@@ -92,5 +88,6 @@ Testable properties:
         t = Test.AddTestRun("server started properly")
         t.Processes.Default.Command = "kill-server"
         t.NotRunningAfter = p
+
 
 

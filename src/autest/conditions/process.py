@@ -66,18 +66,22 @@ def _RunCommand(self, cmd, name: str, shell: bool):
 def HasPythonPackage(self, package: Union[str, List[str]], msg: str):
     '''
     Returns a condition that test if a python package is installed by calling the current active pip.
+    
     Args:
         package: One or more packages to test for. The input can be a space seperated string or a list.
         msg: The message to print if the packages are not found
+    
     Examples:
-        Test to see if requests is installed.
-        .. code:: python3
+        Test to see if requests is installed::
+        
             Test.SkipUnless(Condition.HasProgram.HasPythonPackage("requests"))
-        Test to see if requests and microserver is installed.
-        .. code:: python3
+        
+        Test to see if requests and microserver is installed::
+        
             Test.SkipUnless(Condition.HasProgram.HasPythonPackage("requests microserver"))
-        or via a list.
-        .. code:: python3
+        
+        or via a list::
+        
             Test.SkipUnless(Condition.HasProgram.HasPythonPackage(["requests","microserver"]))
     '''
     def _check(output):
@@ -172,6 +176,7 @@ def CheckOutput(self, command: str, check_func: Callable[[str], bool], msg: str,
 def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, output_parser: Optional[Callable[[str], Union[str, None]]] = None, shell=False):
     '''
     Returns a condition that will run a command and test the output matches a predefined version match callback.
+    
     Args:
         command:
             The command to run to get the version value
@@ -182,6 +187,7 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         max_version:
             Optional maximum version that we much match.
             If not provided and value greater or equal to the min version will be accepted
+            
             Note:
                 One value for min_version or max_version has to be provided.
                 Both cannot be None.
@@ -195,8 +201,11 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
         pass_value: Value to test for the condition to pass.
         neg_msg: Option message to print if the condition fails.
         shell: Run the command in a shell vs running it without a shell.
-    .. code:: python3
-        Test.SkipIf(Condition.EnsureVersion(['curl','--version']),"7.47.0')
+    
+    Examples:
+        Skip test if curl version is not 7.47.0::
+        
+            Test.SkipIf(Condition.EnsureVersion(['curl','--version']),"7.47.0')
     '''
     has_min = False
     has_max = False
@@ -259,6 +268,7 @@ def EnsureVersion(self, command, min_version=None, max_version=None, msg=None, o
 def HasProgram(self, program: str, msg, pass_value=True, path=None):
     '''
     Returns a condition that will test is a application can be found on the path.
+    
     Args:
         program:
             The program to test for.
