@@ -175,3 +175,4 @@ src/env3.4/
 docsrc/source/_build/
 
 Pipfile.lock
+uv.lock
