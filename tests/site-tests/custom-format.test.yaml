@@ -1,0 +1,4 @@
+summary: Custom YAML test format works
+testrun: Run the custom YAML test
+command: echo custom-yaml-format
+contains: custom-yaml-format

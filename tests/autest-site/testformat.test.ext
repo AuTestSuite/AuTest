@@ -1,0 +1,29 @@
+import os
+
+
+def _load_custom_yaml_test(test):
+    data = {}
+    file_name = os.path.join(test.TestDirectory, test.TestFile)
+
+    with open(file_name) as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line or line.startswith('#'):
+                continue
+            key, value = line.split(':', 1)
+            data[key.strip()] = value.strip()
+
+    test.Summary = data['summary']
+
+    if test.Variables.Autest.Action == 'list':
+        return
+
+    tr = test.AddTestRun(data.get('testrun', 'custom yaml test'))
+    tr.Processes.Default.Command = data['command']
+    tr.Processes.Default.ReturnCode = 0
+    tr.Processes.Default.Streams.stdout = Testers.ContainsExpression(
+        data['contains'],
+        'Custom YAML test loader output is validated')
+
+
+RegisterTestFormat(_load_custom_yaml_test, "custom-yaml-test", ext=['.test.yaml'])

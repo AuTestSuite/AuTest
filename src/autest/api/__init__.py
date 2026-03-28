@@ -4,6 +4,7 @@ from .instance import AddMethodToInstance
 from .reporter import RegisterReporter
 from .setup import AddSetupItem
 from .test import ExtendTest
+from .testformat import RegisterTestFormat
 from .testenity import AddTestEntityMember
 from .testers import AddTester
 from .testrun import ExtendTestRun

@@ -9,3 +9,12 @@ The goal extending AuTest is to allow the ability to customize the system to mak
 to write and run for the different applications and domains.
 
 At this time the system allow extending of..
+
+* Global helper methods and namespaces loaded from ``autest-site``.
+* Testers, setup items, conditions, and runnable-object helpers.
+* Custom test formats via ``RegisterTestFormat(...)`` for non-Python test files.
+
+Custom test formats are discovered by filename suffix. For example, an
+extension can register ``.test.yaml`` and provide a loader callback that
+populates the ``Test`` object directly. These custom formats are available to
+both ``autest run`` and ``autest list``.
