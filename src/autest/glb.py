@@ -30,3 +30,9 @@ reporters: Dict[str, Any] = {}
 FileTypeMap: Dict[str, Any] = {}
 # mapping of file extension to class
 FileExtMap: Dict[str, Any] = {}
+
+# extension for custom test definitions
+# mapping of test format names to loader callbacks
+TestFormatMap: Dict[str, Any] = {}
+# mapping of test filename suffixes to loader callbacks
+TestExtMap: Dict[str, Any] = {}

@@ -27,6 +27,7 @@ class Test(Runable, Order, Item):
                  "__test_runs",
                  "__test_dir",
                  "__test_file",
+                 "__test_loader",
                  "__test_root",
                  "__run_dir",
                  "__result",
@@ -34,7 +35,7 @@ class Test(Runable, Order, Item):
                  "__conditions", ]
 
     @call_base(Runable=(None,), Order=(), Item=(None, "id"))
-    def __init__(self, id, test_dir, test_file, run_root, test_root, env, variables):
+    def __init__(self, id, test_dir, test_file, run_root, test_root, env, variables, test_loader=None):
 
         # additional variables
         self.Variables = variables
@@ -48,6 +49,8 @@ class Test(Runable, Order, Item):
         self.__test_dir = test_dir
         # this is the name of the test file
         self.__test_file = test_file
+        # optional loader used for non-Python test definitions
+        self.__test_loader = test_loader
         # this is the directory we scanned to find this test
         self.__test_root = test_root
         # this is the directory we will run the test in
@@ -200,6 +203,13 @@ class Test(Runable, Order, Item):
         return self.__test_file
 
     @property
+    def TestLoader(self):
+        '''
+        Returns the loader callback for custom test formats.
+        '''
+        return self.__test_loader
+
+    @property
     def TestRoot(self):
         '''
         Returns the root directory in which autest start scanning for tests
@@ -289,6 +299,9 @@ def loadTest(test):
                             test.TestFile)
     host.WriteVerbose(["test_logic", "reading"],
                       'reading test "{0}"'.format(test.Name))
-    execFile(fileName, locals, locals)
+    if test.TestLoader is None:
+        execFile(fileName, locals, locals)
+    else:
+        test.TestLoader(test)
     host.WriteVerbose(["test_logic", "reading"],
                       'Done reading test "{0}"'.format(test.Name))

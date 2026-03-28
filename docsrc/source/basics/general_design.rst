@@ -6,6 +6,7 @@ What makes up a test
 ====================
 
 The basics of defining a test are creating a text file that ends with ".test" or ".test.py".
+Extensions loaded from ``autest-site`` may also register additional test file suffixes.
 This file should be added under a root directory that should hold all defined tests.
 
 .. tip::
@@ -200,4 +201,3 @@ When running the test program "autest" results in these steps:
 #.   Report out the results via the default or user-provided reporter objects.
 
 Various options and features exist to help control the running test.
-

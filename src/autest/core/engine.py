@@ -92,6 +92,7 @@ class Engine(object):
             # add expected API function so they can be called
             _locals = {
                 'RegisterFileType': api.RegisterFileType,
+                'RegisterTestFormat': api.RegisterTestFormat,
                 'AddTestRunSet': api.ExtendTest,  # backward compat
                 'ExtendTest': api.ExtendTest,
                 'ExtendTestRun': api.ExtendTestRun,
@@ -135,6 +136,18 @@ class Engine(object):
 
             sys.path = old_path
 
+    def _match_test_file(self, filename):
+        if filename.endswith('.test.py'):
+            return (filename[:-len('.test.py')], None)
+        if filename.endswith(".test"):
+            return (filename[:-len('.test')], None)
+
+        for ext in sorted(glb.TestExtMap.keys(), key=len, reverse=True):
+            if filename.endswith(ext):
+                return (filename[:-len(ext)], glb.TestExtMap[ext])
+
+        return (None, None)
+
     def _scan_for_tests(self):
         # scan for tests in and under the provided test directory
         for root, dirs, files in os.walk(self.__test_dir):
@@ -147,30 +160,28 @@ class Engine(object):
             # same name that
             # was loaded at a later time.
             for f in files:
-                if f.endswith('.test.py') or f.endswith(".test"):
-                    if f.endswith('.test.py'):
-                        name = f[:-len('.test.py')]
-                    else:
-                        name = f[:-len('.test')]
+                name, loader = self._match_test_file(f)
+                if name is None:
+                    continue
 
-                    for filter in self.__filters:
-                        if not filter.startswith("*"):
-                            filter = "*" + filter
-                        if fnmatch(os.path.join(root, name), filter):
-                            # we have a match, use this test
-                            break
-                    else:
-                        # did not get a match
-                        host.WriteVerbose("test_scan", "   Skipping test",
-                                          name)
-                        continue
-                    if name in self.__tests:
-                        host.WriteWarning("overiding test", name,
-                                          "with test in", root)
-                    host.WriteVerbose("test_scan", "   Found test", name)
-                    self.__tests[name] = test.Test(
-                        name, root, f, self.__run_dir, self.__test_dir,
-                        self.__ENV, self.__variables)
+                for filter in self.__filters:
+                    if not filter.startswith("*"):
+                        filter = "*" + filter
+                    if fnmatch(os.path.join(root, name), filter):
+                        # we have a match, use this test
+                        break
+                else:
+                    # did not get a match
+                    host.WriteVerbose("test_scan", "   Skipping test",
+                                      name)
+                    continue
+                if name in self.__tests:
+                    host.WriteWarning("overiding test", name,
+                                      "with test in", root)
+                host.WriteVerbose("test_scan", "   Found test", name)
+                self.__tests[name] = test.Test(
+                    name, root, f, self.__run_dir, self.__test_dir,
+                    self.__ENV, self.__variables, test_loader=loader)
 
     def _run_tests(self):
         if self.__jobs > 1:
@@ -259,6 +270,8 @@ class Engine(object):
         return result
 
     def __list(self):
+        host.WriteVerbose("engine", "Loading Extensions")
+        self._load_extensions()
         host.WriteVerbose("engine", "Scanning for tests")
         self._scan_for_tests()
         if not self.__tests:
